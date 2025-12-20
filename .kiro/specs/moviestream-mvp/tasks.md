@@ -56,19 +56,19 @@ This implementation plan breaks down the MovieStream MVP into incremental coding
     - **Property 34: Recently Viewed Persistence**
     - **Validates: Requirements 7.3, 14.3**
 
-- [ ] 3. State Management
-  - [ ] 3.1 Create Zustand stores
+- [x] 3. State Management
+  - [x] 3.1 Create Zustand stores
     - Create stores/watchlistStore.ts with add/remove/toggle actions
     - Create stores/downloadsStore.ts with queue management
     - Create stores/preferencesStore.ts with theme/language/analytics settings
     - Create stores/recentlyViewedStore.ts with add/get actions
     - _Requirements: 7.2, 8.2, 9.2, 14.1_
 
-  - [ ] 3.2 Write property tests for watchlist store
+  - [x] 3.2 Write property tests for watchlist store
     - **Property 16: Watchlist Toggle**
     - **Validates: Requirements 7.2**
 
-  - [ ] 3.3 Write property tests for recently viewed store
+  - [x] 3.3 Write property tests for recently viewed store
     - **Property 33: Recently Viewed Limit**
     - **Property 35: Recently Viewed Row Visibility**
     - **Validates: Requirements 14.1, 14.4**
