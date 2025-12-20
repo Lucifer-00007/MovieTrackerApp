@@ -230,8 +230,8 @@ This implementation plan breaks down the MovieStream MVP into incremental coding
     - Navigate to Country Hub on selection
     - _Requirements: 3.1_
 
-- [ ] 13. Search Implementation
-  - [ ] 13.1 Create Search screen
+- [x] 13. Search Implementation
+  - [x] 13.1 Create Search screen
     - Implement app/(tabs)/search.tsx with search input
     - Add 300ms debounce for instant suggestions
     - Group results by Content_Type (movies, TV)
@@ -239,20 +239,20 @@ This implementation plan breaks down the MovieStream MVP into incremental coding
     - Handle empty results with suggestions
     - _Requirements: 6.1, 6.2, 6.3, 6.4, 6.5, 6.6_
 
-  - [ ] 13.2 Write property tests for search
+  - [x] 13.2 Write property tests for search
     - **Property 14: Search Results Grouping**
     - **Property 15: Search Filter Application**
     - **Validates: Requirements 6.3, 6.4**
 
-- [ ] 14. Watchlist Implementation
-  - [ ] 14.1 Create Watchlist screen
+- [x] 14. Watchlist Implementation
+  - [x] 14.1 Create Watchlist screen
     - Implement watchlist grid in app/(tabs)/profile.tsx or dedicated screen
     - Display all saved titles in grid layout
     - Add remove functionality with immediate UI update
     - Implement sync status indicators
     - _Requirements: 7.4, 7.5, 7.6_
 
-  - [ ] 14.2 Write property tests for watchlist display
+  - [x] 14.2 Write property tests for watchlist display
     - **Property 17: Watchlist Grid Display**
     - **Validates: Requirements 7.4**
 
