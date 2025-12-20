@@ -193,15 +193,15 @@ This implementation plan breaks down the MovieStream MVP into incremental coding
     - Add season/episode information display
     - _Requirements: 4.2_
 
-- [ ] 10. Trailer Playback
-  - [ ] 10.1 Implement trailer player
+- [x] 10. Trailer Playback
+  - [x] 10.1 Implement trailer player
     - Create components/media/TrailerPlayer.tsx with expo-av
     - Add play/pause, seek, fullscreen controls
     - Implement app/trailer/[key].tsx fullscreen route
     - Handle trailer unavailable state
     - _Requirements: 5.1, 5.2, 5.3, 5.4, 5.5_
 
-  - [ ] 10.2 Write property tests for trailer visibility
+  - [x] 10.2 Write property tests for trailer visibility
     - **Property 13: Trailer Button Visibility**
     - **Validates: Requirements 5.1, 5.5**
 

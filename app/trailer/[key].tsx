@@ -1,39 +1,61 @@
-import { StyleSheet, View, Text, Pressable } from 'react-native';
+/**
+ * Fullscreen Trailer Screen
+ * Plays YouTube trailers in fullscreen mode
+ * Returns to previous screen when video ends or user closes
+ * 
+ * Requirements: 5.1, 5.2, 5.3, 5.4, 5.5
+ */
+
+import { useCallback } from 'react';
+import { StyleSheet, View, StatusBar } from 'react-native';
 import { useLocalSearchParams, router } from 'expo-router';
-import { useColorScheme } from '@/hooks/use-color-scheme';
-import { Colors, Spacing, Typography } from '@/constants/theme';
-import { IconSymbol } from '@/components/ui/icon-symbol';
+
+import { TrailerPlayer } from '@/components/media';
 
 export default function TrailerScreen() {
   const { key } = useLocalSearchParams<{ key: string }>();
-  const colorScheme = useColorScheme() ?? 'light';
-  const colors = Colors[colorScheme];
+
+  // Handle video end - return to detail page
+  const handleVideoEnd = useCallback(() => {
+    router.back();
+  }, []);
+
+  // Handle close button press
+  const handleClose = useCallback(() => {
+    router.back();
+  }, []);
+
+  // Handle error
+  const handleError = useCallback((error: string) => {
+    console.error('Trailer playback error:', error);
+  }, []);
+
+  // If no video key, show error state via TrailerPlayer
+  if (!key) {
+    return (
+      <View style={styles.container}>
+        <StatusBar hidden />
+        <TrailerPlayer
+          videoKey=""
+          autoPlay={false}
+          onClose={handleClose}
+          testID="trailer-player"
+        />
+      </View>
+    );
+  }
 
   return (
-    <View style={[styles.container, { backgroundColor: colors.background }]}>
-      <View style={styles.header}>
-        <Pressable
-          onPress={() => router.back()}
-          style={styles.closeButton}
-          accessibilityLabel="Close trailer"
-          accessibilityRole="button"
-        >
-          <IconSymbol name="xmark" size={24} color="#FFFFFF" />
-        </Pressable>
-      </View>
-      
-      <View style={styles.playerContainer}>
-        <View style={[styles.playerPlaceholder, { backgroundColor: colors.backgroundSecondary }]}>
-          <IconSymbol name="play.fill" size={48} color={colors.textSecondary} />
-          <Text style={[styles.title, { color: colors.text }]}>Trailer Player</Text>
-          <Text style={[styles.subtitle, { color: colors.textSecondary }]}>
-            Video key: {key}
-          </Text>
-          <Text style={[styles.hint, { color: colors.textMuted }]}>
-            Video player will be implemented here
-          </Text>
-        </View>
-      </View>
+    <View style={styles.container}>
+      <StatusBar hidden />
+      <TrailerPlayer
+        videoKey={key}
+        autoPlay={true}
+        onVideoEnd={handleVideoEnd}
+        onClose={handleClose}
+        onError={handleError}
+        testID="trailer-player"
+      />
     </View>
   );
 }
@@ -41,50 +63,6 @@ export default function TrailerScreen() {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-  },
-  header: {
-    position: 'absolute',
-    top: 0,
-    left: 0,
-    right: 0,
-    zIndex: 10,
-    flexDirection: 'row',
-    justifyContent: 'flex-end',
-    padding: Spacing.md,
-  },
-  closeButton: {
-    minWidth: 44,
-    minHeight: 44,
-    alignItems: 'center',
-    justifyContent: 'center',
-    backgroundColor: 'rgba(0, 0, 0, 0.5)',
-    borderRadius: 22,
-  },
-  playerContainer: {
-    flex: 1,
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
-  playerPlaceholder: {
-    width: '90%',
-    aspectRatio: 16 / 9,
-    borderRadius: 12,
-    alignItems: 'center',
-    justifyContent: 'center',
-    padding: Spacing.lg,
-  },
-  title: {
-    fontSize: Typography.sizes.xl,
-    fontWeight: Typography.weights.bold,
-    marginTop: Spacing.md,
-    marginBottom: Spacing.sm,
-  },
-  subtitle: {
-    fontSize: Typography.sizes.md,
-    marginBottom: Spacing.xs,
-  },
-  hint: {
-    fontSize: Typography.sizes.sm,
-    textAlign: 'center',
+    backgroundColor: '#000000',
   },
 });

@@ -20,3 +20,14 @@ export type { HeroCarouselProps } from './HeroCarousel';
 
 export { ContentRow } from './ContentRow';
 export type { ContentRowProps } from './ContentRow';
+
+export { TrailerPlayer } from './TrailerPlayer';
+export type { TrailerPlayerProps, TrailerPlayerState } from './TrailerPlayer';
+export {
+  getYouTubeEmbedUrl,
+  formatTime,
+  calculateProgress,
+  shouldShowTrailerButton,
+  isValidVideoKey,
+  calculateSeekPosition,
+} from './trailer-utils';
