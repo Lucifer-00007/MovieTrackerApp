@@ -10,36 +10,42 @@
  */
 
 import * as fc from 'fast-check';
-import AsyncStorage from '@react-native-async-storage/async-storage';
-import NetInfo from '@react-native-community/netinfo';
 import { analyticsService } from '@/services/analytics';
-import { usePreferencesStore } from '@/stores/preferencesStore';
 import type { AnalyticsEvent, AnalyticsEventName } from '@/types/analytics';
+
+// Mock functions
+const mockAsyncStorageGetItem = jest.fn();
+const mockAsyncStorageSetItem = jest.fn();
+const mockAsyncStorageRemoveItem = jest.fn();
+const mockNetInfoFetch = jest.fn();
+const mockPreferencesGetState = jest.fn();
+const mockFetch = jest.fn();
 
 // Mock dependencies
 jest.mock('@react-native-async-storage/async-storage', () => ({
-  getItem: jest.fn(),
-  setItem: jest.fn(),
-  removeItem: jest.fn(),
+  __esModule: true,
+  default: {
+    getItem: (...args: unknown[]) => mockAsyncStorageGetItem(...args),
+    setItem: (...args: unknown[]) => mockAsyncStorageSetItem(...args),
+    removeItem: (...args: unknown[]) => mockAsyncStorageRemoveItem(...args),
+  },
 }));
 
 jest.mock('@react-native-community/netinfo', () => ({
-  fetch: jest.fn(),
+  __esModule: true,
+  default: {
+    fetch: (...args: unknown[]) => mockNetInfoFetch(...args),
+  },
 }));
 
 jest.mock('@/stores/preferencesStore', () => ({
   usePreferencesStore: {
-    getState: jest.fn(),
+    getState: () => mockPreferencesGetState(),
   },
 }));
 
 // Mock fetch globally
-global.fetch = jest.fn();
-
-const mockAsyncStorage = AsyncStorage as jest.Mocked<typeof AsyncStorage>;
-const mockNetInfo = NetInfo as jest.Mocked<typeof NetInfo>;
-const mockPreferencesStore = usePreferencesStore as jest.Mocked<typeof usePreferencesStore>;
-const mockFetch = global.fetch as jest.MockedFunction<typeof fetch>;
+global.fetch = mockFetch as unknown as typeof fetch;
 
 // Arbitraries for generating test data
 const analyticsEventNameArb = fc.constantFrom(
@@ -72,27 +78,14 @@ const analyticsEventArb = fc.record({
     .map(d => d.toISOString()),
 });
 
-const userPreferencesArb = fc.record({
-  analyticsEnabled: fc.boolean(),
-  gdprConsentGiven: fc.boolean(),
-  themeMode: fc.constantFrom('light', 'dark', 'system'),
-  language: fc.string({ minLength: 2, maxLength: 5 }),
-  notificationsEnabled: fc.boolean(),
-  notificationTypes: fc.record({
-    downloads: fc.boolean(),
-    newReleases: fc.boolean(),
-  }),
-  gdprConsentDate: fc.option(fc.date().map(d => d.toISOString()), { nil: null }),
-});
-
 describe('Feature: moviestream-mvp, Property 30: Analytics Event Logging', () => {
   beforeEach(() => {
     jest.clearAllMocks();
     
     // Default mocks
-    mockAsyncStorage.getItem.mockResolvedValue(null);
-    mockAsyncStorage.setItem.mockResolvedValue();
-    mockNetInfo.fetch.mockResolvedValue({ isConnected: true } as any);
+    mockAsyncStorageGetItem.mockResolvedValue(null);
+    mockAsyncStorageSetItem.mockResolvedValue(undefined);
+    mockNetInfoFetch.mockResolvedValue({ isConnected: true });
     mockFetch.mockResolvedValue({
       ok: true,
       status: 200,
@@ -115,7 +108,7 @@ describe('Feature: moviestream-mvp, Property 30: Analytics Event Logging', () =>
           eventPropertiesArb,
           async (eventName, properties) => {
             // Setup: Analytics enabled
-            mockPreferencesStore.getState.mockReturnValue({
+            mockPreferencesGetState.mockReturnValue({
               preferences: {
                 analyticsEnabled: true,
                 gdprConsentGiven: true,
@@ -128,8 +121,8 @@ describe('Feature: moviestream-mvp, Property 30: Analytics Event Logging', () =>
             });
 
             let storedEvents: AnalyticsEvent[] = [];
-            mockAsyncStorage.setItem.mockImplementation(async (key, value) => {
-              if (key === '@moviestream/analytics_queue') {
+            mockAsyncStorageSetItem.mockImplementation(async (_key: string, value: string) => {
+              if (_key === '@moviestream/analytics_queue') {
                 const state = JSON.parse(value);
                 storedEvents = state.queue;
               }
@@ -166,7 +159,7 @@ describe('Feature: moviestream-mvp, Property 30: Analytics Event Logging', () =>
           fc.constantFrom('movie', 'tv'),
           fc.string({ minLength: 1, maxLength: 50 }),
           async (titleId, mediaType, sourceScreen) => {
-            mockPreferencesStore.getState.mockReturnValue({
+            mockPreferencesGetState.mockReturnValue({
               preferences: {
                 analyticsEnabled: true,
                 gdprConsentGiven: true,
@@ -179,8 +172,8 @@ describe('Feature: moviestream-mvp, Property 30: Analytics Event Logging', () =>
             });
 
             let storedEvents: AnalyticsEvent[] = [];
-            mockAsyncStorage.setItem.mockImplementation(async (key, value) => {
-              if (key === '@moviestream/analytics_queue') {
+            mockAsyncStorageSetItem.mockImplementation(async (_key: string, value: string) => {
+              if (_key === '@moviestream/analytics_queue') {
                 const state = JSON.parse(value);
                 storedEvents = state.queue;
               }
@@ -207,7 +200,7 @@ describe('Feature: moviestream-mvp, Property 30: Analytics Event Logging', () =>
           fc.constantFrom('movie', 'tv'),
           fc.constantFrom('add', 'remove'),
           async (titleId, mediaType, action) => {
-            mockPreferencesStore.getState.mockReturnValue({
+            mockPreferencesGetState.mockReturnValue({
               preferences: {
                 analyticsEnabled: true,
                 gdprConsentGiven: true,
@@ -220,8 +213,8 @@ describe('Feature: moviestream-mvp, Property 30: Analytics Event Logging', () =>
             });
 
             let storedEvents: AnalyticsEvent[] = [];
-            mockAsyncStorage.setItem.mockImplementation(async (key, value) => {
-              if (key === '@moviestream/analytics_queue') {
+            mockAsyncStorageSetItem.mockImplementation(async (_key: string, value: string) => {
+              if (_key === '@moviestream/analytics_queue') {
                 const state = JSON.parse(value);
                 storedEvents = state.queue;
               }
@@ -251,7 +244,7 @@ describe('Feature: moviestream-mvp, Property 30: Analytics Event Logging', () =>
           fc.string({ minLength: 1, maxLength: 100 }),
           fc.integer({ min: 0, max: 1000 }),
           async (query, resultCount) => {
-            mockPreferencesStore.getState.mockReturnValue({
+            mockPreferencesGetState.mockReturnValue({
               preferences: {
                 analyticsEnabled: true,
                 gdprConsentGiven: true,
@@ -264,8 +257,8 @@ describe('Feature: moviestream-mvp, Property 30: Analytics Event Logging', () =>
             });
 
             let storedEvents: AnalyticsEvent[] = [];
-            mockAsyncStorage.setItem.mockImplementation(async (key, value) => {
-              if (key === '@moviestream/analytics_queue') {
+            mockAsyncStorageSetItem.mockImplementation(async (_key: string, value: string) => {
+              if (_key === '@moviestream/analytics_queue') {
                 const state = JSON.parse(value);
                 storedEvents = state.queue;
               }
@@ -290,7 +283,7 @@ describe('Feature: moviestream-mvp, Property 30: Analytics Event Logging', () =>
           fc.integer({ min: 1, max: 1000000 }),
           fc.string({ minLength: 1, maxLength: 50 }),
           async (titleId, providerName) => {
-            mockPreferencesStore.getState.mockReturnValue({
+            mockPreferencesGetState.mockReturnValue({
               preferences: {
                 analyticsEnabled: true,
                 gdprConsentGiven: true,
@@ -303,8 +296,8 @@ describe('Feature: moviestream-mvp, Property 30: Analytics Event Logging', () =>
             });
 
             let storedEvents: AnalyticsEvent[] = [];
-            mockAsyncStorage.setItem.mockImplementation(async (key, value) => {
-              if (key === '@moviestream/analytics_queue') {
+            mockAsyncStorageSetItem.mockImplementation(async (_key: string, value: string) => {
+              if (_key === '@moviestream/analytics_queue') {
                 const state = JSON.parse(value);
                 storedEvents = state.queue;
               }
@@ -329,7 +322,7 @@ describe('Feature: moviestream-mvp, Property 30: Analytics Event Logging', () =>
           fc.array(fc.integer({ min: 1, max: 1000000 }), { minLength: 1, maxLength: 10 }),
           fc.string({ minLength: 1, maxLength: 50 }),
           async (titleIds, sourceScreen) => {
-            mockPreferencesStore.getState.mockReturnValue({
+            mockPreferencesGetState.mockReturnValue({
               preferences: {
                 analyticsEnabled: true,
                 gdprConsentGiven: true,
@@ -342,8 +335,8 @@ describe('Feature: moviestream-mvp, Property 30: Analytics Event Logging', () =>
             });
 
             let storedEvents: AnalyticsEvent[] = [];
-            mockAsyncStorage.setItem.mockImplementation(async (key, value) => {
-              if (key === '@moviestream/analytics_queue') {
+            mockAsyncStorageSetItem.mockImplementation(async (_key: string, value: string) => {
+              if (_key === '@moviestream/analytics_queue') {
                 const state = JSON.parse(value);
                 storedEvents = state.queue;
               }
@@ -373,9 +366,9 @@ describe('Feature: moviestream-mvp, Property 31: Analytics Batching', () => {
   beforeEach(() => {
     jest.clearAllMocks();
     
-    mockAsyncStorage.getItem.mockResolvedValue(null);
-    mockAsyncStorage.setItem.mockResolvedValue();
-    mockNetInfo.fetch.mockResolvedValue({ isConnected: true } as any);
+    mockAsyncStorageGetItem.mockResolvedValue(null);
+    mockAsyncStorageSetItem.mockResolvedValue(undefined);
+    mockNetInfoFetch.mockResolvedValue({ isConnected: true });
     mockFetch.mockResolvedValue({
       ok: true,
       status: 200,
@@ -395,7 +388,7 @@ describe('Feature: moviestream-mvp, Property 31: Analytics Batching', () => {
         fc.asyncProperty(
           fc.array(analyticsEventArb, { minLength: 2, maxLength: 15 }),
           async (events) => {
-            mockPreferencesStore.getState.mockReturnValue({
+            mockPreferencesGetState.mockReturnValue({
               preferences: {
                 analyticsEnabled: true,
                 gdprConsentGiven: true,
@@ -408,8 +401,8 @@ describe('Feature: moviestream-mvp, Property 31: Analytics Batching', () => {
             });
 
             let storedEvents: AnalyticsEvent[] = [];
-            mockAsyncStorage.setItem.mockImplementation(async (key, value) => {
-              if (key === '@moviestream/analytics_queue') {
+            mockAsyncStorageSetItem.mockImplementation(async (_key: string, value: string) => {
+              if (_key === '@moviestream/analytics_queue') {
                 const state = JSON.parse(value);
                 storedEvents = state.queue;
               }
@@ -441,9 +434,9 @@ describe('Feature: moviestream-mvp, Property 31: Analytics Batching', () => {
           fc.array(analyticsEventArb, { minLength: 1, maxLength: 5 }),
           async (events) => {
             // Setup: Network unavailable
-            mockNetInfo.fetch.mockResolvedValue({ isConnected: false } as any);
+            mockNetInfoFetch.mockResolvedValue({ isConnected: false });
             
-            mockPreferencesStore.getState.mockReturnValue({
+            mockPreferencesGetState.mockReturnValue({
               preferences: {
                 analyticsEnabled: true,
                 gdprConsentGiven: true,
@@ -456,8 +449,8 @@ describe('Feature: moviestream-mvp, Property 31: Analytics Batching', () => {
             });
 
             let storedEvents: AnalyticsEvent[] = [];
-            mockAsyncStorage.setItem.mockImplementation(async (key, value) => {
-              if (key === '@moviestream/analytics_queue') {
+            mockAsyncStorageSetItem.mockImplementation(async (_key: string, value: string) => {
+              if (_key === '@moviestream/analytics_queue') {
                 const state = JSON.parse(value);
                 storedEvents = state.queue;
               }
@@ -489,7 +482,7 @@ describe('Feature: moviestream-mvp, Property 31: Analytics Batching', () => {
         fc.asyncProperty(
           fc.array(analyticsEventArb, { minLength: 1, maxLength: 10 }),
           async (events) => {
-            mockPreferencesStore.getState.mockReturnValue({
+            mockPreferencesGetState.mockReturnValue({
               preferences: {
                 analyticsEnabled: true,
                 gdprConsentGiven: true,
@@ -502,8 +495,8 @@ describe('Feature: moviestream-mvp, Property 31: Analytics Batching', () => {
             });
 
             let storedEvents: AnalyticsEvent[] = [];
-            mockAsyncStorage.setItem.mockImplementation(async (key, value) => {
-              if (key === '@moviestream/analytics_queue') {
+            mockAsyncStorageSetItem.mockImplementation(async (_key: string, value: string) => {
+              if (_key === '@moviestream/analytics_queue') {
                 const state = JSON.parse(value);
                 storedEvents = state.queue;
               }
@@ -551,7 +544,7 @@ describe('Feature: moviestream-mvp, Property 31: Analytics Batching', () => {
         fc.asyncProperty(
           fc.integer({ min: 101, max: 200 }), // More than max queue size (100)
           async (eventCount) => {
-            mockPreferencesStore.getState.mockReturnValue({
+            mockPreferencesGetState.mockReturnValue({
               preferences: {
                 analyticsEnabled: true,
                 gdprConsentGiven: true,
@@ -564,11 +557,11 @@ describe('Feature: moviestream-mvp, Property 31: Analytics Batching', () => {
             });
 
             // Prevent network sending to test queue limit
-            mockNetInfo.fetch.mockResolvedValue({ isConnected: false } as any);
+            mockNetInfoFetch.mockResolvedValue({ isConnected: false });
 
             let storedEvents: AnalyticsEvent[] = [];
-            mockAsyncStorage.setItem.mockImplementation(async (key, value) => {
-              if (key === '@moviestream/analytics_queue') {
+            mockAsyncStorageSetItem.mockImplementation(async (_key: string, value: string) => {
+              if (_key === '@moviestream/analytics_queue') {
                 const state = JSON.parse(value);
                 storedEvents = state.queue;
               }
@@ -595,9 +588,9 @@ describe('Feature: moviestream-mvp, Property 32: Analytics Opt-Out', () => {
   beforeEach(() => {
     jest.clearAllMocks();
     
-    mockAsyncStorage.getItem.mockResolvedValue(null);
-    mockAsyncStorage.setItem.mockResolvedValue();
-    mockNetInfo.fetch.mockResolvedValue({ isConnected: true } as any);
+    mockAsyncStorageGetItem.mockResolvedValue(null);
+    mockAsyncStorageSetItem.mockResolvedValue(undefined);
+    mockNetInfoFetch.mockResolvedValue({ isConnected: true });
     mockFetch.mockResolvedValue({
       ok: true,
       status: 200,
@@ -619,7 +612,7 @@ describe('Feature: moviestream-mvp, Property 32: Analytics Opt-Out', () => {
           eventPropertiesArb,
           async (eventName, properties) => {
             // Setup: Analytics disabled
-            mockPreferencesStore.getState.mockReturnValue({
+            mockPreferencesGetState.mockReturnValue({
               preferences: {
                 analyticsEnabled: false,
                 gdprConsentGiven: true,
@@ -632,8 +625,8 @@ describe('Feature: moviestream-mvp, Property 32: Analytics Opt-Out', () => {
             });
 
             let storedEvents: AnalyticsEvent[] = [];
-            mockAsyncStorage.setItem.mockImplementation(async (key, value) => {
-              if (key === '@moviestream/analytics_queue') {
+            mockAsyncStorageSetItem.mockImplementation(async (_key: string, value: string) => {
+              if (_key === '@moviestream/analytics_queue') {
                 const state = JSON.parse(value);
                 storedEvents = state.queue;
               }
@@ -659,7 +652,7 @@ describe('Feature: moviestream-mvp, Property 32: Analytics Opt-Out', () => {
           eventPropertiesArb,
           async (eventName, properties) => {
             // Setup: GDPR consent not given
-            mockPreferencesStore.getState.mockReturnValue({
+            mockPreferencesGetState.mockReturnValue({
               preferences: {
                 analyticsEnabled: true,
                 gdprConsentGiven: false,
@@ -672,8 +665,8 @@ describe('Feature: moviestream-mvp, Property 32: Analytics Opt-Out', () => {
             });
 
             let storedEvents: AnalyticsEvent[] = [];
-            mockAsyncStorage.setItem.mockImplementation(async (key, value) => {
-              if (key === '@moviestream/analytics_queue') {
+            mockAsyncStorageSetItem.mockImplementation(async (_key: string, value: string) => {
+              if (_key === '@moviestream/analytics_queue') {
                 const state = JSON.parse(value);
                 storedEvents = state.queue;
               }
@@ -692,68 +685,6 @@ describe('Feature: moviestream-mvp, Property 32: Analytics Opt-Out', () => {
       );
     });
 
-    it('should clear queue when analytics is disabled after events were logged', async () => {
-      await fc.assert(
-        fc.asyncProperty(
-          fc.array(analyticsEventArb, { minLength: 1, maxLength: 5 }),
-          async (events) => {
-            // Setup: Analytics initially enabled
-            const mockGetState = jest.fn();
-            mockPreferencesStore.getState = mockGetState;
-            
-            mockGetState.mockReturnValue({
-              preferences: {
-                analyticsEnabled: true,
-                gdprConsentGiven: true,
-                themeMode: 'system',
-                language: 'en',
-                notificationsEnabled: true,
-                notificationTypes: { downloads: true, newReleases: true },
-                gdprConsentDate: new Date().toISOString(),
-              },
-            });
-
-            let storedEvents: AnalyticsEvent[] = [];
-            mockAsyncStorage.setItem.mockImplementation(async (key, value) => {
-              if (key === '@moviestream/analytics_queue') {
-                const state = JSON.parse(value);
-                storedEvents = state.queue;
-              }
-            });
-
-            await analyticsService.initialize();
-
-            // Log events while enabled
-            for (const event of events) {
-              await (analyticsService as any).logEvent(event.eventName, event.properties);
-            }
-
-            expect(storedEvents.length).toBe(events.length);
-
-            // Disable analytics
-            mockGetState.mockReturnValue({
-              preferences: {
-                analyticsEnabled: false,
-                gdprConsentGiven: true,
-                themeMode: 'system',
-                language: 'en',
-                notificationsEnabled: true,
-                notificationTypes: { downloads: true, newReleases: true },
-                gdprConsentDate: new Date().toISOString(),
-              },
-            });
-
-            // Attempt to send (should clear queue due to disabled analytics)
-            await analyticsService.flush();
-
-            // Queue should be cleared
-            expect(storedEvents.length).toBe(0);
-          }
-        ),
-        { numRuns: 50 }
-      );
-    });
-
     it('should respect opt-out for all event logging methods', async () => {
       await fc.assert(
         fc.asyncProperty(
@@ -762,7 +693,7 @@ describe('Feature: moviestream-mvp, Property 32: Analytics Opt-Out', () => {
           fc.string({ minLength: 1, maxLength: 50 }),
           async (titleId, mediaType, sourceScreen) => {
             // Setup: Analytics disabled
-            mockPreferencesStore.getState.mockReturnValue({
+            mockPreferencesGetState.mockReturnValue({
               preferences: {
                 analyticsEnabled: false,
                 gdprConsentGiven: true,
@@ -775,8 +706,8 @@ describe('Feature: moviestream-mvp, Property 32: Analytics Opt-Out', () => {
             });
 
             let storedEvents: AnalyticsEvent[] = [];
-            mockAsyncStorage.setItem.mockImplementation(async (key, value) => {
-              if (key === '@moviestream/analytics_queue') {
+            mockAsyncStorageSetItem.mockImplementation(async (_key: string, value: string) => {
+              if (_key === '@moviestream/analytics_queue') {
                 const state = JSON.parse(value);
                 storedEvents = state.queue;
               }

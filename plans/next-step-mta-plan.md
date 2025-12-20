@@ -11,7 +11,7 @@
 ## Bugs
 
 #### Priority Lv: P0
-- [] Fix the following packages compatibility warning, following best practices:
+- [] Fix the following packages compatibility warning which come when we run the command `expo start`, following best practices:
 	```
 	> expo start
 
@@ -25,6 +25,15 @@
 
 	```
 
+- [x] Make a detailed summary report md file with all the issues, possible solutions, challenges faces etc in ./md-docs/reports/ following best practices
+
+- [x] In `./services/analytics.ts` file fix this error:
+	```
+	Type 'number' is not assignable to type 'Timeout'.ts(2322)
+	(property) AnalyticsService.sendTimer: NodeJS.Timeout | null
+	```
+
+- [] 
 - [] 
 - [] 
 - [] 

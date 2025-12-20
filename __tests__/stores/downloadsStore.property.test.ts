@@ -31,8 +31,14 @@ const downloadItemArb = fc.record({
   posterPath: fc.option(fc.string()),
   filePath: fc.string({ minLength: 1 }),
   fileSize: fc.integer({ min: 1 }),
-  downloadedAt: fc.date({ min: new Date('2020-01-01'), max: new Date() }).map(d => d.toISOString()),
-  expiresAt: fc.option(fc.date({ min: new Date(), max: new Date('2030-01-01') }).map(d => d.toISOString())),
+  downloadedAt: fc.integer({ 
+    min: new Date('2020-01-01').getTime(), 
+    max: new Date('2025-12-31').getTime() 
+  }).map(ts => new Date(ts).toISOString()),
+  expiresAt: fc.option(fc.integer({ 
+    min: new Date('2025-01-01').getTime(), 
+    max: new Date('2030-01-01').getTime() 
+  }).map(ts => new Date(ts).toISOString())),
 }) as fc.Arbitrary<DownloadItem>;
 
 // Helper to reset store state between tests

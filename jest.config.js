@@ -27,4 +27,6 @@ module.exports = {
   ],
   setupFilesAfterEnv: ['<rootDir>/__tests__/setup.ts'],
   testPathIgnorePatterns: ['/node_modules/', '/.expo/'],
+  // Improve test isolation
+  clearMocks: true,
 };

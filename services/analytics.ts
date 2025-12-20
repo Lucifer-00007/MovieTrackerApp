@@ -52,7 +52,7 @@ const ANALYTICS_ENDPOINT = 'https://api.moviestream.app/analytics';
 class AnalyticsService {
   private queue: AnalyticsEvent[] = [];
   private isInitialized = false;
-  private sendTimer: NodeJS.Timeout | null = null;
+  private sendTimer: ReturnType<typeof setInterval> | null = null;
   private deviceId: string | null = null;
   private appVersion: string = '1.0.0'; // Should come from app.json in real app
 

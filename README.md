@@ -1,206 +1,164 @@
-# Welcome to your Expo app 👋
+# MovieStream MVP
 
-This is an [Expo](https://expo.dev) project created with [`create-expo-app`](https://www.npmjs.com/package/create-expo-app).
+A cross-platform mobile application for discovering and tracking movies, TV series, and anime content worldwide. Built with React Native and Expo SDK 54.
 
-## Get started
+## Features
 
-Choose your preferred package manager below for installation and setup instructions.
+- **Global Trending Feed** - Discover popular movies and series with hero carousel and infinite scroll
+- **Country Hubs** - Browse top-rated content from USA, Japan, India, China, Russia, Spain, and Germany
+- **Detailed Media Pages** - View synopsis, cast, trailers, streaming providers, and recommendations
+- **Search & Filters** - Find content by title, country, genre, and release year
+- **Watchlist** - Save titles for later viewing with offline persistence
+- **Downloads** - Download content for offline viewing with progress tracking
+- **Personalization** - Recently viewed history and genre-based recommendations
+- **Themes** - Light and dark mode with system preference support
+- **Accessibility** - Screen reader support, dynamic type, and 44pt touch targets
 
-<details>
-<summary><strong>npm</strong></summary>
+## Tech Stack
 
-### Install dependencies
+- **Framework**: React Native with Expo SDK 54
+- **Language**: TypeScript (strict mode)
+- **Navigation**: Expo Router 6 (file-based routing)
+- **State Management**: Zustand for local state, React Query for server state
+- **Styling**: React Native StyleSheet with custom theming
+- **Testing**: Jest with fast-check for property-based testing
+- **API**: TMDB (The Movie Database)
 
-```bash
-npm install
-```
+## Getting Started
 
-### Start the app
+### Prerequisites
 
-```bash
-npx expo start
-```
+- Node.js 18+ or Bun
+- iOS Simulator (macOS) or Android Emulator
+- Expo Go app (for physical device testing)
 
-### Reset project
-
-```bash
-npm run reset-project
-```
-
-### Common commands
-
-```bash
-# Add a package
-npm install <package-name>
-
-# Add a dev dependency
-npm install -D <package-name>
-
-# Remove a package
-npm uninstall <package-name>
-
-# Run tests
-npm test
-
-# Build for production
-npx expo export
-```
-
-</details>
-
-<details>
-<summary><strong>yarn</strong></summary>
-
-### Install dependencies
+### Installation
 
 ```bash
-yarn install
-```
-
-### Start the app
-
-```bash
-yarn expo start
-```
-
-### Reset project
-
-```bash
-yarn reset-project
-```
-
-### Common commands
-
-```bash
-# Add a package
-yarn add <package-name>
-
-# Add a dev dependency
-yarn add -D <package-name>
-
-# Remove a package
-yarn remove <package-name>
-
-# Run tests
-yarn test
-
-# Build for production
-yarn expo export
-```
-
-</details>
-
-<details>
-<summary><strong>pnpm</strong></summary>
-
-### Install dependencies
-
-```bash
-pnpm install
-```
-
-### Start the app
-
-```bash
-pnpm expo start
-```
-
-### Reset project
-
-```bash
-pnpm reset-project
-```
-
-### Common commands
-
-```bash
-# Add a package
-pnpm add <package-name>
-
-# Add a dev dependency
-pnpm add -D <package-name>
-
-# Remove a package
-pnpm remove <package-name>
-
-# Run tests
-pnpm test
-
-# Build for production
-pnpm expo export
-```
-
-</details>
-
-<details>
-<summary><strong>bun</strong></summary>
-
-### Install dependencies
-
-```bash
+# Install dependencies
 bun install
+
+# Start development server
+bun run dev
 ```
 
-### Start the app
+### Running the App
 
 ```bash
-bun expo start
+# iOS Simulator
+bun run ios
+
+# Android Emulator
+bun run android
+
+# Web Browser
+bun run web
 ```
 
-### Reset project
+## Project Structure
 
-```bash
-bun run reset-project
+```
+├── app/                    # Expo Router screens
+│   ├── (tabs)/            # Tab navigation screens
+│   ├── movie/[id].tsx     # Movie detail page
+│   ├── tv/[id].tsx        # TV series detail page
+│   ├── country/[code].tsx # Country hub page
+│   └── trailer/[key].tsx  # Fullscreen trailer player
+├── components/            # Reusable UI components
+│   ├── detail/           # Detail page components
+│   ├── media/            # Media cards, carousels, players
+│   ├── search/           # Search utilities
+│   ├── ui/               # Base UI components
+│   └── watchlist/        # Watchlist utilities
+├── services/             # API clients and services
+│   ├── api/tmdb.ts       # TMDB API client
+│   ├── analytics.ts      # Analytics service
+│   ├── downloads.ts      # Download manager
+│   ├── localization.ts   # i18n service
+│   └── storage.ts        # AsyncStorage wrapper
+├── stores/               # Zustand state stores
+├── hooks/                # Custom React hooks
+├── types/                # TypeScript type definitions
+├── constants/            # Theme and configuration
+└── __tests__/            # Test files
 ```
 
-### Common commands
+## Testing
 
 ```bash
-# Add a package
-bun add <package-name>
-
-# Add a dev dependency
-bun add -D <package-name>
-
-# Remove a package
-bun remove <package-name>
-
-# Run tests
+# Run all tests
 bun test
 
-# Build for production
-bun expo export
+# Run tests in watch mode
+bun run test:watch
+
+# Run tests with coverage
+bun run test:coverage
 ```
 
-</details>
+### Property-Based Testing
 
----
+This project uses property-based testing with fast-check to verify correctness properties. Each property test validates specific requirements from the design document.
 
-## Running the app
+Example properties tested:
+- Media cards render required fields for any valid input
+- Search filters correctly filter results for any combination
+- Watchlist toggle persists state correctly
+- Theme colors maintain 4.5:1 contrast ratio
 
-In the output, you'll find options to open the app in a:
+## Configuration
 
-- [Development build](https://docs.expo.dev/develop/development-builds/introduction/)
-- [Android emulator](https://docs.expo.dev/workflow/android-studio-emulator/)
-- [iOS simulator](https://docs.expo.dev/workflow/ios-simulator/)
-- [Expo Go](https://expo.dev/go) — a limited sandbox for trying out app development with Expo
+### Environment Variables
 
-You can start developing by editing the files inside the **app** directory. This project uses [file-based routing](https://docs.expo.dev/router/introduction).
+Create a `.env` file with your TMDB API key:
 
-## Get a fresh project
+```
+TMDB_API_KEY=your_api_key_here
+```
 
-Run the reset-project script (see your package manager section above) to move the starter code to the **app-example** directory and create a blank **app** directory where you can start developing.
+### Theme Customization
 
-## Learn more
+Edit `constants/theme.ts` to customize colors, typography, and spacing.
 
-To learn more about developing your project with Expo, look at the following resources:
+## Scripts
 
-- [Expo documentation](https://docs.expo.dev/): Learn fundamentals, or go into advanced topics with our [guides](https://docs.expo.dev/guides).
-- [Learn Expo tutorial](https://docs.expo.dev/tutorial/introduction/): Follow a step-by-step tutorial where you'll create a project that runs on Android, iOS, and the web.
+| Command | Description |
+|---------|-------------|
+| `bun run dev` | Start Expo development server |
+| `bun run ios` | Run on iOS simulator |
+| `bun run android` | Run on Android emulator |
+| `bun run web` | Run in web browser |
+| `bun test` | Run test suite |
+| `bun run lint` | Run ESLint |
 
-## Join the community
+## Architecture
 
-Join our community of developers creating universal apps.
+The app follows a layered architecture:
 
-- [Expo on GitHub](https://github.com/expo/expo): View our open source platform and contribute.
-- [Discord community](https://chat.expo.dev): Chat with Expo users and ask questions.
+1. **Presentation Layer** - React components and screens
+2. **Business Logic Layer** - Custom hooks and Zustand stores
+3. **Data Layer** - API clients, AsyncStorage, and caching
+
+Key design decisions:
+- File-based routing with Expo Router for type-safe navigation
+- Zustand for lightweight, performant state management
+- Property-based testing for comprehensive correctness verification
+- Modular component design for reusability
+
+## Contributing
+
+1. Fork the repository
+2. Create a feature branch (`git checkout -b feature/amazing-feature`)
+3. Commit your changes (`git commit -m 'Add amazing feature'`)
+4. Push to the branch (`git push origin feature/amazing-feature`)
+5. Open a Pull Request
+
+## License
+
+This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
+
+## Acknowledgments
+
+- [TMDB](https://www.themoviedb.org/) for the movie and TV data API
+- [Expo](https://expo.dev/) for the React Native development platform
+- [fast-check](https://github.com/dubzzz/fast-check) for property-based testing
