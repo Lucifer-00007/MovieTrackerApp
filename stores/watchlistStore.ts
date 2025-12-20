@@ -10,6 +10,7 @@
 
 import { create } from 'zustand';
 import type { WatchlistItem, WatchlistSyncStatus } from '@/types/watchlist';
+import { logWatchlistAction } from '@/services/analytics';
 import {
   getWatchlist,
   saveWatchlist,
@@ -73,6 +74,10 @@ export const useWatchlistStore = create<WatchlistStore>((set, get) => ({
 
     try {
       await addToStorage(newItem);
+      
+      // Log analytics event
+      logWatchlistAction(item.id, item.mediaType, 'add');
+      
       // Update sync status to synced after successful persistence
       set((state) => ({
         items: state.items.map(i =>
@@ -105,6 +110,9 @@ export const useWatchlistStore = create<WatchlistStore>((set, get) => ({
 
     try {
       await removeFromStorage(id, mediaType);
+      
+      // Log analytics event
+      logWatchlistAction(id, mediaType, 'remove');
     } catch (error) {
       // Rollback on failure
       set({ 

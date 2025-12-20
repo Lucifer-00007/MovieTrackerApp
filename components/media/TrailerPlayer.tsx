@@ -20,6 +20,7 @@ import { Video, ResizeMode, AVPlaybackStatus } from 'expo-av';
 import { useThemeColor } from '@/hooks/use-theme-color';
 import { Spacing, BorderRadius, Typography, AnimationDurations } from '@/constants/theme';
 import { IconSymbol } from '@/components/ui/icon-symbol';
+import { logTrailerTap } from '@/services/analytics';
 import {
   getYouTubeEmbedUrl,
   formatTime,
@@ -32,6 +33,12 @@ const { width: SCREEN_WIDTH } = Dimensions.get('window');
 export interface TrailerPlayerProps {
   /** YouTube video key */
   videoKey: string;
+  /** Media ID for analytics tracking */
+  mediaId?: number;
+  /** Media type for analytics tracking */
+  mediaType?: 'movie' | 'tv';
+  /** Source screen for analytics tracking */
+  sourceScreen?: string;
   /** Whether to autoplay the video */
   autoPlay?: boolean;
   /** Callback when video ends */
@@ -57,6 +64,9 @@ export interface TrailerPlayerState {
 
 export function TrailerPlayer({
   videoKey,
+  mediaId,
+  mediaType,
+  sourceScreen = 'trailer_player',
   autoPlay = true,
   onVideoEnd,
   onClose,
@@ -149,12 +159,17 @@ export function TrailerPlayer({
         await videoRef.current.pauseAsync();
       } else {
         await videoRef.current.playAsync();
+        
+        // Log analytics event when trailer starts playing
+        if (mediaId && mediaType) {
+          logTrailerTap(mediaId, mediaType, sourceScreen);
+        }
       }
       showControls();
     } catch (error) {
       console.error('Error toggling playback:', error);
     }
-  }, [state.isPlaying, showControls]);
+  }, [state.isPlaying, showControls, mediaId, mediaType, sourceScreen]);
 
   // Seek to position
   const seekTo = useCallback(async (position: number) => {

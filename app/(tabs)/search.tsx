@@ -27,6 +27,7 @@ import { MediaCard } from '@/components/media/MediaCard';
 import { EmptyState } from '@/components/ui/EmptyState';
 import { Skeleton } from '@/components/ui/Skeleton';
 import { searchMulti } from '@/services/api/tmdb';
+import { logSearchQuery } from '@/services/analytics';
 import type { MediaItem } from '@/types/media';
 import type { SearchFilters, SearchResults } from '@/types/user';
 import {
@@ -185,6 +186,13 @@ export default function SearchScreen() {
     queryFn: () => searchMulti(debouncedQuery),
     enabled: isValidSearchQuery(debouncedQuery),
     staleTime: 5 * 60 * 1000,
+    onSuccess: (data) => {
+      // Log analytics event when search completes
+      if (isValidSearchQuery(debouncedQuery)) {
+        const totalResults = (data?.movies?.length || 0) + (data?.tvShows?.length || 0);
+        logSearchQuery(debouncedQuery, totalResults);
+      }
+    },
   });
 
   // Apply filters to results

@@ -18,6 +18,7 @@ import { Image } from 'expo-image';
 
 import { useThemeColor } from '@/hooks/use-theme-color';
 import { Spacing, BorderRadius, Typography } from '@/constants/theme';
+import { logProviderTap } from '@/services/analytics';
 import type { StreamingProvider } from '@/types/media';
 import {
   getProviderLogoUrl,
@@ -31,6 +32,8 @@ const LOGO_SIZE = 48;
 export interface ProviderListProps {
   /** Array of streaming providers */
   providers: StreamingProvider[];
+  /** Media ID for analytics tracking */
+  mediaId?: number;
   /** Test ID for testing */
   testID?: string;
 }
@@ -39,10 +42,11 @@ interface ProviderGroupProps {
   title: string;
   providers: StreamingProvider[];
   onProviderPress: (provider: StreamingProvider) => void;
+  mediaId?: number;
   testID?: string;
 }
 
-function ProviderGroup({ title, providers, onProviderPress, testID }: ProviderGroupProps) {
+function ProviderGroup({ title, providers, onProviderPress, mediaId, testID }: ProviderGroupProps) {
   const textColor = useThemeColor({}, 'text');
   const textSecondary = useThemeColor({}, 'textSecondary');
   const cardBackground = useThemeColor({}, 'card');
@@ -122,7 +126,7 @@ function ProviderGroup({ title, providers, onProviderPress, testID }: ProviderGr
   );
 }
 
-export function ProviderList({ providers, testID }: ProviderListProps) {
+export function ProviderList({ providers, mediaId, testID }: ProviderListProps) {
   const textColor = useThemeColor({}, 'text');
   const textSecondary = useThemeColor({}, 'textSecondary');
 
@@ -130,6 +134,11 @@ export function ProviderList({ providers, testID }: ProviderListProps) {
     if (!provider.isAvailable || !provider.link) return;
     
     try {
+      // Log analytics event
+      if (mediaId) {
+        logProviderTap(mediaId, provider.providerName);
+      }
+      
       const canOpen = await Linking.canOpenURL(provider.link);
       if (canOpen) {
         await Linking.openURL(provider.link);
@@ -137,7 +146,7 @@ export function ProviderList({ providers, testID }: ProviderListProps) {
     } catch (error) {
       console.error('Failed to open provider link:', error);
     }
-  }, []);
+  }, [mediaId]);
 
   // Show "not available" message if no providers
   if (!shouldShowProviders(providers)) {
@@ -174,6 +183,7 @@ export function ProviderList({ providers, testID }: ProviderListProps) {
         title="Stream"
         providers={grouped.flatrate}
         onProviderPress={handleProviderPress}
+        mediaId={mediaId}
         testID={testID ? `${testID}-flatrate` : undefined}
       />
       
@@ -181,6 +191,7 @@ export function ProviderList({ providers, testID }: ProviderListProps) {
         title="Rent"
         providers={grouped.rent}
         onProviderPress={handleProviderPress}
+        mediaId={mediaId}
         testID={testID ? `${testID}-rent` : undefined}
       />
       
@@ -188,6 +199,7 @@ export function ProviderList({ providers, testID }: ProviderListProps) {
         title="Buy"
         providers={grouped.buy}
         onProviderPress={handleProviderPress}
+        mediaId={mediaId}
         testID={testID ? `${testID}-buy` : undefined}
       />
     </View>

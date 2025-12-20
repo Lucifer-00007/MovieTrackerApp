@@ -2,9 +2,11 @@ import { DarkTheme, DefaultTheme, ThemeProvider } from '@react-navigation/native
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { Stack } from 'expo-router';
 import { StatusBar } from 'expo-status-bar';
+import { useEffect } from 'react';
 import 'react-native-reanimated';
 
 import { useColorScheme } from '@/hooks/use-color-scheme';
+import { initializeAnalytics } from '@/services/analytics';
 
 export const unstable_settings = {
   anchor: '(tabs)',
@@ -23,6 +25,11 @@ const queryClient = new QueryClient({
 
 export default function RootLayout() {
   const colorScheme = useColorScheme();
+
+  // Initialize analytics service on app start
+  useEffect(() => {
+    initializeAnalytics();
+  }, []);
 
   return (
     <QueryClientProvider client={queryClient}>

@@ -5,7 +5,7 @@
  * Requirements: 1.4, 1.5
  */
 
-import { useCallback } from 'react';
+import { useCallback, useRef, useEffect } from 'react';
 import {
   StyleSheet,
   View,
@@ -17,6 +17,7 @@ import {
 import { useThemeColor } from '@/hooks/use-theme-color';
 import { Spacing, Typography, ComponentTokens } from '@/constants/theme';
 import { MediaCard } from './MediaCard';
+import { logMediaImpressions } from '@/services/analytics';
 import type { MediaItem } from '@/types/media';
 
 export interface ContentRowProps {
@@ -32,6 +33,8 @@ export interface ContentRowProps {
   onEndReached?: () => void;
   /** Whether more items are being loaded */
   isLoading?: boolean;
+  /** Source screen name for analytics */
+  sourceScreen?: string;
   /** Test ID for testing purposes */
   testID?: string;
 }
@@ -45,10 +48,28 @@ export function ContentRow({
   onSeeAllPress,
   onEndReached,
   isLoading = false,
+  sourceScreen = 'content_row',
   testID,
 }: ContentRowProps) {
   const textColor = useThemeColor({}, 'text');
   const tintColor = useThemeColor({}, 'tint');
+  const impressionTrackedRef = useRef(new Set<number>());
+
+  // Track impressions when items are rendered
+  useEffect(() => {
+    if (items.length > 0) {
+      // Get first 4 visible items (initial render)
+      const visibleItems = items.slice(0, 4);
+      const newImpressions = visibleItems
+        .filter(item => !impressionTrackedRef.current.has(item.id))
+        .map(item => item.id);
+      
+      if (newImpressions.length > 0) {
+        newImpressions.forEach(id => impressionTrackedRef.current.add(id));
+        logMediaImpressions(newImpressions, sourceScreen);
+      }
+    }
+  }, [items, sourceScreen]);
 
   const handleEndReached = useCallback(() => {
     if (!isLoading && onEndReached) {

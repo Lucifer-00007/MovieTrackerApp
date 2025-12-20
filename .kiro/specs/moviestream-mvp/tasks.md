@@ -284,21 +284,21 @@ This implementation plan breaks down the MovieStream MVP into incremental coding
     - **Property 37: Download Complete Notification**
     - **Validates: Requirements 15.1**
 
-- [ ] 17. Analytics Implementation
-  - [ ] 17.1 Create analytics service
+- [x] 17. Analytics Implementation
+  - [x] 17.1 Create analytics service
     - Create services/analytics.ts with event logging
     - Implement event batching and queue
     - Add network-aware sending
     - Respect analytics opt-out preference
     - _Requirements: 13.1, 13.2, 13.3, 13.4, 13.5, 13.6, 19.4_
 
-  - [ ] 17.2 Write property tests for analytics
+  - [x] 17.2 Write property tests for analytics
     - **Property 30: Analytics Event Logging**
     - **Property 31: Analytics Batching**
     - **Property 32: Analytics Opt-Out**
     - **Validates: Requirements 13.1-13.6, 19.4**
 
-  - [ ] 17.3 Integrate analytics tracking
+  - [x] 17.3 Integrate analytics tracking
     - Add trailer tap tracking to TrailerPlayer
     - Add watchlist action tracking to watchlist store
     - Add impression tracking to ContentRow
