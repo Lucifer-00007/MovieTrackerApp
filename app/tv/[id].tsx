@@ -1,38 +1,285 @@
-import { StyleSheet, View, Text, ScrollView, Pressable } from 'react-native';
+/**
+ * TV Series Detail Screen
+ * Displays comprehensive TV series information with watchlist options
+ * Reuses detail components from movie screen
+ * 
+ * Requirements: 4.2
+ */
+
+import { useCallback, useEffect, useState } from 'react';
+import {
+  StyleSheet,
+  View,
+  ScrollView,
+  Pressable,
+  Text,
+  ActivityIndicator,
+  RefreshControl,
+} from 'react-native';
 import { useLocalSearchParams, router } from 'expo-router';
+import Animated, {
+  useSharedValue,
+  useAnimatedScrollHandler,
+} from 'react-native-reanimated';
+
 import { useColorScheme } from '@/hooks/use-color-scheme';
-import { Colors, Spacing, Typography } from '@/constants/theme';
+import { Colors, Spacing, Typography, BorderRadius } from '@/constants/theme';
 import { IconSymbol } from '@/components/ui/icon-symbol';
+import { ErrorState } from '@/components/ui/ErrorState';
+import {
+  DetailHeader,
+  Synopsis,
+  CastCarousel,
+  ProviderList,
+  RecommendationsRow,
+} from '@/components/detail';
+import {
+  getTvDetails,
+  getTvCredits,
+  getWatchProviders,
+  getRecommendations,
+  getTrailerKey,
+} from '@/services/api/tmdb';
+import { useWatchlistStore } from '@/stores/watchlistStore';
+import { useRecentlyViewedStore } from '@/stores/recentlyViewedStore';
+import type { MediaDetails, CastMember, StreamingProvider, MediaItem } from '@/types/media';
+
+const AnimatedScrollView = Animated.createAnimatedComponent(ScrollView);
 
 export default function TvDetailScreen() {
   const { id } = useLocalSearchParams<{ id: string }>();
+  const tvId = parseInt(id || '0', 10);
+  
   const colorScheme = useColorScheme() ?? 'light';
   const colors = Colors[colorScheme];
 
+  // State
+  const [details, setDetails] = useState<MediaDetails | null>(null);
+  const [cast, setCast] = useState<CastMember[]>([]);
+  const [providers, setProviders] = useState<StreamingProvider[]>([]);
+  const [recommendations, setRecommendations] = useState<MediaItem[]>([]);
+  const [trailerKey, setTrailerKey] = useState<string | null>(null);
+  const [isLoading, setIsLoading] = useState(true);
+  const [isRefreshing, setIsRefreshing] = useState(false);
+  const [error, setError] = useState<string | null>(null);
+
+  // Stores
+  const { isInWatchlist, toggleItem } = useWatchlistStore();
+  const { addItem: addToRecentlyViewed } = useRecentlyViewedStore();
+
+  // Animation
+  const scrollY = useSharedValue(0);
+  const scrollHandler = useAnimatedScrollHandler({
+    onScroll: (event) => {
+      scrollY.value = event.contentOffset.y;
+    },
+  });
+
+  // Check if in watchlist
+  const inWatchlist = details ? isInWatchlist(details.id, 'tv') : false;
+
+  // Fetch TV data
+  const fetchTvData = useCallback(async (showRefresh = false) => {
+    if (!tvId) return;
+
+    if (showRefresh) {
+      setIsRefreshing(true);
+    } else {
+      setIsLoading(true);
+    }
+    setError(null);
+
+    try {
+      // Fetch all data in parallel
+      const [tvDetails, tvCast, tvProviders, tvRecs, trailer] = await Promise.all([
+        getTvDetails(tvId),
+        getTvCredits(tvId).catch(() => []),
+        getWatchProviders('tv', tvId).catch(() => []),
+        getRecommendations('tv', tvId).then(r => r.items).catch(() => []),
+        getTrailerKey('tv', tvId).catch(() => null),
+      ]);
+
+      setDetails(tvDetails);
+      setCast(tvCast);
+      setProviders(tvProviders);
+      setRecommendations(tvRecs);
+      setTrailerKey(trailer);
+
+      // Add to recently viewed
+      addToRecentlyViewed({
+        id: tvDetails.id,
+        mediaType: 'tv',
+        title: tvDetails.title,
+        posterPath: tvDetails.posterPath,
+      });
+    } catch (err) {
+      setError(err instanceof Error ? err.message : 'Failed to load TV series details');
+    } finally {
+      setIsLoading(false);
+      setIsRefreshing(false);
+    }
+  }, [tvId, addToRecentlyViewed]);
+
+  // Initial fetch
+  useEffect(() => {
+    fetchTvData();
+  }, [fetchTvData]);
+
+  // Handle watchlist toggle
+  const handleWatchlistToggle = useCallback(async () => {
+    if (!details) return;
+    
+    await toggleItem({
+      id: details.id,
+      mediaType: 'tv',
+      title: details.title,
+      posterPath: details.posterPath,
+    });
+  }, [details, toggleItem]);
+
+  // Handle play trailer
+  const handlePlayTrailer = useCallback(() => {
+    if (trailerKey) {
+      router.push(`/trailer/${trailerKey}` as any);
+    }
+  }, [trailerKey]);
+
+  // Handle recommendation press
+  const handleRecommendationPress = useCallback((recId: number, mediaType: 'movie' | 'tv') => {
+    if (mediaType === 'movie') {
+      router.push(`/movie/${recId}` as any);
+    } else {
+      router.push(`/tv/${recId}` as any);
+    }
+  }, []);
+
+  // Handle refresh
+  const handleRefresh = useCallback(() => {
+    fetchTvData(true);
+  }, [fetchTvData]);
+
+  // Handle retry
+  const handleRetry = useCallback(() => {
+    fetchTvData();
+  }, [fetchTvData]);
+
+  // Loading state
+  if (isLoading) {
+    return (
+      <View style={[styles.container, styles.centered, { backgroundColor: colors.background }]}>
+        <ActivityIndicator size="large" color={colors.tint} />
+        <Text style={[styles.loadingText, { color: colors.textSecondary }]}>
+          Loading TV series details...
+        </Text>
+      </View>
+    );
+  }
+
+  // Error state
+  if (error || !details) {
+    return (
+      <View style={[styles.container, { backgroundColor: colors.background }]}>
+        <View style={[styles.header, { borderBottomColor: colors.border }]}>
+          <Pressable
+            onPress={() => router.back()}
+            style={styles.backButton}
+            accessibilityLabel="Go back"
+            accessibilityRole="button"
+          >
+            <IconSymbol name="chevron.left" size={24} color={colors.text} />
+          </Pressable>
+          <Text style={[styles.headerTitle, { color: colors.text }]}>TV Series Details</Text>
+          <View style={styles.headerSpacer} />
+        </View>
+        <ErrorState
+          message={error || 'TV series not found'}
+          onRetry={handleRetry}
+        />
+      </View>
+    );
+  }
+
   return (
     <View style={[styles.container, { backgroundColor: colors.background }]}>
-      <View style={[styles.header, { borderBottomColor: colors.border }]}>
+      {/* Header with back button */}
+      <View style={[styles.header, styles.absoluteHeader]}>
         <Pressable
           onPress={() => router.back()}
-          style={styles.backButton}
+          style={[styles.backButton, styles.headerButton, { backgroundColor: 'rgba(0,0,0,0.5)' }]}
           accessibilityLabel="Go back"
           accessibilityRole="button"
         >
-          <IconSymbol name="chevron.left" size={24} color={colors.text} />
+          <IconSymbol name="chevron.left" size={24} color="#FFFFFF" />
         </Pressable>
-        <Text style={[styles.headerTitle, { color: colors.text }]}>TV Series Details</Text>
-        <View style={styles.headerSpacer} />
+        
+        <View style={styles.headerActions}>
+          {/* Watchlist button */}
+          <Pressable
+            onPress={handleWatchlistToggle}
+            style={[styles.headerButton, { backgroundColor: 'rgba(0,0,0,0.5)' }]}
+            accessibilityLabel={inWatchlist ? 'Remove from watchlist' : 'Add to watchlist'}
+            accessibilityRole="button"
+          >
+            <IconSymbol
+              name={inWatchlist ? 'bookmark.fill' : 'bookmark'}
+              size={24}
+              color={inWatchlist ? colors.tint : '#FFFFFF'}
+            />
+          </Pressable>
+        </View>
       </View>
-      
-      <ScrollView 
-        style={styles.content}
-        contentContainerStyle={styles.contentContainer}
+
+      <AnimatedScrollView
+        style={styles.scrollView}
+        onScroll={scrollHandler}
+        scrollEventThrottle={16}
+        refreshControl={
+          <RefreshControl
+            refreshing={isRefreshing}
+            onRefresh={handleRefresh}
+            tintColor={colors.tint}
+          />
+        }
       >
-        <Text style={[styles.title, { color: colors.text }]}>TV Series ID: {id}</Text>
-        <Text style={[styles.subtitle, { color: colors.textSecondary }]}>
-          TV series details will be loaded here
-        </Text>
-      </ScrollView>
+        {/* Hero Header with Parallax */}
+        <DetailHeader
+          details={details}
+          scrollY={scrollY}
+          hasTrailer={!!trailerKey}
+          onPlayPress={handlePlayTrailer}
+          testID="tv-detail-header"
+        />
+
+        {/* Synopsis */}
+        {details.overview && (
+          <Synopsis
+            overview={details.overview}
+            testID="tv-synopsis"
+          />
+        )}
+
+        {/* Cast Carousel - hidden if empty (Requirement 17.1) */}
+        <CastCarousel
+          cast={cast}
+          testID="tv-cast"
+        />
+
+        {/* Streaming Providers - shows "not available" if empty (Requirement 17.6) */}
+        <ProviderList
+          providers={providers}
+          testID="tv-providers"
+        />
+
+        {/* Recommendations */}
+        <RecommendationsRow
+          recommendations={recommendations}
+          onItemPress={handleRecommendationPress}
+          testID="tv-recommendations"
+        />
+
+        {/* Bottom padding */}
+        <View style={styles.bottomPadding} />
+      </AnimatedScrollView>
     </View>
   );
 }
@@ -40,6 +287,14 @@ export default function TvDetailScreen() {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
+  },
+  centered: {
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  loadingText: {
+    marginTop: Spacing.md,
+    fontSize: Typography.sizes.md,
   },
   header: {
     flexDirection: 'row',
@@ -49,11 +304,24 @@ const styles = StyleSheet.create({
     paddingVertical: Spacing.sm,
     borderBottomWidth: 1,
   },
+  absoluteHeader: {
+    position: 'absolute',
+    top: 0,
+    left: 0,
+    right: 0,
+    zIndex: 100,
+    borderBottomWidth: 0,
+    paddingTop: Spacing.xl,
+  },
   backButton: {
     minWidth: 44,
     minHeight: 44,
     alignItems: 'center',
     justifyContent: 'center',
+  },
+  headerButton: {
+    borderRadius: BorderRadius.full,
+    padding: Spacing.sm,
   },
   headerTitle: {
     fontSize: Typography.sizes.lg,
@@ -62,22 +330,14 @@ const styles = StyleSheet.create({
   headerSpacer: {
     width: 44,
   },
-  content: {
+  headerActions: {
+    flexDirection: 'row',
+    gap: Spacing.sm,
+  },
+  scrollView: {
     flex: 1,
   },
-  contentContainer: {
-    padding: Spacing.md,
-    alignItems: 'center',
-    justifyContent: 'center',
-    minHeight: 300,
-  },
-  title: {
-    fontSize: Typography.sizes.xxl,
-    fontWeight: Typography.weights.bold,
-    marginBottom: Spacing.sm,
-  },
-  subtitle: {
-    fontSize: Typography.sizes.md,
-    textAlign: 'center',
+  bottomPadding: {
+    height: Spacing.xxl,
   },
 });

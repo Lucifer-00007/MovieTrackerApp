@@ -144,8 +144,8 @@ This implementation plan breaks down the MovieStream MVP into incremental coding
     - Configure smooth animated transitions
     - _Requirements: 2.4, 10.4, 10.5_
 
-- [ ] 8. Home Screen Implementation
-  - [ ] 8.1 Implement Home Screen with Trending Feed
+- [x] 8. Home Screen Implementation
+  - [x] 8.1 Implement Home Screen with Trending Feed
     - Update app/(tabs)/index.tsx with hero carousel and content rows
     - Integrate useQuery for trending data fetching
     - Add skeleton loading states
@@ -153,13 +153,13 @@ This implementation plan breaks down the MovieStream MVP into incremental coding
     - Add Recommendations row (conditional on watchlist)
     - _Requirements: 1.1, 1.4, 1.6, 14.1, 14.2, 14.4_
 
-  - [ ] 8.2 Write property tests for personalization rows
+  - [x] 8.2 Write property tests for personalization rows
     - **Property 35: Recently Viewed Row Visibility**
     - **Property 36: Recommendations Based on Watchlist**
     - **Validates: Requirements 14.2, 14.4**
 
-- [ ] 9. Detail Page Implementation
-  - [ ] 9.1 Create Detail Page layout
+- [x] 9. Detail Page Implementation
+  - [x] 9.1 Create Detail Page layout
     - Create shared components/detail/DetailHeader.tsx with parallax hero
     - Create components/detail/Synopsis.tsx with expand/collapse
     - Create components/detail/CastCarousel.tsx with 10-member limit
@@ -167,7 +167,7 @@ This implementation plan breaks down the MovieStream MVP into incremental coding
     - Create components/detail/RecommendationsRow.tsx
     - _Requirements: 4.1, 4.2, 4.3, 4.4, 4.5, 4.6, 4.8_
 
-  - [ ] 9.2 Write property tests for Detail Page components
+  - [x] 9.2 Write property tests for Detail Page components
     - **Property 8: Detail Page Required Fields**
     - **Property 9: Synopsis Expandability**
     - **Property 10: Cast Carousel Display**
@@ -175,19 +175,19 @@ This implementation plan breaks down the MovieStream MVP into incremental coding
     - **Property 12: Streaming Provider Display**
     - **Validates: Requirements 4.2, 4.3, 4.4, 4.5, 4.6, 16.3**
 
-  - [ ] 9.3 Implement Movie Detail Screen
+  - [x] 9.3 Implement Movie Detail Screen
     - Implement app/movie/[id].tsx with data fetching
     - Add watchlist toggle button
     - Add download button (conditional)
     - Handle missing data gracefully (cast, providers)
     - _Requirements: 4.2, 7.2, 8.1, 17.1, 17.6_
 
-  - [ ] 9.4 Write property tests for edge case handling
+  - [x] 9.4 Write property tests for edge case handling
     - **Property 41: Empty Cast Section Handling**
     - **Property 43: Empty Providers Handling**
     - **Validates: Requirements 17.1, 17.6**
 
-  - [ ] 9.5 Implement TV Detail Screen
+  - [x] 9.5 Implement TV Detail Screen
     - Implement app/tv/[id].tsx with data fetching
     - Reuse detail components from movie screen
     - Add season/episode information display
