@@ -350,8 +350,8 @@ This implementation plan breaks down the MovieStream MVP into incremental coding
     - **Property 29: Dynamic Type Support**
     - **Validates: Requirements 12.1, 12.3, 12.4**
 
-- [ ] 21. Age Ratings Display
-  - [ ] 21.1 Add age rating badges
+- [-] 21. Age Ratings Display
+  - [-] 21.1 Add age rating badges
     - Add age rating to MediaCard component
     - Add age rating to Detail Page header
     - _Requirements: 19.1_
