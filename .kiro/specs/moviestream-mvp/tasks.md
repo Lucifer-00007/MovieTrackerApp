@@ -256,31 +256,31 @@ This implementation plan breaks down the MovieStream MVP into incremental coding
     - **Property 17: Watchlist Grid Display**
     - **Validates: Requirements 7.4**
 
-- [ ] 15. Checkpoint - Feature Screens
+- [x] 15. Checkpoint - Feature Screens
   - Ensure all tests pass, ask the user if questions arise.
 
-- [ ] 16. Downloads Implementation
-  - [ ] 16.1 Create Downloads screen
+- [x] 16. Downloads Implementation
+  - [x] 16.1 Create Downloads screen
     - Implement app/(tabs)/downloads.tsx with download list
     - Display download progress for active downloads
     - Show storage usage information
     - Add pause/resume/cancel controls
     - _Requirements: 8.2, 8.3, 8.5_
 
-  - [ ] 16.2 Write property tests for downloads
+  - [x] 16.2 Write property tests for downloads
     - **Property 18: Download Progress Tracking**
     - **Property 19: Download Pause/Resume**
     - **Property 20: Storage Warning**
     - **Property 21: Download Cancellation Cleanup**
     - **Validates: Requirements 8.2, 8.3, 8.6, 17.3**
 
-  - [ ] 16.3 Implement download service
+  - [x] 16.3 Implement download service
     - Create services/downloads.ts with background download support
     - Implement storage check before download
     - Add download complete notification
     - _Requirements: 8.4, 8.6, 8.7, 15.1_
 
-  - [ ] 16.4 Write property tests for download notifications
+  - [x] 16.4 Write property tests for download notifications
     - **Property 37: Download Complete Notification**
     - **Validates: Requirements 15.1**
 
