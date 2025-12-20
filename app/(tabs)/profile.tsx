@@ -332,6 +332,7 @@ function WatchlistItemCard({
               title={item.title}
               posterPath={item.posterPath}
               rating={null}
+              ageRating={null}
               variant="small"
               onPress={onPress}
               onLongPress={handleLongPress}

@@ -51,9 +51,20 @@ export function calculateTouchTarget(variant: MediaCardVariant): { width: number
 }
 
 /** Generate accessibility label for media card */
-export function generateAccessibilityLabel(title: string, rating: number | null): string {
+export function generateAccessibilityLabel(
+  title: string, 
+  rating: number | null, 
+  ageRating?: string | null
+): string {
+  const parts: string[] = [title];
+  
   if (shouldShowRating(rating)) {
-    return `${title}, rated ${formatRating(rating!)} out of 10`;
+    parts.push(`rated ${formatRating(rating!)} out of 10`);
   }
-  return title;
+  
+  if (ageRating) {
+    parts.push(`age rating ${ageRating}`);
+  }
+  
+  return parts.join(', ');
 }

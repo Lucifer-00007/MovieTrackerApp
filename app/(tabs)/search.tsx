@@ -128,6 +128,7 @@ function ResultSection({ title, items, onItemPress, testID }: ResultSectionProps
               title={item.title}
               posterPath={item.posterPath}
               rating={item.voteAverage}
+              ageRating={item.ageRating}
               variant="medium"
               onPress={() => onItemPress(item.id, item.mediaType)}
               testID={testID ? `${testID}-item-${item.id}` : undefined}

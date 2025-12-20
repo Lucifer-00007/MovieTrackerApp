@@ -190,6 +190,10 @@ export function generateDetailAccessibilityLabel(details: MediaDetails): string 
   const rating = formatRating(details.voteAverage);
   if (rating) parts.push(`rated ${rating} out of 10`);
   
+  if (details.ageRating) {
+    parts.push(`age rating ${details.ageRating}`);
+  }
+  
   return parts.join(', ');
 }
 

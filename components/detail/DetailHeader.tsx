@@ -65,6 +65,8 @@ export function DetailHeader({
   const backgroundColor = useThemeColor({}, 'background');
   const ratingBadgeColor = useThemeColor({}, 'ratingBadge');
   const ratingTextColor = useThemeColor({}, 'ratingText');
+  const ageRatingBadgeColor = useThemeColor({}, 'warning');
+  const ageRatingTextColor = useThemeColor({}, 'background');
 
   const backdropUrl = getBackdropUrl(details.backdropPath);
   const runtime = formatRuntime(details.runtime);
@@ -158,18 +160,34 @@ export function DetailHeader({
 
       {/* Content Overlay */}
       <View style={styles.contentOverlay}>
-        {/* Rating Badge */}
-        {rating && (
-          <View 
-            style={[styles.ratingBadge, { backgroundColor: ratingBadgeColor }]}
-            accessibilityLabel={`Rating: ${rating} out of 10`}
-            testID={testID ? `${testID}-rating` : undefined}
-          >
-            <Text style={[styles.ratingText, { color: ratingTextColor }]}>
-              ★ {rating}
-            </Text>
-          </View>
-        )}
+        {/* Badges Row */}
+        <View style={styles.badgesRow}>
+          {/* Rating Badge */}
+          {rating && (
+            <View 
+              style={[styles.ratingBadge, { backgroundColor: ratingBadgeColor }]}
+              accessibilityLabel={`Rating: ${rating} out of 10`}
+              testID={testID ? `${testID}-rating` : undefined}
+            >
+              <Text style={[styles.ratingText, { color: ratingTextColor }]}>
+                ★ {rating}
+              </Text>
+            </View>
+          )}
+
+          {/* Age Rating Badge */}
+          {details.ageRating && (
+            <View 
+              style={[styles.ageRatingBadge, { backgroundColor: ageRatingBadgeColor }]}
+              accessibilityLabel={`Age rating: ${details.ageRating}`}
+              testID={testID ? `${testID}-age-rating` : undefined}
+            >
+              <Text style={[styles.ageRatingText, { color: ageRatingTextColor }]}>
+                {details.ageRating}
+              </Text>
+            </View>
+          )}
+        </View>
 
         {/* Title */}
         <Text
@@ -268,18 +286,35 @@ const styles = StyleSheet.create({
     right: 0,
     padding: Spacing.lg,
   },
+  badgesRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    marginBottom: Spacing.sm,
+    gap: Spacing.sm,
+  },
   ratingBadge: {
-    alignSelf: 'flex-start',
     paddingHorizontal: Spacing.sm,
     paddingVertical: Spacing.xs,
     borderRadius: BorderRadius.sm,
-    marginBottom: Spacing.sm,
     minWidth: 44,
     minHeight: 28,
     alignItems: 'center',
     justifyContent: 'center',
   },
   ratingText: {
+    fontSize: Typography.sizes.sm,
+    fontWeight: Typography.weights.bold,
+  },
+  ageRatingBadge: {
+    paddingHorizontal: Spacing.sm,
+    paddingVertical: Spacing.xs,
+    borderRadius: BorderRadius.sm,
+    minWidth: 32,
+    minHeight: 28,
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  ageRatingText: {
     fontSize: Typography.sizes.sm,
     fontWeight: Typography.weights.bold,
   },

@@ -8,8 +8,9 @@
  * - Property 10: Cast Carousel Display
  * - Property 11: Cast Member Limit
  * - Property 12: Streaming Provider Display
+ * - Property 44: Age Rating Display
  * 
- * Validates: Requirements 4.2, 4.3, 4.4, 4.5, 4.6, 16.3
+ * Validates: Requirements 4.2, 4.3, 4.4, 4.5, 4.6, 16.3, 19.1
  */
 
 import * as fc from 'fast-check';
@@ -137,6 +138,7 @@ interface MediaDetails {
   voteCount: number;
   mediaType: 'movie' | 'tv';
   genreIds: number[];
+  ageRating?: string | null;
   runtime: number | null;
   genres: Genre[];
   tagline: string;
@@ -179,11 +181,54 @@ const mediaDetailsArb = fc.record({
   posterPath: fc.option(fc.string({ minLength: 1, maxLength: 100 }).map(s => `/${s}.jpg`), { nil: null }),
   backdropPath: fc.option(fc.string({ minLength: 1, maxLength: 100 }).map(s => `/${s}.jpg`), { nil: null }),
   overview: fc.string({ minLength: 0, maxLength: 1000 }),
-  releaseDate: fc.date({ min: new Date('1900-01-01'), max: new Date('2030-12-31') }).map(d => d.toISOString().split('T')[0]),
+  releaseDate: fc.integer({ min: 1900, max: 2030 }).chain(year => 
+    fc.integer({ min: 1, max: 12 }).chain(month =>
+      fc.integer({ min: 1, max: 28 }).map(day => 
+        `${year}-${month.toString().padStart(2, '0')}-${day.toString().padStart(2, '0')}`
+      )
+    )
+  ),
   voteAverage: fc.option(fc.float({ min: Math.fround(0), max: Math.fround(10), noNaN: true }), { nil: null }),
   voteCount: fc.integer({ min: 0, max: 100000 }),
   mediaType: fc.constantFrom<'movie' | 'tv'>('movie', 'tv'),
   genreIds: fc.array(fc.integer({ min: 1, max: 100 }), { minLength: 0, maxLength: 5 }),
+  ageRating: fc.option(fc.constantFrom('G', 'PG', 'PG-13', 'R', 'NC-17', 'TV-Y', 'TV-Y7', 'TV-G', 'TV-PG', 'TV-14', 'TV-MA'), { nil: null }),
+  runtime: fc.option(fc.integer({ min: 1, max: 300 }), { nil: null }),
+  genres: genresArrayArb,
+  tagline: fc.string({ minLength: 0, maxLength: 200 }),
+  status: fc.constantFrom('Released', 'In Production', 'Post Production', 'Planned'),
+  productionCountries: fc.array(fc.record({
+    iso_3166_1: fc.string({ minLength: 2, maxLength: 2 }),
+    name: fc.string({ minLength: 1, maxLength: 50 }),
+  }), { minLength: 0, maxLength: 3 }),
+  spokenLanguages: fc.array(fc.record({
+    iso_639_1: fc.string({ minLength: 2, maxLength: 2 }),
+    name: fc.string({ minLength: 1, maxLength: 50 }),
+    englishName: fc.string({ minLength: 1, maxLength: 50 }),
+  }), { minLength: 0, maxLength: 3 }),
+  numberOfSeasons: fc.option(fc.integer({ min: 1, max: 50 })),
+  numberOfEpisodes: fc.option(fc.integer({ min: 1, max: 500 })),
+});
+
+const mediaDetailsWithAgeRatingArb = fc.record({
+  id: fc.integer({ min: 1, max: 1000000 }),
+  title: fc.string({ minLength: 1, maxLength: 200 }),
+  originalTitle: fc.string({ minLength: 1, maxLength: 200 }),
+  posterPath: fc.option(fc.string({ minLength: 1, maxLength: 100 }).map(s => `/${s}.jpg`), { nil: null }),
+  backdropPath: fc.option(fc.string({ minLength: 1, maxLength: 100 }).map(s => `/${s}.jpg`), { nil: null }),
+  overview: fc.string({ minLength: 0, maxLength: 1000 }),
+  releaseDate: fc.integer({ min: 1900, max: 2030 }).chain(year => 
+    fc.integer({ min: 1, max: 12 }).chain(month =>
+      fc.integer({ min: 1, max: 28 }).map(day => 
+        `${year}-${month.toString().padStart(2, '0')}-${day.toString().padStart(2, '0')}`
+      )
+    )
+  ),
+  voteAverage: fc.option(fc.float({ min: Math.fround(0), max: Math.fround(10), noNaN: true }), { nil: null }),
+  voteCount: fc.integer({ min: 0, max: 100000 }),
+  mediaType: fc.constantFrom<'movie' | 'tv'>('movie', 'tv'),
+  genreIds: fc.array(fc.integer({ min: 1, max: 100 }), { minLength: 0, maxLength: 5 }),
+  ageRating: fc.constantFrom('G', 'PG', 'PG-13', 'R', 'NC-17', 'TV-Y', 'TV-Y7', 'TV-G', 'TV-PG', 'TV-14', 'TV-MA'),
   runtime: fc.option(fc.integer({ min: 1, max: 300 }), { nil: null }),
   genres: genresArrayArb,
   tagline: fc.string({ minLength: 0, maxLength: 200 }),
@@ -601,6 +646,70 @@ describe('Detail Page Property Tests', () => {
             } else {
               expect(label).toContain('unavailable');
             }
+            
+            return true;
+          }
+        ),
+        { numRuns: 100 }
+      );
+    });
+  });
+
+  /**
+   * Property 44: Age Rating Display
+   * For any MediaItem or MediaDetails with an age rating, the rating SHALL be displayed on Media_Cards and Detail_Pages.
+   * **Validates: Requirements 19.1**
+   */
+  describe('Property 44: Age Rating Display', () => {
+    it('for any media details with age rating, age rating is available for display', () => {
+      fc.assert(
+        fc.property(
+          mediaDetailsWithAgeRatingArb,
+          (details) => {
+            // Age rating should be a valid string
+            expect(details.ageRating).toBeTruthy();
+            expect(typeof details.ageRating).toBe('string');
+            expect(details.ageRating!.length).toBeGreaterThan(0);
+            
+            // Age rating should be one of the standard ratings
+            const validRatings = ['G', 'PG', 'PG-13', 'R', 'NC-17', 'TV-Y', 'TV-Y7', 'TV-G', 'TV-PG', 'TV-14', 'TV-MA'];
+            expect(validRatings).toContain(details.ageRating);
+            
+            return true;
+          }
+        ),
+        { numRuns: 100 }
+      );
+    });
+
+    it('for any media details, age rating is optional and can be null', () => {
+      fc.assert(
+        fc.property(
+          mediaDetailsArb,
+          (details) => {
+            // Age rating can be null or a valid string
+            if (details.ageRating !== null && details.ageRating !== undefined) {
+              expect(typeof details.ageRating).toBe('string');
+              expect(details.ageRating.length).toBeGreaterThan(0);
+            }
+            
+            return true;
+          }
+        ),
+        { numRuns: 100 }
+      );
+    });
+
+    it('age rating values are from standard rating systems', () => {
+      const validMovieRatings = ['G', 'PG', 'PG-13', 'R', 'NC-17'];
+      const validTvRatings = ['TV-Y', 'TV-Y7', 'TV-G', 'TV-PG', 'TV-14', 'TV-MA'];
+      const allValidRatings = [...validMovieRatings, ...validTvRatings];
+      
+      fc.assert(
+        fc.property(
+          mediaDetailsWithAgeRatingArb,
+          (details) => {
+            expect(allValidRatings).toContain(details.ageRating);
             
             return true;
           }

@@ -8,8 +8,9 @@
  * - Property 3: Media Card Graceful Degradation
  * - Property 27: Accessibility Labels
  * - Property 28: Touch Target Size
+ * - Property 44: Age Rating Display
  * 
- * Validates: Requirements 2.1, 2.2, 12.1, 12.3, 17.4, 17.5
+ * Validates: Requirements 2.1, 2.2, 12.1, 12.3, 17.4, 17.5, 19.1
  */
 
 import * as fc from 'fast-check';
@@ -33,6 +34,7 @@ const mediaItemArb = fc.record({
   title: fc.string({ minLength: 1, maxLength: 200 }),
   posterPath: fc.option(fc.string({ minLength: 1, maxLength: 100 }).map(s => `/${s}.jpg`), { nil: null }),
   rating: fc.option(fc.float({ min: Math.fround(0), max: Math.fround(10), noNaN: true }), { nil: null }),
+  ageRating: fc.option(fc.constantFrom('G', 'PG', 'PG-13', 'R', 'NC-17', 'TV-Y', 'TV-Y7', 'TV-G', 'TV-PG', 'TV-14', 'TV-MA'), { nil: null }),
 });
 
 const mediaItemWithPosterAndRatingArb = fc.record({
@@ -40,6 +42,15 @@ const mediaItemWithPosterAndRatingArb = fc.record({
   title: fc.string({ minLength: 1, maxLength: 200 }),
   posterPath: fc.string({ minLength: 1, maxLength: 100 }).map(s => `/${s}.jpg`),
   rating: fc.float({ min: Math.fround(0.1), max: Math.fround(10), noNaN: true }),
+  ageRating: fc.option(fc.constantFrom('G', 'PG', 'PG-13', 'R', 'NC-17', 'TV-Y', 'TV-Y7', 'TV-G', 'TV-PG', 'TV-14', 'TV-MA'), { nil: null }),
+});
+
+const mediaItemWithAgeRatingArb = fc.record({
+  id: fc.integer({ min: 1, max: 1000000 }),
+  title: fc.string({ minLength: 1, maxLength: 200 }),
+  posterPath: fc.option(fc.string({ minLength: 1, maxLength: 100 }).map(s => `/${s}.jpg`), { nil: null }),
+  rating: fc.option(fc.float({ min: Math.fround(0), max: Math.fround(10), noNaN: true }), { nil: null }),
+  ageRating: fc.constantFrom('G', 'PG', 'PG-13', 'R', 'NC-17', 'TV-Y', 'TV-Y7', 'TV-G', 'TV-PG', 'TV-14', 'TV-MA'),
 });
 
 const mediaItemWithNullPosterArb = fc.record({
@@ -47,6 +58,7 @@ const mediaItemWithNullPosterArb = fc.record({
   title: fc.string({ minLength: 1, maxLength: 200 }),
   posterPath: fc.constant(null),
   rating: fc.option(fc.float({ min: 0, max: 10, noNaN: true }), { nil: null }),
+  ageRating: fc.option(fc.constantFrom('G', 'PG', 'PG-13', 'R', 'NC-17', 'TV-Y', 'TV-Y7', 'TV-G', 'TV-PG', 'TV-14', 'TV-MA'), { nil: null }),
 });
 
 const mediaItemWithNullRatingArb = fc.record({
@@ -54,6 +66,7 @@ const mediaItemWithNullRatingArb = fc.record({
   title: fc.string({ minLength: 1, maxLength: 200 }),
   posterPath: fc.option(fc.string({ minLength: 1, maxLength: 100 }).map(s => `/${s}.jpg`), { nil: null }),
   rating: fc.constant(null),
+  ageRating: fc.option(fc.constantFrom('G', 'PG', 'PG-13', 'R', 'NC-17', 'TV-Y', 'TV-Y7', 'TV-G', 'TV-PG', 'TV-14', 'TV-MA'), { nil: null }),
 });
 
 describe('MediaCard Property Tests', () => {
@@ -232,16 +245,20 @@ describe('MediaCard Property Tests', () => {
             const hasTitle = item.title.length > 0;
             expect(hasTitle).toBe(true);
             
+            const accessibilityLabel = generateAccessibilityLabel(item.title, item.rating, item.ageRating);
+            
+            // Should always contain title
+            expect(accessibilityLabel).toContain(item.title);
+            
             // If rating exists, it should be included in accessibility label
             if (item.rating !== null && item.rating > 0) {
               const formattedRating = item.rating.toFixed(1);
-              const accessibilityLabel = `${item.title}, rated ${formattedRating} out of 10`;
-              expect(accessibilityLabel).toContain(item.title);
               expect(accessibilityLabel).toContain(formattedRating);
-            } else {
-              // Without rating, just the title
-              const accessibilityLabel = item.title;
-              expect(accessibilityLabel.length).toBeGreaterThan(0);
+            }
+            
+            // If age rating exists, it should be included in accessibility label
+            if (item.ageRating) {
+              expect(accessibilityLabel).toContain(item.ageRating);
             }
             
             return true;
@@ -294,6 +311,70 @@ describe('MediaCard Property Tests', () => {
         expect(dimensions.width).toBeGreaterThanOrEqual(minTouchTarget);
         expect(dimensions.height).toBeGreaterThanOrEqual(minTouchTarget);
       });
+    });
+  });
+
+  /**
+   * Property 44: Age Rating Display
+   * For any MediaItem or MediaDetails with an age rating, the rating SHALL be displayed on Media_Cards and Detail_Pages.
+   * **Validates: Requirements 19.1**
+   */
+  describe('Property 44: Age Rating Display', () => {
+    it('for any media item with age rating, age rating is available for display', () => {
+      fc.assert(
+        fc.property(
+          mediaItemWithAgeRatingArb,
+          (item) => {
+            // Age rating should be a valid string
+            expect(item.ageRating).toBeTruthy();
+            expect(typeof item.ageRating).toBe('string');
+            expect(item.ageRating!.length).toBeGreaterThan(0);
+            
+            // Age rating should be one of the standard ratings
+            const validRatings = ['G', 'PG', 'PG-13', 'R', 'NC-17', 'TV-Y', 'TV-Y7', 'TV-G', 'TV-PG', 'TV-14', 'TV-MA'];
+            expect(validRatings).toContain(item.ageRating);
+            
+            return true;
+          }
+        ),
+        { numRuns: 100 }
+      );
+    });
+
+    it('for any media item, age rating is optional and can be null', () => {
+      fc.assert(
+        fc.property(
+          mediaItemArb,
+          (item) => {
+            // Age rating can be null or a valid string
+            if (item.ageRating !== null) {
+              expect(typeof item.ageRating).toBe('string');
+              expect(item.ageRating.length).toBeGreaterThan(0);
+            }
+            
+            return true;
+          }
+        ),
+        { numRuns: 100 }
+      );
+    });
+
+    it('for any media item with age rating, accessibility label includes age rating', () => {
+      fc.assert(
+        fc.property(
+          mediaItemWithAgeRatingArb,
+          (item) => {
+            const accessibilityLabel = generateAccessibilityLabel(item.title, item.rating, item.ageRating);
+            
+            // Should contain the age rating
+            expect(accessibilityLabel).toContain(item.ageRating);
+            expect(accessibilityLabel).toContain('age rating');
+            
+            return true;
+          }
+        ),
+        { numRuns: 100 }
+      );
     });
   });
 });

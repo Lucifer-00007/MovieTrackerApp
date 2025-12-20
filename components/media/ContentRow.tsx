@@ -85,6 +85,7 @@ export function ContentRow({
           title={item.title}
           posterPath={item.posterPath}
           rating={item.voteAverage}
+          ageRating={item.ageRating}
           variant="medium"
           onPress={() => onItemPress(item.id, item.mediaType)}
           testID={testID ? `${testID}-item-${item.id}` : undefined}

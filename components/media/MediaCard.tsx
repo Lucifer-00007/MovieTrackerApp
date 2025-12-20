@@ -33,6 +33,8 @@ export interface MediaCardProps {
   posterPath: string | null;
   /** Rating value (null if unavailable) */
   rating: number | null;
+  /** Age rating (e.g., PG, R, TV-MA) */
+  ageRating?: string | null;
   /** Size variant of the card */
   variant: MediaCardVariant;
   /** Callback when card is pressed */
@@ -48,6 +50,7 @@ export function MediaCard({
   title,
   posterPath,
   rating,
+  ageRating,
   variant,
   onPress,
   onLongPress,
@@ -58,6 +61,8 @@ export function MediaCard({
   const textSecondary = useThemeColor({}, 'textSecondary');
   const ratingBadgeColor = useThemeColor({}, 'ratingBadge');
   const ratingTextColor = useThemeColor({}, 'ratingText');
+  const ageRatingBadgeColor = useThemeColor({}, 'warning');
+  const ageRatingTextColor = useThemeColor({}, 'background');
   
   const dimensions = getVariantDimensions(variant);
   const posterUrl = getPosterUrl(posterPath, variant);
@@ -68,7 +73,7 @@ export function MediaCard({
   const touchHeight = Math.max(dimensions.height, ComponentTokens.touchTarget.min);
   
   // Accessibility label
-  const accessibilityLabel = generateAccessibilityLabel(title, rating);
+  const accessibilityLabel = generateAccessibilityLabel(title, rating, ageRating);
 
   return (
     <Pressable
@@ -143,6 +148,23 @@ export function MediaCard({
           </View>
         )}
 
+        {/* Age Rating Badge - only shown when age rating is available */}
+        {ageRating && (
+          <View
+            style={[
+              styles.ageRatingBadge,
+              { backgroundColor: ageRatingBadgeColor },
+              showRating && styles.ageRatingBadgeWithRating,
+            ]}
+            accessibilityLabel={`Age rating: ${ageRating}`}
+            testID={testID ? `${testID}-age-rating` : undefined}
+          >
+            <Text style={[styles.ageRatingText, { color: ageRatingTextColor }]}>
+              {ageRating}
+            </Text>
+          </View>
+        )}
+
         {/* Title overlay for large variant */}
         {variant === 'large' && (
           <View style={styles.titleOverlay}>
@@ -203,6 +225,25 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
   },
   ratingText: {
+    fontSize: Typography.sizes.xs,
+    fontWeight: Typography.weights.bold,
+  },
+  ageRatingBadge: {
+    position: 'absolute',
+    top: Spacing.xs,
+    left: Spacing.xs,
+    paddingHorizontal: Spacing.sm,
+    paddingVertical: Spacing.xs,
+    borderRadius: BorderRadius.sm,
+    minWidth: 32,
+    minHeight: 24,
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  ageRatingBadgeWithRating: {
+    top: Spacing.xs + 32, // Position below rating badge when both are present
+  },
+  ageRatingText: {
     fontSize: Typography.sizes.xs,
     fontWeight: Typography.weights.bold,
   },
