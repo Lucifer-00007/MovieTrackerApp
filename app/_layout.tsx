@@ -14,8 +14,43 @@ export default function RootLayout() {
 
   return (
     <ThemeProvider value={colorScheme === 'dark' ? DarkTheme : DefaultTheme}>
-      <Stack>
+      <Stack
+        screenOptions={{
+          animation: 'slide_from_right',
+          gestureEnabled: true,
+          gestureDirection: 'horizontal',
+        }}
+      >
         <Stack.Screen name="(tabs)" options={{ headerShown: false }} />
+        <Stack.Screen 
+          name="movie/[id]" 
+          options={{ 
+            headerShown: false,
+            animation: 'slide_from_right',
+          }} 
+        />
+        <Stack.Screen 
+          name="tv/[id]" 
+          options={{ 
+            headerShown: false,
+            animation: 'slide_from_right',
+          }} 
+        />
+        <Stack.Screen 
+          name="country/[code]" 
+          options={{ 
+            headerShown: false,
+            animation: 'slide_from_right',
+          }} 
+        />
+        <Stack.Screen 
+          name="trailer/[key]" 
+          options={{ 
+            headerShown: false,
+            presentation: 'fullScreenModal',
+            animation: 'fade',
+          }} 
+        />
         <Stack.Screen name="modal" options={{ presentation: 'modal', title: 'Modal' }} />
       </Stack>
       <StatusBar style="auto" />
