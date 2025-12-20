@@ -73,11 +73,11 @@ This implementation plan breaks down the MovieStream MVP into incremental coding
     - **Property 35: Recently Viewed Row Visibility**
     - **Validates: Requirements 14.1, 14.4**
 
-- [ ] 4. Checkpoint - Core Infrastructure
+- [x] 4. Checkpoint - Core Infrastructure
   - Ensure all tests pass, ask the user if questions arise.
 
-- [ ] 5. Core UI Components
-  - [ ] 5.1 Create Media Card component
+- [x] 5. Core UI Components
+  - [x] 5.1 Create Media Card component
     - Create components/media/MediaCard.tsx with variant support (large/medium/small)
     - Implement poster image with expo-image and placeholder fallback
     - Implement rating badge with conditional visibility
@@ -85,7 +85,7 @@ This implementation plan breaks down the MovieStream MVP into incremental coding
     - Ensure 44x44 minimum touch target
     - _Requirements: 2.1, 2.2, 2.3, 12.1, 12.3, 17.4, 17.5_
 
-  - [ ] 5.2 Write property tests for Media Card
+  - [x] 5.2 Write property tests for Media Card
     - **Property 1: Media Card Renders Required Fields**
     - **Property 2: Media Card Variant Dimensions**
     - **Property 3: Media Card Graceful Degradation**
@@ -93,34 +93,34 @@ This implementation plan breaks down the MovieStream MVP into incremental coding
     - **Property 28: Touch Target Size**
     - **Validates: Requirements 2.1, 2.2, 12.1, 12.3, 17.4, 17.5**
 
-  - [ ] 5.3 Create Hero Carousel component
+  - [x] 5.3 Create Hero Carousel component
     - Create components/media/HeroCarousel.tsx with auto-advance (5s interval)
     - Implement swipe gesture navigation with react-native-gesture-handler
     - Add pagination indicators
     - _Requirements: 1.1, 1.2, 1.3_
 
-  - [ ] 5.4 Create Content Row component
+  - [x] 5.4 Create Content Row component
     - Create components/media/ContentRow.tsx with horizontal scroll
     - Implement infinite scroll with onEndReached callback
     - Add section title and "See All" link
     - _Requirements: 1.4, 1.5_
 
-  - [ ] 5.5 Write property tests for infinite scroll pagination
+  - [x] 5.5 Write property tests for infinite scroll pagination
     - **Property 4: Infinite Scroll Pagination**
     - **Validates: Requirements 1.5**
 
-  - [ ] 5.6 Create Skeleton components
+  - [x] 5.6 Create Skeleton components
     - Create components/ui/Skeleton.tsx with variants (card, hero, row, detail)
     - Implement shimmer animation with react-native-reanimated
     - _Requirements: 1.6_
 
-  - [ ] 5.7 Create Error and Empty State components
+  - [x] 5.7 Create Error and Empty State components
     - Create components/ui/ErrorState.tsx with retry button
     - Create components/ui/EmptyState.tsx with suggestions
     - Create components/ui/OfflineBanner.tsx
     - _Requirements: 6.5, 16.1, 16.2, 16.6, 17.2_
 
-  - [ ] 5.8 Write property tests for error states
+  - [x] 5.8 Write property tests for error states
     - **Property 38: Offline Banner Display**
     - **Property 39: Server Error Display**
     - **Property 42: Empty Filter Results Handling**
@@ -361,6 +361,7 @@ This implementation plan breaks down the MovieStream MVP into incremental coding
     - **Validates: Requirements 19.1**
 
 - [ ] 22. Final Checkpoint
+  - Update ./README.md following best practices.
   - Ensure all tests pass, ask the user if questions arise.
   - Verify all requirements are implemented
   - Run full test suite including property tests
