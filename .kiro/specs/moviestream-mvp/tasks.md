@@ -31,8 +31,8 @@ This implementation plan breaks down the MovieStream MVP into incremental coding
     - **Property 23: Color Contrast Compliance**
     - **Validates: Requirements 9.5**
 
-- [ ] 2. API Client and Data Layer
-  - [ ] 2.1 Create TMDB API client
+- [x] 2. API Client and Data Layer
+  - [x] 2.1 Create TMDB API client
     - Create services/api/tmdb.ts with base configuration
     - Implement getTrending(), getMovieDetails(), getTvDetails(), searchMulti()
     - Implement getMovieCredits(), getTvCredits(), getWatchProviders()
@@ -40,18 +40,18 @@ This implementation plan breaks down the MovieStream MVP into incremental coding
     - Add retry logic with exponential backoff (3 attempts)
     - _Requirements: 1.1, 3.2, 4.2, 6.2, 16.7_
 
-  - [ ] 2.2 Write property tests for API retry logic
+  - [x] 2.2 Write property tests for API retry logic
     - **Property 40: Network Retry Logic**
     - **Validates: Requirements 16.7**
 
-  - [ ] 2.3 Create AsyncStorage service
+  - [x] 2.3 Create AsyncStorage service
     - Create services/storage.ts with typed get/set/remove operations
     - Implement watchlist persistence functions
     - Implement recently viewed persistence functions
     - Implement user preferences persistence
     - _Requirements: 7.3, 14.3_
 
-  - [ ] 2.4 Write property tests for storage persistence
+  - [x] 2.4 Write property tests for storage persistence
     - **Property 16: Watchlist Toggle** (persistence aspect)
     - **Property 34: Recently Viewed Persistence**
     - **Validates: Requirements 7.3, 14.3**
