@@ -205,11 +205,11 @@ This implementation plan breaks down the MovieStream MVP into incremental coding
     - **Property 13: Trailer Button Visibility**
     - **Validates: Requirements 5.1, 5.5**
 
-- [ ] 11. Checkpoint - Core Screens
+- [x] 11. Checkpoint - Core Screens
   - Ensure all tests pass, ask the user if questions arise.
 
-- [ ] 12. Country Hub Implementation
-  - [ ] 12.1 Create Country Hub screen
+- [x] 12. Country Hub Implementation
+  - [x] 12.1 Create Country Hub screen
     - Implement app/country/[code].tsx with ranked content list
     - Add country flag and name header
     - Implement rank badges (1-10)
@@ -218,13 +218,13 @@ This implementation plan breaks down the MovieStream MVP into incremental coding
     - Handle empty filter results
     - _Requirements: 3.1, 3.2, 3.3, 3.4, 3.5, 3.6, 17.2_
 
-  - [ ] 12.2 Write property tests for Country Hub
+  - [x] 12.2 Write property tests for Country Hub
     - **Property 5: Country Hub Content Filtering**
     - **Property 6: Country Hub Rank Badges**
     - **Property 7: Country Hub Header Display**
     - **Validates: Requirements 3.3, 3.4, 3.5, 3.6**
 
-  - [ ] 12.3 Create Browse screen with country selection
+  - [x] 12.3 Create Browse screen with country selection
     - Implement app/(tabs)/browse.tsx with country grid
     - Display all 7 supported countries with flags
     - Navigate to Country Hub on selection
