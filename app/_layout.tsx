@@ -6,6 +6,7 @@ import { useEffect, useState } from 'react';
 import 'react-native-reanimated';
 
 import { useColorScheme } from '@/hooks/use-color-scheme';
+import { useRouteAnnouncements } from '@/hooks/use-route-announcements';
 import { initializeAnalytics } from '@/services/analytics';
 import { initializeLocalization } from '@/services/localization';
 import { usePreferencesStore } from '@/stores/preferencesStore';
@@ -30,6 +31,9 @@ export default function RootLayout() {
   const colorScheme = useColorScheme();
   const [isConsentModalVisible, setIsConsentModalVisible] = useState(false);
   const [isConsentLoading, setIsConsentLoading] = useState(false);
+
+  // Enable route announcements for screen readers
+  useRouteAnnouncements();
 
   const {
     preferences,

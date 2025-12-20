@@ -337,14 +337,14 @@ This implementation plan breaks down the MovieStream MVP into incremental coding
     - **Property 26: RTL Layout Support**
     - **Validates: Requirements 11.2, 11.4, 11.5**
 
-- [ ] 20. Accessibility Enhancements
-  - [ ] 20.1 Add accessibility labels throughout
+- [x] 20. Accessibility Enhancements
+  - [x] 20.1 Add accessibility labels throughout
     - Audit all interactive components for labels
     - Add screen reader announcements for route changes
     - Verify dynamic type support
     - _Requirements: 12.1, 12.4, 12.5_
 
-  - [ ] 20.2 Write property tests for accessibility
+  - [x] 20.2 Write property tests for accessibility
     - **Property 27: Accessibility Labels**
     - **Property 28: Touch Target Size**
     - **Property 29: Dynamic Type Support**

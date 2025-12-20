@@ -5,6 +5,7 @@ import { HapticTab } from '@/components/haptic-tab';
 import { IconSymbol } from '@/components/ui/icon-symbol';
 import { Colors } from '@/constants/theme';
 import { useColorScheme } from '@/hooks/use-color-scheme';
+import { getAccessibilityRole } from '@/hooks/use-accessibility';
 
 export default function TabLayout() {
   const colorScheme = useColorScheme();
@@ -21,12 +22,14 @@ export default function TabLayout() {
           backgroundColor: colors.background,
           borderTopColor: colors.border,
         },
+        tabBarAccessibilityLabel: 'Main navigation',
       }}>
       <Tabs.Screen
         name="index"
         options={{
           title: 'Home',
           tabBarIcon: ({ color }) => <IconSymbol size={28} name="house.fill" color={color} />,
+          tabBarAccessibilityLabel: 'Home tab',
         }}
       />
       <Tabs.Screen
@@ -34,6 +37,7 @@ export default function TabLayout() {
         options={{
           title: 'Browse',
           tabBarIcon: ({ color }) => <IconSymbol size={28} name="globe" color={color} />,
+          tabBarAccessibilityLabel: 'Browse countries tab',
         }}
       />
       <Tabs.Screen
@@ -41,6 +45,7 @@ export default function TabLayout() {
         options={{
           title: 'Downloads',
           tabBarIcon: ({ color }) => <IconSymbol size={28} name="arrow.down.circle.fill" color={color} />,
+          tabBarAccessibilityLabel: 'Downloads tab',
         }}
       />
       <Tabs.Screen
@@ -48,6 +53,7 @@ export default function TabLayout() {
         options={{
           title: 'Search',
           tabBarIcon: ({ color }) => <IconSymbol size={28} name="magnifyingglass" color={color} />,
+          tabBarAccessibilityLabel: 'Search tab',
         }}
       />
       <Tabs.Screen
@@ -55,6 +61,7 @@ export default function TabLayout() {
         options={{
           title: 'Profile',
           tabBarIcon: ({ color }) => <IconSymbol size={28} name="person.fill" color={color} />,
+          tabBarAccessibilityLabel: 'Profile and settings tab',
         }}
       />
       {/* Hide the old explore tab */}
