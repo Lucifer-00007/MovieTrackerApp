@@ -306,8 +306,8 @@ This implementation plan breaks down the MovieStream MVP into incremental coding
     - Add provider tap tracking to ProviderList
     - _Requirements: 13.1, 13.2, 13.3, 13.4, 13.5_
 
-- [ ] 18. Settings and Preferences
-  - [ ] 18.1 Create Profile/Settings screen
+- [x] 18. Settings and Preferences
+  - [x] 18.1 Create Profile/Settings screen
     - Implement app/(tabs)/profile.tsx with settings sections
     - Add theme mode toggle (light/dark/system)
     - Add language selection
@@ -315,23 +315,23 @@ This implementation plan breaks down the MovieStream MVP into incremental coding
     - Add privacy/analytics settings
     - _Requirements: 9.2, 11.3, 15.3, 19.3_
 
-  - [ ] 18.2 Write property tests for theme settings
+  - [x] 18.2 Write property tests for theme settings
     - **Property 22: System Theme Respect**
     - **Validates: Requirements 9.3**
 
-  - [ ] 18.3 Implement GDPR consent flow
+  - [x] 18.3 Implement GDPR consent flow
     - Create first-launch consent dialog
     - Persist consent to preferences
     - _Requirements: 19.2_
 
-- [ ] 19. Localization
-  - [ ] 19.1 Set up i18n infrastructure
+- [x] 19. Localization
+  - [x] 19.1 Set up i18n infrastructure
     - Create locales/ folder with en.json as default
     - Implement locale loading service
     - Add date/number formatting utilities
     - _Requirements: 11.1, 11.2, 11.4_
 
-  - [ ] 19.2 Write property tests for localization
+  - [x] 19.2 Write property tests for localization
     - **Property 24: Locale String Loading**
     - **Property 25: Locale Date/Number Formatting**
     - **Property 26: RTL Layout Support**

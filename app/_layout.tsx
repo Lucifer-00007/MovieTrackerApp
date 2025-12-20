@@ -2,11 +2,14 @@ import { DarkTheme, DefaultTheme, ThemeProvider } from '@react-navigation/native
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { Stack } from 'expo-router';
 import { StatusBar } from 'expo-status-bar';
-import { useEffect } from 'react';
+import { useEffect, useState } from 'react';
 import 'react-native-reanimated';
 
 import { useColorScheme } from '@/hooks/use-color-scheme';
 import { initializeAnalytics } from '@/services/analytics';
+import { initializeLocalization } from '@/services/localization';
+import { usePreferencesStore } from '@/stores/preferencesStore';
+import { GdprConsentModal } from '@/components/ui/GdprConsentModal';
 
 export const unstable_settings = {
   anchor: '(tabs)',
@@ -25,11 +28,66 @@ const queryClient = new QueryClient({
 
 export default function RootLayout() {
   const colorScheme = useColorScheme();
+  const [isConsentModalVisible, setIsConsentModalVisible] = useState(false);
+  const [isConsentLoading, setIsConsentLoading] = useState(false);
 
-  // Initialize analytics service on app start
+  const {
+    preferences,
+    loadPreferences,
+    setGdprConsent,
+    setAnalyticsEnabled,
+  } = usePreferencesStore();
+
+  // Initialize analytics service and check consent status
   useEffect(() => {
-    initializeAnalytics();
-  }, []);
+    const initializeApp = async () => {
+      // Initialize localization first
+      await initializeLocalization();
+      
+      // Load preferences
+      await loadPreferences();
+      
+      // Initialize analytics service
+      initializeAnalytics();
+    };
+
+    initializeApp();
+  }, [loadPreferences]);
+
+  // Show consent modal if GDPR consent hasn't been given
+  useEffect(() => {
+    if (preferences && !preferences.gdprConsentGiven) {
+      setIsConsentModalVisible(true);
+    }
+  }, [preferences]);
+
+  const handleConsentAccept = async () => {
+    setIsConsentLoading(true);
+    try {
+      // Set GDPR consent and enable analytics
+      await setGdprConsent(true);
+      await setAnalyticsEnabled(true);
+      setIsConsentModalVisible(false);
+    } catch (error) {
+      console.error('Failed to save consent:', error);
+    } finally {
+      setIsConsentLoading(false);
+    }
+  };
+
+  const handleConsentDecline = async () => {
+    setIsConsentLoading(true);
+    try {
+      // Set GDPR consent but disable analytics
+      await setGdprConsent(true);
+      await setAnalyticsEnabled(false);
+      setIsConsentModalVisible(false);
+    } catch (error) {
+      console.error('Failed to save consent:', error);
+    } finally {
+      setIsConsentLoading(false);
+    }
+  };
 
   return (
     <QueryClientProvider client={queryClient}>
@@ -73,6 +131,15 @@ export default function RootLayout() {
         />
         <Stack.Screen name="modal" options={{ presentation: 'modal', title: 'Modal' }} />
       </Stack>
+      
+      {/* GDPR Consent Modal */}
+      <GdprConsentModal
+        visible={isConsentModalVisible}
+        onAccept={handleConsentAccept}
+        onDecline={handleConsentDecline}
+        isLoading={isConsentLoading}
+      />
+      
       <StatusBar style="auto" />
     </ThemeProvider>
     </QueryClientProvider>

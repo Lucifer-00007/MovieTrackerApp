@@ -1,0 +1,168 @@
+{
+  "common": {
+    "loading": "Loading...",
+    "error": "Error",
+    "retry": "Retry",
+    "cancel": "Cancel",
+    "save": "Save",
+    "delete": "Delete",
+    "edit": "Edit",
+    "done": "Done",
+    "close": "Close",
+    "back": "Back",
+    "next": "Next",
+    "previous": "Previous",
+    "search": "Search",
+    "filter": "Filter",
+    "sort": "Sort",
+    "clear": "Clear",
+    "all": "All",
+    "none": "None",
+    "yes": "Yes",
+    "no": "No",
+    "ok": "OK"
+  },
+  "navigation": {
+    "home": "Home",
+    "browse": "Browse",
+    "downloads": "Downloads",
+    "search": "Search",
+    "profile": "Profile"
+  },
+  "home": {
+    "trending": "Trending",
+    "recentlyViewed": "Recently Viewed",
+    "recommendedForYou": "Recommended for You",
+    "seeAll": "See All"
+  },
+  "detail": {
+    "synopsis": "Synopsis",
+    "cast": "Cast",
+    "streamingOn": "Streaming On",
+    "notAvailableForStreaming": "Not available for streaming",
+    "recommendations": "Recommendations",
+    "addToWatchlist": "Add to Watchlist",
+    "removeFromWatchlist": "Remove from Watchlist",
+    "download": "Download",
+    "playTrailer": "Play Trailer",
+    "runtime": "Runtime",
+    "releaseDate": "Release Date",
+    "rating": "Rating",
+    "genres": "Genres"
+  },
+  "search": {
+    "searchPlaceholder": "Search movies, series, anime...",
+    "noResults": "No results found",
+    "tryDifferentKeywords": "Try different keywords or browse by category",
+    "movies": "Movies",
+    "tvShows": "TV Shows",
+    "filterByCountry": "Filter by Country",
+    "filterByGenre": "Filter by Genre",
+    "filterByYear": "Filter by Year"
+  },
+  "watchlist": {
+    "title": "Watchlist",
+    "empty": "Your watchlist is empty",
+    "addSomeTitles": "Add some titles to get started",
+    "syncStatus": {
+      "synced": "Synced",
+      "pending": "Syncing...",
+      "error": "Sync failed"
+    }
+  },
+  "downloads": {
+    "title": "Downloads",
+    "empty": "No downloads",
+    "startDownloading": "Start downloading content for offline viewing",
+    "storageUsed": "Storage Used",
+    "available": "Available",
+    "pause": "Pause",
+    "resume": "Resume",
+    "cancel": "Cancel",
+    "completed": "Completed",
+    "downloading": "Downloading",
+    "paused": "Paused",
+    "queued": "Queued",
+    "error": "Error",
+    "insufficientStorage": "Insufficient storage space",
+    "freeUpSpace": "Free up space and try again"
+  },
+  "countryHub": {
+    "topContent": "Top Content",
+    "filterByType": "Filter by Type",
+    "movies": "Movies",
+    "series": "Series",
+    "anime": "Anime",
+    "noContentForFilters": "No content found for selected filters",
+    "tryDifferentFilters": "Try adjusting your filters"
+  },
+  "settings": {
+    "title": "Settings",
+    "theme": "Theme",
+    "language": "Language",
+    "notifications": "Notifications",
+    "privacy": "Privacy",
+    "analytics": "Analytics",
+    "themeOptions": {
+      "light": "Light",
+      "dark": "Dark",
+      "system": "System"
+    },
+    "notificationTypes": {
+      "downloads": "Download notifications",
+      "newReleases": "New release notifications"
+    },
+    "analyticsDescription": "Help improve the app by sharing usage data"
+  },
+  "gdpr": {
+    "title": "Privacy & Data Collection",
+    "description": "To improve MovieStream and provide you with a better experience, we'd like to collect anonymous usage analytics.",
+    "benefits": {
+      "features": "Help us understand which features are most useful",
+      "bugs": "Identify and fix bugs more quickly",
+      "privacy": "No personal information is collected"
+    },
+    "showDetails": "What data do we collect?",
+    "hideDetails": "Hide Details",
+    "dataWeCollect": "Data We Collect:",
+    "dataWeCollectList": "• Screen views and navigation patterns\n• Feature usage (search, watchlist, downloads)\n• Error reports and crash logs\n• Device type and app version\n• Performance metrics",
+    "dataWeDontCollect": "Data We Don't Collect:",
+    "dataWeDontCollectList": "• Personal information or account details\n• Search queries or viewing history\n• Location data\n• Contact information",
+    "changeAnytime": "You can change this preference at any time in the app settings.",
+    "accept": "Accept",
+    "decline": "No Thanks",
+    "saving": "Saving...",
+    "declineTitle": "Decline Analytics",
+    "declineMessage": "You can change this setting later in the app preferences."
+  },
+  "errors": {
+    "networkError": "Network error",
+    "serverError": "Server error",
+    "offline": "You're offline",
+    "tryAgain": "Try again",
+    "somethingWentWrong": "Something went wrong",
+    "trailerUnavailable": "Trailer unavailable",
+    "downloadFailed": "Download failed",
+    "castUnavailable": "Cast information unavailable",
+    "providersUnavailable": "Streaming providers unavailable"
+  },
+  "accessibility": {
+    "mediaCard": "{{title}} - {{rating}} rating",
+    "playButton": "Play trailer for {{title}}",
+    "watchlistButton": "Add {{title}} to watchlist",
+    "downloadButton": "Download {{title}}",
+    "backButton": "Go back",
+    "closeButton": "Close",
+    "searchButton": "Search",
+    "filterButton": "Filter results"
+  },
+  "countries": {
+    "US": "United States",
+    "JP": "Japan",
+    "IN": "India",
+    "CN": "China",
+    "RU": "Russia",
+    "ES": "Spain",
+    "DE": "Germany"
+  }
+}
