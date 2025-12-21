@@ -16,7 +16,7 @@ import { ContentRow } from '@/components/media/ContentRow';
 import { Skeleton } from '@/components/ui/Skeleton';
 import { ErrorState } from '@/components/ui/ErrorState';
 import { Spacing } from '@/constants/theme';
-import { getTrending, getRecommendations } from '@/services/api/tmdb';
+import { getTrending, getRecommendations } from '@/services/api';
 import { useRecentlyViewedStore } from '@/stores/recentlyViewedStore';
 import { useWatchlistStore } from '@/stores/watchlistStore';
 import type { TrendingItem, MediaItem } from '@/types/media';

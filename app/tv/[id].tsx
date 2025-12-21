@@ -39,7 +39,7 @@ import {
   getWatchProviders,
   getRecommendations,
   getTrailerKey,
-} from '@/services/api/tmdb';
+} from '@/services/api';
 import { useWatchlistStore } from '@/stores/watchlistStore';
 import { useRecentlyViewedStore } from '@/stores/recentlyViewedStore';
 import type { MediaDetails, CastMember, StreamingProvider, MediaItem } from '@/types/media';

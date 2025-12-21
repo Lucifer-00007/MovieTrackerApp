@@ -27,7 +27,7 @@ import { Skeleton } from '@/components/ui/Skeleton';
 import { ErrorState } from '@/components/ui/ErrorState';
 import { EmptyState } from '@/components/ui/EmptyState';
 import { SUPPORTED_COUNTRIES, type TrendingItem } from '@/types/media';
-import { discoverByCountry, getImageUrl } from '@/services/api/tmdb';
+import { discoverByCountry, getImageUrl } from '@/services/api';
 
 /** Content type filter options */
 export type ContentTypeFilter = 'all' | 'movie' | 'tv';

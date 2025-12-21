@@ -26,7 +26,7 @@ import { Colors, Spacing, Typography, BorderRadius } from '@/constants/theme';
 import { MediaCard } from '@/components/media/MediaCard';
 import { EmptyState } from '@/components/ui/EmptyState';
 import { Skeleton } from '@/components/ui/Skeleton';
-import { searchMulti } from '@/services/api/tmdb';
+import { searchMulti } from '@/services/api';
 import { logSearchQuery } from '@/services/analytics';
 import type { MediaItem } from '@/types/media';
 import type { SearchFilters, SearchResults } from '@/types/user';

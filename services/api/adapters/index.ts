@@ -1,0 +1,7 @@
+/**
+ * API Adapters Index
+ * Export all available adapters for the media API
+ */
+
+export { tmdbAdapter } from './tmdb-adapter';
+export { mockAdapter } from './mock-adapter';

@@ -15,7 +15,7 @@ import type {
   AnalyticsEventName 
 } from '@/types/analytics';
 import { usePreferencesStore } from '@/stores/preferencesStore';
-import { calculateBackoffDelay, type RetryConfig } from './api/tmdb';
+import { calculateBackoffDelay, type RetryConfig } from './api';
 
 // Get platform info
 const getPlatform = (): 'ios' | 'android' | 'web' => {

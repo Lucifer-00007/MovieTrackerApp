@@ -11,7 +11,8 @@
 ## Bugs
 
 #### Priority Lv: P0
-- [] Fix the following packages compatibility warning which come when we run the command `expo start`, following best practices:
+
+- [x] Fix the following packages compatibility warning which come when we run the command `expo start`, following best practices:
 	```
 	> expo start
 
@@ -32,8 +33,8 @@
 	Type 'number' is not assignable to type 'Timeout'.ts(2322)
 	(property) AnalyticsService.sendTimer: NodeJS.Timeout | null
 	```
+- [] I think the TMDB API is not responding. Create a constants usage variable in .env file. Which can be set true/false accordingly. When set to true its will use the the data from the constants and ignore the API. Also update the codebase to be flexible to use any other API other than TMDB(Make a md doc on how to setup to match the keys based on fronted). Make these changes following best practices
 
-- [] 
 - [] 
 - [] 
 - [] 
