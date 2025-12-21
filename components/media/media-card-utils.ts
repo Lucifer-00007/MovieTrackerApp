@@ -11,9 +11,22 @@ export type MediaCardVariant = 'large' | 'medium' | 'small';
 /** TMDB image base URL */
 export const TMDB_IMAGE_BASE = 'https://image.tmdb.org/t/p';
 
+/** Placeholder image for mock data mode */
+export const PLACEHOLDER_IMAGE = require('@/assets/images/placeholder-poster.png');
+
+/** Check if mock data mode is enabled */
+export function isMockDataMode(): boolean {
+  return process.env.EXPO_PUBLIC_USE_MOCK_DATA === 'true';
+}
+
 /** Get poster URL based on variant size */
 export function getPosterUrl(posterPath: string | null, variant: MediaCardVariant): string | null {
   if (!posterPath) return null;
+  
+  // In mock data mode, return special marker for placeholder
+  if (isMockDataMode() || posterPath === 'placeholder') {
+    return 'placeholder';
+  }
   
   const sizeMap: Record<MediaCardVariant, string> = {
     large: 'w500',

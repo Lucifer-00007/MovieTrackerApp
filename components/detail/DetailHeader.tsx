@@ -35,6 +35,9 @@ import {
   generateDetailAccessibilityLabel,
 } from './detail-utils';
 
+/** Placeholder image for mock data mode */
+const PLACEHOLDER_IMAGE = require('@/assets/images/placeholder-poster.png');
+
 const { width: SCREEN_WIDTH } = Dimensions.get('window');
 const HEADER_HEIGHT = 400;
 const PARALLAX_FACTOR = 0.5;
@@ -118,7 +121,7 @@ export function DetailHeader({
       <Animated.View style={[styles.imageContainer, parallaxStyle]}>
         {backdropUrl ? (
           <Image
-            source={{ uri: backdropUrl }}
+            source={backdropUrl === 'placeholder' ? PLACEHOLDER_IMAGE : { uri: backdropUrl }}
             style={styles.heroImage}
             contentFit="cover"
             transition={300}

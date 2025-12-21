@@ -29,6 +29,9 @@ import {
 const ITEM_WIDTH = ComponentTokens.cast.itemWidth;
 const ITEM_HEIGHT = ITEM_WIDTH * 1.5;
 
+/** Placeholder image for mock data mode */
+const PLACEHOLDER_IMAGE = require('@/assets/images/placeholder-poster.png');
+
 export interface CastCarouselProps {
   /** Array of cast members */
   cast: CastMember[];
@@ -69,7 +72,7 @@ export function CastCarousel({
           <View style={[styles.imageContainer, { backgroundColor: cardBorder }]}>
             {profileUrl ? (
               <Image
-                source={{ uri: profileUrl }}
+                source={profileUrl === 'placeholder' ? PLACEHOLDER_IMAGE : { uri: profileUrl }}
                 style={styles.profileImage}
                 contentFit="cover"
                 transition={200}

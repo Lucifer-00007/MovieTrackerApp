@@ -30,6 +30,14 @@ const AUTO_ADVANCE_INTERVAL = ComponentTokens.heroCarousel.autoAdvanceInterval;
 /** TMDB image base URL */
 const TMDB_IMAGE_BASE = 'https://image.tmdb.org/t/p';
 
+/** Placeholder image for mock data mode */
+const PLACEHOLDER_IMAGE = require('@/assets/images/placeholder-poster.png');
+
+/** Check if mock data mode is enabled */
+function isMockDataMode(): boolean {
+  return process.env.EXPO_PUBLIC_USE_MOCK_DATA === 'true';
+}
+
 export interface HeroCarouselProps {
   /** Array of trending items to display */
   items: TrendingItem[];
@@ -44,6 +52,7 @@ export interface HeroCarouselProps {
 /** Get backdrop URL for hero image */
 function getBackdropUrl(backdropPath: string | null): string | null {
   if (!backdropPath) return null;
+  if (isMockDataMode()) return 'placeholder';
   return `${TMDB_IMAGE_BASE}/w1280${backdropPath}`;
 }
 
@@ -128,7 +137,7 @@ export function HeroCarousel({
         >
           {backdropUrl ? (
             <Image
-              source={{ uri: backdropUrl }}
+              source={backdropUrl === 'placeholder' ? PLACEHOLDER_IMAGE : { uri: backdropUrl }}
               style={styles.heroImage}
               contentFit="cover"
               transition={300}

@@ -11,6 +11,11 @@ import { ComponentTokens } from '@/constants/theme';
 /** TMDB image base URL */
 const TMDB_IMAGE_BASE = 'https://image.tmdb.org/t/p';
 
+/** Check if mock data mode is enabled */
+function isMockDataMode(): boolean {
+  return process.env.EXPO_PUBLIC_USE_MOCK_DATA === 'true';
+}
+
 /** Synopsis expand threshold in characters */
 export const SYNOPSIS_EXPAND_THRESHOLD = ComponentTokens.synopsis.expandThreshold;
 
@@ -24,6 +29,7 @@ export const MAX_CAST_DISPLAY = ComponentTokens.cast.maxDisplay;
  */
 export function getBackdropUrl(backdropPath: string | null, size: string = 'w1280'): string | null {
   if (!backdropPath) return null;
+  if (isMockDataMode()) return 'placeholder';
   return `${TMDB_IMAGE_BASE}/${size}${backdropPath}`;
 }
 
@@ -34,6 +40,7 @@ export function getBackdropUrl(backdropPath: string | null, size: string = 'w128
  */
 export function getProfileUrl(profilePath: string | null, size: string = 'w185'): string | null {
   if (!profilePath) return null;
+  if (isMockDataMode()) return 'placeholder';
   return `${TMDB_IMAGE_BASE}/${size}${profilePath}`;
 }
 
@@ -44,6 +51,7 @@ export function getProfileUrl(profilePath: string | null, size: string = 'w185')
  */
 export function getProviderLogoUrl(logoPath: string | null, size: string = 'w92'): string | null {
   if (!logoPath) return null;
+  if (isMockDataMode()) return 'placeholder';
   return `${TMDB_IMAGE_BASE}/${size}${logoPath}`;
 }
 

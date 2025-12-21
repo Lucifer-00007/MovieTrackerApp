@@ -18,6 +18,7 @@ import {
   formatRating,
   shouldShowRating,
   generateAccessibilityLabel,
+  PLACEHOLDER_IMAGE,
 } from './media-card-utils';
 
 // Re-export types and utilities for external use
@@ -107,12 +108,12 @@ export function MediaCard({
         {/* Poster Image or Placeholder */}
         {posterUrl ? (
           <Image
-            source={{ uri: posterUrl }}
+            source={posterUrl === 'placeholder' ? PLACEHOLDER_IMAGE : { uri: posterUrl }}
             style={styles.poster}
             contentFit="cover"
             transition={300}
-            placeholder={require('@/assets/images/icon.png')}
-            placeholderContentFit="contain"
+            placeholder={PLACEHOLDER_IMAGE}
+            placeholderContentFit="cover"
             accessibilityLabel={`${title} poster`}
             testID={testID ? `${testID}-poster` : undefined}
           />

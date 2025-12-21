@@ -29,6 +29,9 @@ import { EmptyState } from '@/components/ui/EmptyState';
 import { SUPPORTED_COUNTRIES, type TrendingItem } from '@/types/media';
 import { discoverByCountry, getImageUrl } from '@/services/api';
 
+/** Placeholder image for mock data mode */
+const PLACEHOLDER_IMAGE = require('@/assets/images/placeholder-poster.png');
+
 /** Content type filter options */
 export type ContentTypeFilter = 'all' | 'movie' | 'tv';
 
@@ -172,7 +175,7 @@ function ContentItem({ item, onPress }: ContentItemProps) {
       <View style={styles.posterContainer}>
         {posterUrl ? (
           <Image
-            source={{ uri: posterUrl }}
+            source={posterUrl === 'placeholder' ? PLACEHOLDER_IMAGE : { uri: posterUrl }}
             style={styles.poster}
             contentFit="cover"
             transition={300}
