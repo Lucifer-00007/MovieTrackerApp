@@ -150,11 +150,12 @@ Call Stack
   RootLayout (app/_layout.tsx:99:9)
 ```
 
-- [] Fix the following 2 issues
+- [x] Fix the following 2 issues
 	- The current light mode theme is identical to dark mode theme colors fix this. 
 	- Also i have a placeholder image which i want to use when  `EXPO_PUBLIC_USE_MOCK_DATA=true`now at which path should i keep this image such that it can be used throughout the app ?? 
 
-- [] 
+- [x] Make a detailed report md  with the RCA, challenges faced and solution implemeted based on the placeholder image issue in - ./md-docs/reports/
+
 - [] 
 - [] 
 - [] 
