@@ -222,9 +222,9 @@ export const MOCK_CAST: CastMember[] = [
 
 /** Mock streaming providers */
 export const MOCK_PROVIDERS: StreamingProvider[] = [
-  { providerId: 8, providerName: 'Netflix', logoPath: null, link: '#', type: 'flatrate', isAvailable: true },
-  { providerId: 9, providerName: 'Amazon Prime', logoPath: null, link: '#', type: 'flatrate', isAvailable: true },
-  { providerId: 337, providerName: 'Disney+', logoPath: null, link: '#', type: 'flatrate', isAvailable: true },
+  { providerId: 8, providerName: 'Netflix', logoPath: '', link: '#', type: 'flatrate', isAvailable: true },
+  { providerId: 9, providerName: 'Amazon Prime', logoPath: '', link: '#', type: 'flatrate', isAvailable: true },
+  { providerId: 337, providerName: 'Disney+', logoPath: '', link: '#', type: 'flatrate', isAvailable: true },
 ];
 
 /** Mock search results */
