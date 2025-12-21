@@ -1,7 +1,7 @@
 /**
  * TrailerPlayer Component
  * Video player for YouTube trailers using expo-video
- * Provides play/pause, seek, and fullscreen controls
+ * Shows mock UI when in mock data mode
  * 
  * Requirements: 5.1, 5.2, 5.3, 5.4, 5.5
  */
@@ -15,8 +15,7 @@ import {
   ActivityIndicator,
   Dimensions,
 } from 'react-native';
-import { useVideoPlayer, VideoView } from 'expo-video';
-import { useEvent } from 'expo';
+import { Image } from 'expo-image';
 
 import { useThemeColor } from '@/hooks/use-theme-color';
 import { Spacing, BorderRadius, Typography } from '@/constants/theme';
@@ -30,6 +29,14 @@ import {
 } from './trailer-utils';
 
 const { width: SCREEN_WIDTH } = Dimensions.get('window');
+
+/** Check if mock data mode is enabled */
+function isMockDataMode(): boolean {
+  return process.env.EXPO_PUBLIC_USE_MOCK_DATA === 'true';
+}
+
+/** Placeholder image for mock mode */
+const PLACEHOLDER_IMAGE = require('@/assets/images/placeholder-poster.png');
 
 export interface TrailerPlayerProps {
   /** YouTube video key */
@@ -63,7 +70,112 @@ export interface TrailerPlayerState {
   showControls: boolean;
 }
 
-export function TrailerPlayer({
+/**
+ * Mock Trailer Player - shown when EXPO_PUBLIC_USE_MOCK_DATA=true
+ */
+function MockTrailerPlayer({
+  onClose,
+  onVideoEnd,
+  testID,
+}: Pick<TrailerPlayerProps, 'onClose' | 'onVideoEnd' | 'testID'>) {
+  const textColor = useThemeColor({}, 'text');
+  const textSecondary = useThemeColor({}, 'textSecondary');
+  const tintColor = useThemeColor({}, 'tint');
+  const [isPlaying, setIsPlaying] = useState(false);
+  const [progress, setProgress] = useState(0);
+
+  // Simulate playback progress
+  useEffect(() => {
+    if (!isPlaying) return;
+
+    const interval = setInterval(() => {
+      setProgress(prev => {
+        if (prev >= 100) {
+          setIsPlaying(false);
+          onVideoEnd?.();
+          return 0;
+        }
+        return prev + 2;
+      });
+    }, 500);
+
+    return () => clearInterval(interval);
+  }, [isPlaying, onVideoEnd]);
+
+  const togglePlayPause = () => {
+    setIsPlaying(prev => !prev);
+  };
+
+  return (
+    <View style={[styles.container, { backgroundColor: '#000000' }]} testID={testID}>
+      {/* Background Image */}
+      <Image
+        source={PLACEHOLDER_IMAGE}
+        style={styles.mockBackground}
+        contentFit="cover"
+      />
+
+      {/* Overlay */}
+      <View style={styles.mockOverlay}>
+        {/* Mock Mode Badge */}
+        <View style={styles.mockBadge}>
+          <Text style={styles.mockBadgeText}>Mock Mode - No Video Available</Text>
+        </View>
+
+        {/* Close Button */}
+        {onClose && (
+          <View style={styles.topBar}>
+            <Pressable
+              onPress={onClose}
+              style={styles.closeButton}
+              accessibilityRole="button"
+              accessibilityLabel="Close trailer"
+              testID={testID ? `${testID}-close` : undefined}
+            >
+              <IconSymbol name="xmark" size={24} color="#FFFFFF" />
+            </Pressable>
+          </View>
+        )}
+
+        {/* Center Play Button */}
+        <View style={styles.centerControls}>
+          <Pressable
+            onPress={togglePlayPause}
+            style={[styles.playPauseButton, { backgroundColor: tintColor }]}
+            accessibilityRole="button"
+            accessibilityLabel={isPlaying ? 'Pause' : 'Play'}
+            testID={testID ? `${testID}-play-pause` : undefined}
+          >
+            <IconSymbol
+              name={isPlaying ? 'pause.fill' : 'play.fill'}
+              size={48}
+              color="#FFFFFF"
+            />
+          </Pressable>
+          <Text style={styles.mockText}>
+            {isPlaying ? 'Simulating playback...' : 'Tap to simulate playback'}
+          </Text>
+        </View>
+
+        {/* Progress Bar */}
+        <View style={styles.bottomBar}>
+          <Text style={styles.timeText}>{formatTime((progress / 100) * 120)}</Text>
+          <View style={styles.seekBarContainer}>
+            <View style={styles.seekBarBackground}>
+              <View style={[styles.seekBarProgress, { width: `${progress}%` }]} />
+            </View>
+          </View>
+          <Text style={styles.timeText}>{formatTime(120)}</Text>
+        </View>
+      </View>
+    </View>
+  );
+}
+
+/**
+ * Real Trailer Player - uses expo-video
+ */
+function RealTrailerPlayer({
   videoKey,
   mediaId,
   mediaType,
@@ -93,11 +205,166 @@ export function TrailerPlayer({
     showControls: true,
   });
 
+  // Dynamically import expo-video to avoid issues in mock mode
+  const [VideoComponents, setVideoComponents] = useState<{
+    useVideoPlayer: any;
+    VideoView: any;
+    useEvent: any;
+  } | null>(null);
+
+  useEffect(() => {
+    const loadVideoComponents = async () => {
+      try {
+        const expoVideo = await import('expo-video');
+        const expo = await import('expo');
+        setVideoComponents({
+          useVideoPlayer: expoVideo.useVideoPlayer,
+          VideoView: expoVideo.VideoView,
+          useEvent: expo.useEvent,
+        });
+      } catch (error) {
+        console.error('Failed to load video components:', error);
+        setState(prev => ({
+          ...prev,
+          hasError: true,
+          errorMessage: 'Video player not available',
+          isLoading: false,
+        }));
+        onError?.('Video player not available');
+      }
+    };
+
+    loadVideoComponents();
+  }, [onError]);
+
+  // Auto-hide controls after 3 seconds
+  const resetControlsTimeout = useCallback(() => {
+    if (controlsTimeoutRef.current) {
+      clearTimeout(controlsTimeoutRef.current);
+    }
+    controlsTimeoutRef.current = setTimeout(() => {
+      if (state.isPlaying) {
+        setState(prev => ({ ...prev, showControls: false }));
+      }
+    }, 3000);
+  }, [state.isPlaying]);
+
+  // Show controls and reset timeout
+  const showControls = useCallback(() => {
+    setState(prev => ({ ...prev, showControls: true }));
+    resetControlsTimeout();
+  }, [resetControlsTimeout]);
+
+  // Cleanup timeout on unmount
+  useEffect(() => {
+    return () => {
+      if (controlsTimeoutRef.current) {
+        clearTimeout(controlsTimeoutRef.current);
+      }
+    };
+  }, []);
+
+  const progress = calculateProgress(state.position, state.duration);
+
+  // Loading video components
+  if (!VideoComponents) {
+    return (
+      <View style={[styles.container, { backgroundColor: '#000000' }]} testID={testID}>
+        <View style={styles.loadingOverlay}>
+          <ActivityIndicator size="large" color="#FFFFFF" />
+          <Text style={styles.loadingText}>Loading player...</Text>
+        </View>
+      </View>
+    );
+  }
+
+  // Error state
+  if (state.hasError) {
+    return (
+      <View style={[styles.container, { backgroundColor }]} testID={testID}>
+        <View style={styles.errorContainer}>
+          <IconSymbol name="exclamationmark.triangle" size={48} color={errorColor} />
+          <Text style={[styles.errorTitle, { color: textColor }]}>
+            Trailer Unavailable
+          </Text>
+          <Text style={[styles.errorMessage, { color: textSecondary }]}>
+            {state.errorMessage || 'Unable to load the trailer. Please try again.'}
+          </Text>
+          <View style={styles.errorActions}>
+            {onClose && (
+              <Pressable
+                onPress={onClose}
+                style={[styles.dismissButton, { backgroundColor: tintColor }]}
+                accessibilityRole="button"
+                accessibilityLabel="Close"
+                testID={testID ? `${testID}-dismiss` : undefined}
+              >
+                <Text style={styles.retryButtonText}>Close</Text>
+              </Pressable>
+            )}
+          </View>
+        </View>
+      </View>
+    );
+  }
+
+  // Render with video player
+  return (
+    <VideoPlayerContent
+      VideoComponents={VideoComponents}
+      videoKey={videoKey}
+      mediaId={mediaId}
+      mediaType={mediaType}
+      sourceScreen={sourceScreen}
+      autoPlay={autoPlay}
+      onVideoEnd={onVideoEnd}
+      onClose={onClose}
+      onError={onError}
+      testID={testID}
+    />
+  );
+}
+
+/**
+ * Video Player Content - rendered after video components are loaded
+ */
+function VideoPlayerContent({
+  VideoComponents,
+  videoKey,
+  mediaId,
+  mediaType,
+  sourceScreen,
+  autoPlay,
+  onVideoEnd,
+  onClose,
+  onError,
+  testID,
+}: TrailerPlayerProps & { VideoComponents: any }) {
+  const { useVideoPlayer, VideoView, useEvent } = VideoComponents;
+  const controlsTimeoutRef = { current: null as ReturnType<typeof setTimeout> | null };
+
+  const backgroundColor = useThemeColor({}, 'background');
+  const textColor = useThemeColor({}, 'text');
+  const textSecondary = useThemeColor({}, 'textSecondary');
+  const tintColor = useThemeColor({}, 'tint');
+  const errorColor = useThemeColor({}, 'error');
+
+  const [state, setState] = useState<TrailerPlayerState>({
+    isPlaying: autoPlay ?? true,
+    isLoading: true,
+    isBuffering: false,
+    hasError: false,
+    errorMessage: null,
+    duration: 0,
+    position: 0,
+    showControls: true,
+  });
+
   // Create video player
-  const player = useVideoPlayer(getYouTubeEmbedUrl(videoKey), (player) => {
-    player.loop = false;
+  const player = useVideoPlayer(getYouTubeEmbedUrl(videoKey), (p: any) => {
+    p.loop = false;
     if (autoPlay) {
-      player.play();
+      p.play();
     }
   });
 
@@ -142,7 +409,6 @@ export function TrailerPlayer({
           duration: player.duration,
         }));
 
-        // Check if video ended
         if (player.currentTime >= player.duration && player.duration > 0) {
           onVideoEnd?.();
         }
@@ -152,7 +418,7 @@ export function TrailerPlayer({
     return () => clearInterval(interval);
   }, [player, state.isLoading, onVideoEnd]);
 
-  // Auto-hide controls after 3 seconds
+  // Auto-hide controls
   const resetControlsTimeout = useCallback(() => {
     if (controlsTimeoutRef.current) {
       clearTimeout(controlsTimeoutRef.current);
@@ -164,13 +430,11 @@ export function TrailerPlayer({
     }, 3000);
   }, [state.isPlaying]);
 
-  // Show controls and reset timeout
   const showControls = useCallback(() => {
     setState(prev => ({ ...prev, showControls: true }));
     resetControlsTimeout();
   }, [resetControlsTimeout]);
 
-  // Cleanup timeout on unmount
   useEffect(() => {
     return () => {
       if (controlsTimeoutRef.current) {
@@ -179,31 +443,26 @@ export function TrailerPlayer({
     };
   }, []);
 
-  // Toggle play/pause
   const togglePlayPause = useCallback(() => {
     if (!player) return;
-    
+
     if (state.isPlaying) {
       player.pause();
     } else {
       player.play();
-      
-      // Log analytics event when trailer starts playing
       if (mediaId && mediaType) {
-        logTrailerTap(mediaId, mediaType, sourceScreen);
+        logTrailerTap(mediaId, mediaType, sourceScreen ?? 'trailer_player');
       }
     }
     showControls();
   }, [player, state.isPlaying, showControls, mediaId, mediaType, sourceScreen]);
 
-  // Seek to position
   const seekTo = useCallback((position: number) => {
     if (!player) return;
     player.currentTime = position;
     showControls();
   }, [player, showControls]);
 
-  // Handle seek bar press
   const handleSeekBarPress = useCallback((event: { nativeEvent: { locationX: number } }) => {
     const seekBarWidth = SCREEN_WIDTH - Spacing.lg * 2;
     const newPosition = calculateSeekPosition(
@@ -214,64 +473,25 @@ export function TrailerPlayer({
     seekTo(newPosition);
   }, [state.duration, seekTo]);
 
-  // Retry loading
-  const handleRetry = useCallback(() => {
-    setState(prev => ({
-      ...prev,
-      hasError: false,
-      errorMessage: null,
-      isLoading: true,
-    }));
-    
-    if (player) {
-      player.replace(getYouTubeEmbedUrl(videoKey));
-      if (autoPlay) {
-        player.play();
-      }
-    }
-  }, [player, videoKey, autoPlay]);
-
   const progress = calculateProgress(state.position, state.duration);
 
-  // Error state
   if (state.hasError) {
     return (
-      <View 
-        style={[styles.container, { backgroundColor }]}
-        testID={testID}
-      >
+      <View style={[styles.container, { backgroundColor }]} testID={testID}>
         <View style={styles.errorContainer}>
           <IconSymbol name="exclamationmark.triangle" size={48} color={errorColor} />
-          <Text style={[styles.errorTitle, { color: textColor }]}>
-            Trailer Unavailable
-          </Text>
+          <Text style={[styles.errorTitle, { color: textColor }]}>Trailer Unavailable</Text>
           <Text style={[styles.errorMessage, { color: textSecondary }]}>
-            {state.errorMessage || 'Unable to load the trailer. Please try again.'}
+            {state.errorMessage || 'Unable to load the trailer.'}
           </Text>
-          <View style={styles.errorActions}>
+          {onClose && (
             <Pressable
-              onPress={handleRetry}
-              style={[styles.retryButton, { backgroundColor: tintColor }]}
-              accessibilityRole="button"
-              accessibilityLabel="Retry loading trailer"
-              testID={testID ? `${testID}-retry` : undefined}
+              onPress={onClose}
+              style={[styles.dismissButton, { backgroundColor: tintColor }]}
             >
-              <Text style={styles.retryButtonText}>Retry</Text>
+              <Text style={styles.retryButtonText}>Close</Text>
             </Pressable>
-            {onClose && (
-              <Pressable
-                onPress={onClose}
-                style={[styles.dismissButton, { borderColor: textSecondary }]}
-                accessibilityRole="button"
-                accessibilityLabel="Dismiss"
-                testID={testID ? `${testID}-dismiss` : undefined}
-              >
-                <Text style={[styles.dismissButtonText, { color: textSecondary }]}>
-                  Dismiss
-                </Text>
-              </Pressable>
-            )}
-          </View>
+          )}
         </View>
       </View>
     );
@@ -283,16 +503,13 @@ export function TrailerPlayer({
       onPress={showControls}
       testID={testID}
     >
-      {/* Video Player */}
       <VideoView
         player={player}
         style={styles.video}
         contentFit="contain"
         nativeControls={false}
-        testID={testID ? `${testID}-video` : undefined}
       />
 
-      {/* Loading Indicator */}
       {state.isLoading && (
         <View style={styles.loadingOverlay}>
           <ActivityIndicator size="large" color="#FFFFFF" />
@@ -300,33 +517,18 @@ export function TrailerPlayer({
         </View>
       )}
 
-      {/* Controls Overlay */}
       {state.showControls && !state.isLoading && (
         <View style={styles.controlsOverlay}>
-          {/* Top Bar - Close Button */}
           {onClose && (
             <View style={styles.topBar}>
-              <Pressable
-                onPress={onClose}
-                style={styles.closeButton}
-                accessibilityRole="button"
-                accessibilityLabel="Close trailer"
-                testID={testID ? `${testID}-close` : undefined}
-              >
+              <Pressable onPress={onClose} style={styles.closeButton}>
                 <IconSymbol name="xmark" size={24} color="#FFFFFF" />
               </Pressable>
             </View>
           )}
 
-          {/* Center - Play/Pause Button */}
           <View style={styles.centerControls}>
-            <Pressable
-              onPress={togglePlayPause}
-              style={styles.playPauseButton}
-              accessibilityRole="button"
-              accessibilityLabel={state.isPlaying ? 'Pause' : 'Play'}
-              testID={testID ? `${testID}-play-pause` : undefined}
-            >
+            <Pressable onPress={togglePlayPause} style={styles.playPauseButton}>
               <IconSymbol
                 name={state.isPlaying ? 'pause.fill' : 'play.fill'}
                 size={48}
@@ -335,43 +537,37 @@ export function TrailerPlayer({
             </Pressable>
           </View>
 
-          {/* Bottom Bar - Seek Bar and Time */}
           <View style={styles.bottomBar}>
-            {/* Current Time */}
-            <Text style={styles.timeText} testID={testID ? `${testID}-current-time` : undefined}>
-              {formatTime(state.position)}
-            </Text>
-
-            {/* Seek Bar */}
-            <Pressable
-              style={styles.seekBarContainer}
-              onPress={handleSeekBarPress}
-              accessibilityRole="adjustable"
-              accessibilityLabel={`Video progress: ${Math.round(progress)}%`}
-              testID={testID ? `${testID}-seek-bar` : undefined}
-            >
+            <Text style={styles.timeText}>{formatTime(state.position)}</Text>
+            <Pressable style={styles.seekBarContainer} onPress={handleSeekBarPress}>
               <View style={styles.seekBarBackground}>
-                <View
-                  style={[styles.seekBarProgress, { width: `${progress}%` }]}
-                />
-                <View
-                  style={[
-                    styles.seekBarThumb,
-                    { left: `${progress}%` },
-                  ]}
-                />
+                <View style={[styles.seekBarProgress, { width: `${progress}%` }]} />
+                <View style={[styles.seekBarThumb, { left: `${progress}%` }]} />
               </View>
             </Pressable>
-
-            {/* Duration */}
-            <Text style={styles.timeText} testID={testID ? `${testID}-duration` : undefined}>
-              {formatTime(state.duration)}
-            </Text>
+            <Text style={styles.timeText}>{formatTime(state.duration)}</Text>
           </View>
         </View>
       )}
     </Pressable>
   );
+}
+
+/**
+ * Main TrailerPlayer export - switches between mock and real player
+ */
+export function TrailerPlayer(props: TrailerPlayerProps) {
+  if (isMockDataMode()) {
+    return (
+      <MockTrailerPlayer
+        onClose={props.onClose}
+        onVideoEnd={props.onVideoEnd}
+        testID={props.testID}
+      />
+    );
+  }
+
+  return <RealTrailerPlayer {...props} />;
 }
 
 const styles = StyleSheet.create({
@@ -383,6 +579,34 @@ const styles = StyleSheet.create({
   video: {
     width: '100%',
     height: '100%',
+  },
+  mockBackground: {
+    ...StyleSheet.absoluteFillObject,
+    opacity: 0.3,
+  },
+  mockOverlay: {
+    ...StyleSheet.absoluteFillObject,
+    justifyContent: 'space-between',
+  },
+  mockBadge: {
+    position: 'absolute',
+    top: 100,
+    alignSelf: 'center',
+    backgroundColor: 'rgba(0, 0, 0, 0.7)',
+    paddingHorizontal: Spacing.md,
+    paddingVertical: Spacing.sm,
+    borderRadius: BorderRadius.md,
+  },
+  mockBadgeText: {
+    color: '#FFFFFF',
+    fontSize: Typography.sizes.sm,
+    fontWeight: Typography.weights.medium,
+  },
+  mockText: {
+    color: '#FFFFFF',
+    fontSize: Typography.sizes.md,
+    marginTop: Spacing.md,
+    textAlign: 'center',
   },
   loadingOverlay: {
     ...StyleSheet.absoluteFillObject,
@@ -502,7 +726,6 @@ const styles = StyleSheet.create({
     paddingHorizontal: Spacing.lg,
     paddingVertical: Spacing.sm,
     borderRadius: BorderRadius.md,
-    borderWidth: 1,
     minWidth: 100,
     minHeight: 44,
     alignItems: 'center',
