@@ -179,8 +179,10 @@ export const mockAdapter: MediaApiAdapter = {
   },
 
   getImageUrl(path: string | null, _size?: string): string | null {
-    // Return placeholder image URL for mock data
+    // For mock data, return the local placeholder image
+    // The actual image file should be at assets/images/placeholder-poster.png
     if (!path) return null;
-    return `https://via.placeholder.com/500x750?text=Mock+Image`;
+    // Return a data URI or the path will be handled by the component
+    return 'placeholder';
   },
 };

@@ -2,7 +2,7 @@ import { DarkTheme, DefaultTheme, ThemeProvider } from '@react-navigation/native
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { Stack } from 'expo-router';
 import { StatusBar } from 'expo-status-bar';
-import { useEffect, useState } from 'react';
+import { useEffect, useState, useMemo } from 'react';
 import 'react-native-reanimated';
 
 import { useColorScheme } from '@/hooks/use-color-scheme';
@@ -28,7 +28,7 @@ const queryClient = new QueryClient({
 });
 
 export default function RootLayout() {
-  const colorScheme = useColorScheme();
+  const systemColorScheme = useColorScheme();
   const [isConsentModalVisible, setIsConsentModalVisible] = useState(false);
   const [isConsentLoading, setIsConsentLoading] = useState(false);
 
@@ -41,6 +41,14 @@ export default function RootLayout() {
     setGdprConsent,
     setAnalyticsEnabled,
   } = usePreferencesStore();
+
+  // Determine effective color scheme based on user preference
+  const effectiveColorScheme = useMemo(() => {
+    if (preferences.themeMode === 'system') {
+      return systemColorScheme ?? 'light';
+    }
+    return preferences.themeMode;
+  }, [preferences.themeMode, systemColorScheme]);
 
   // Initialize analytics service and check consent status
   useEffect(() => {
@@ -95,7 +103,7 @@ export default function RootLayout() {
 
   return (
     <QueryClientProvider client={queryClient}>
-      <ThemeProvider value={colorScheme === 'dark' ? DarkTheme : DefaultTheme}>
+      <ThemeProvider value={effectiveColorScheme === 'dark' ? DarkTheme : DefaultTheme}>
         <Stack
         screenOptions={{
           animation: 'slide_from_right',

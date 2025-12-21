@@ -33,9 +33,10 @@
 	Type 'number' is not assignable to type 'Timeout'.ts(2322)
 	(property) AnalyticsService.sendTimer: NodeJS.Timeout | null
 	```
+
 - [x] I think the TMDB API is not responding. Create a constants usage variable in .env file. Which can be set true/false accordingly. When set to true its will use the the data from the constants and ignore the API. Also update the codebase to be flexible to use any other API other than TMDB(Make a md doc on how to setup to match the keys based on fronted). Make these changes following best practices
 
-- [] Fix these warnings and errors in Using mock data adapter:
+- [x] Fix these warnings and errors in Using mock data adapter:
 
 ```
  LOG  [API] Using mock data adapter
@@ -149,7 +150,10 @@ Call Stack
   RootLayout (app/_layout.tsx:99:9)
 ```
 
-- [] 
+- [] Fix the following 2 issues
+	- The current light mode theme is identical to dark mode theme colors fix this. 
+	- Also i have a placeholder image which i want to use when  `EXPO_PUBLIC_USE_MOCK_DATA=true`now at which path should i keep this image such that it can be used throughout the app ?? 
+
 - [] 
 - [] 
 - [] 
