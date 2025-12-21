@@ -12,6 +12,9 @@ import type {
   Genre,
 } from '@/types/media';
 
+/** Mock image path - triggers placeholder image in mock mode */
+const MOCK_IMAGE = '/mock-placeholder';
+
 /** Mock genres */
 export const MOCK_GENRES: Genre[] = [
   { id: 28, name: 'Action' },
@@ -33,8 +36,8 @@ export const MOCK_TRENDING_MOVIES: TrendingItem[] = [
     id: 1,
     title: 'The Adventure Begins',
     originalTitle: 'The Adventure Begins',
-    posterPath: null,
-    backdropPath: null,
+    posterPath: MOCK_IMAGE,
+    backdropPath: MOCK_IMAGE,
     overview: 'An epic journey through uncharted territories where heroes are made and legends are born.',
     releaseDate: '2024-06-15',
     voteAverage: 8.5,
@@ -47,8 +50,8 @@ export const MOCK_TRENDING_MOVIES: TrendingItem[] = [
     id: 2,
     title: 'Mystery of the Deep',
     originalTitle: 'Mystery of the Deep',
-    posterPath: null,
-    backdropPath: null,
+    posterPath: MOCK_IMAGE,
+    backdropPath: MOCK_IMAGE,
     overview: 'A team of scientists discovers something extraordinary beneath the ocean floor.',
     releaseDate: '2024-05-20',
     voteAverage: 7.8,
@@ -61,8 +64,8 @@ export const MOCK_TRENDING_MOVIES: TrendingItem[] = [
     id: 3,
     title: 'Love in Paris',
     originalTitle: 'Love in Paris',
-    posterPath: null,
-    backdropPath: null,
+    posterPath: MOCK_IMAGE,
+    backdropPath: MOCK_IMAGE,
     overview: 'Two strangers meet in the city of lights and discover that fate has other plans.',
     releaseDate: '2024-02-14',
     voteAverage: 7.2,
@@ -75,8 +78,8 @@ export const MOCK_TRENDING_MOVIES: TrendingItem[] = [
     id: 4,
     title: 'The Last Stand',
     originalTitle: 'The Last Stand',
-    posterPath: null,
-    backdropPath: null,
+    posterPath: MOCK_IMAGE,
+    backdropPath: MOCK_IMAGE,
     overview: 'When all hope seems lost, one hero rises to defend humanity against impossible odds.',
     releaseDate: '2024-07-04',
     voteAverage: 8.1,
@@ -89,8 +92,8 @@ export const MOCK_TRENDING_MOVIES: TrendingItem[] = [
     id: 5,
     title: 'Shadows in the Night',
     originalTitle: 'Shadows in the Night',
-    posterPath: null,
-    backdropPath: null,
+    posterPath: MOCK_IMAGE,
+    backdropPath: MOCK_IMAGE,
     overview: 'A detective uncovers a conspiracy that threatens to destroy everything she holds dear.',
     releaseDate: '2024-03-22',
     voteAverage: 7.6,
@@ -107,8 +110,8 @@ export const MOCK_TRENDING_TV: TrendingItem[] = [
     id: 101,
     title: 'Kingdom of Dreams',
     originalTitle: 'Kingdom of Dreams',
-    posterPath: null,
-    backdropPath: null,
+    posterPath: MOCK_IMAGE,
+    backdropPath: MOCK_IMAGE,
     overview: 'A fantasy epic following the rise and fall of kingdoms in a world where magic is real.',
     releaseDate: '2023-09-01',
     voteAverage: 8.9,
@@ -121,8 +124,8 @@ export const MOCK_TRENDING_TV: TrendingItem[] = [
     id: 102,
     title: 'Tech Titans',
     originalTitle: 'Tech Titans',
-    posterPath: null,
-    backdropPath: null,
+    posterPath: MOCK_IMAGE,
+    backdropPath: MOCK_IMAGE,
     overview: 'The cutthroat world of Silicon Valley startups and the people who build them.',
     releaseDate: '2024-01-15',
     voteAverage: 8.2,
@@ -135,8 +138,8 @@ export const MOCK_TRENDING_TV: TrendingItem[] = [
     id: 103,
     title: 'Space Explorers',
     originalTitle: 'Space Explorers',
-    posterPath: null,
-    backdropPath: null,
+    posterPath: MOCK_IMAGE,
+    backdropPath: MOCK_IMAGE,
     overview: 'A crew of astronauts embarks on humanitys first interstellar mission.',
     releaseDate: '2024-04-10',
     voteAverage: 8.7,
@@ -159,8 +162,8 @@ export const MOCK_MOVIE_DETAILS: Record<number, MediaDetails> = {
     id: 1,
     title: 'The Adventure Begins',
     originalTitle: 'The Adventure Begins',
-    posterPath: null,
-    backdropPath: null,
+    posterPath: MOCK_IMAGE,
+    backdropPath: MOCK_IMAGE,
     overview: 'An epic journey through uncharted territories where heroes are made and legends are born. Follow a group of unlikely companions as they traverse dangerous lands, face mythical creatures, and discover the true meaning of courage.',
     releaseDate: '2024-06-15',
     voteAverage: 8.5,
@@ -188,8 +191,8 @@ export const MOCK_TV_DETAILS: Record<number, MediaDetails> = {
     id: 101,
     title: 'Kingdom of Dreams',
     originalTitle: 'Kingdom of Dreams',
-    posterPath: null,
-    backdropPath: null,
+    posterPath: MOCK_IMAGE,
+    backdropPath: MOCK_IMAGE,
     overview: 'A fantasy epic following the rise and fall of kingdoms in a world where magic is real. Political intrigue, epic battles, and complex characters make this a must-watch series.',
     releaseDate: '2023-09-01',
     voteAverage: 8.9,
@@ -213,18 +216,18 @@ export const MOCK_TV_DETAILS: Record<number, MediaDetails> = {
 
 /** Mock cast members */
 export const MOCK_CAST: CastMember[] = [
-  { id: 1001, name: 'John Smith', character: 'Hero', profilePath: null, order: 0 },
-  { id: 1002, name: 'Jane Doe', character: 'Heroine', profilePath: null, order: 1 },
-  { id: 1003, name: 'Bob Johnson', character: 'Villain', profilePath: null, order: 2 },
-  { id: 1004, name: 'Alice Williams', character: 'Mentor', profilePath: null, order: 3 },
-  { id: 1005, name: 'Charlie Brown', character: 'Sidekick', profilePath: null, order: 4 },
+  { id: 1001, name: 'John Smith', character: 'Hero', profilePath: MOCK_IMAGE, order: 0 },
+  { id: 1002, name: 'Jane Doe', character: 'Heroine', profilePath: MOCK_IMAGE, order: 1 },
+  { id: 1003, name: 'Bob Johnson', character: 'Villain', profilePath: MOCK_IMAGE, order: 2 },
+  { id: 1004, name: 'Alice Williams', character: 'Mentor', profilePath: MOCK_IMAGE, order: 3 },
+  { id: 1005, name: 'Charlie Brown', character: 'Sidekick', profilePath: MOCK_IMAGE, order: 4 },
 ];
 
 /** Mock streaming providers */
 export const MOCK_PROVIDERS: StreamingProvider[] = [
-  { providerId: 8, providerName: 'Netflix', logoPath: '', link: '#', type: 'flatrate', isAvailable: true },
-  { providerId: 9, providerName: 'Amazon Prime', logoPath: '', link: '#', type: 'flatrate', isAvailable: true },
-  { providerId: 337, providerName: 'Disney+', logoPath: '', link: '#', type: 'flatrate', isAvailable: true },
+  { providerId: 8, providerName: 'Netflix', logoPath: MOCK_IMAGE, link: '#', type: 'flatrate', isAvailable: true },
+  { providerId: 9, providerName: 'Amazon Prime', logoPath: MOCK_IMAGE, link: '#', type: 'flatrate', isAvailable: true },
+  { providerId: 337, providerName: 'Disney+', logoPath: MOCK_IMAGE, link: '#', type: 'flatrate', isAvailable: true },
 ];
 
 /** Mock search results */
