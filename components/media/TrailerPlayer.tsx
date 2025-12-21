@@ -1,12 +1,12 @@
 /**
  * TrailerPlayer Component
- * Video player for YouTube trailers using expo-av
+ * Video player for YouTube trailers using expo-video
  * Provides play/pause, seek, and fullscreen controls
  * 
  * Requirements: 5.1, 5.2, 5.3, 5.4, 5.5
  */
 
-import { useCallback, useRef, useState, useEffect } from 'react';
+import { useCallback, useState, useEffect } from 'react';
 import {
   StyleSheet,
   View,
@@ -15,10 +15,11 @@ import {
   ActivityIndicator,
   Dimensions,
 } from 'react-native';
-import { Video, ResizeMode, AVPlaybackStatus } from 'expo-av';
+import { useVideoPlayer, VideoView } from 'expo-video';
+import { useEvent } from 'expo';
 
 import { useThemeColor } from '@/hooks/use-theme-color';
-import { Spacing, BorderRadius, Typography, AnimationDurations } from '@/constants/theme';
+import { Spacing, BorderRadius, Typography } from '@/constants/theme';
 import { IconSymbol } from '@/components/ui/icon-symbol';
 import { logTrailerTap } from '@/services/analytics';
 import {
@@ -73,8 +74,7 @@ export function TrailerPlayer({
   onError,
   testID,
 }: TrailerPlayerProps) {
-  const videoRef = useRef<Video>(null);
-  const controlsTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const controlsTimeoutRef = { current: null as ReturnType<typeof setTimeout> | null };
 
   const backgroundColor = useThemeColor({}, 'background');
   const textColor = useThemeColor({}, 'text');
@@ -92,6 +92,65 @@ export function TrailerPlayer({
     position: 0,
     showControls: true,
   });
+
+  // Create video player
+  const player = useVideoPlayer(getYouTubeEmbedUrl(videoKey), (player) => {
+    player.loop = false;
+    if (autoPlay) {
+      player.play();
+    }
+  });
+
+  // Listen to player status changes
+  const { status } = useEvent(player, 'statusChange', { status: player.status });
+  const { isPlaying } = useEvent(player, 'playingChange', { isPlaying: player.playing });
+
+  // Update state based on player status
+  useEffect(() => {
+    if (status === 'loading') {
+      setState(prev => ({ ...prev, isLoading: true }));
+    } else if (status === 'readyToPlay') {
+      setState(prev => ({
+        ...prev,
+        isLoading: false,
+        duration: player.duration,
+      }));
+    } else if (status === 'error') {
+      const errorMsg = 'Failed to load video';
+      setState(prev => ({
+        ...prev,
+        hasError: true,
+        errorMessage: errorMsg,
+        isLoading: false,
+      }));
+      onError?.(errorMsg);
+    }
+  }, [status, player.duration, onError]);
+
+  // Update playing state
+  useEffect(() => {
+    setState(prev => ({ ...prev, isPlaying }));
+  }, [isPlaying]);
+
+  // Track position updates
+  useEffect(() => {
+    const interval = setInterval(() => {
+      if (player && !state.isLoading) {
+        setState(prev => ({
+          ...prev,
+          position: player.currentTime,
+          duration: player.duration,
+        }));
+
+        // Check if video ended
+        if (player.currentTime >= player.duration && player.duration > 0) {
+          onVideoEnd?.();
+        }
+      }
+    }, 250);
+
+    return () => clearInterval(interval);
+  }, [player, state.isLoading, onVideoEnd]);
 
   // Auto-hide controls after 3 seconds
   const resetControlsTimeout = useCallback(() => {
@@ -120,68 +179,29 @@ export function TrailerPlayer({
     };
   }, []);
 
-  // Handle playback status updates
-  const handlePlaybackStatusUpdate = useCallback((status: AVPlaybackStatus) => {
-    if (!status.isLoaded) {
-      if (status.error) {
-        const errorMsg = `Playback error: ${status.error}`;
-        setState(prev => ({
-          ...prev,
-          hasError: true,
-          errorMessage: errorMsg,
-          isLoading: false,
-        }));
-        onError?.(errorMsg);
-      }
-      return;
-    }
-
-    setState(prev => ({
-      ...prev,
-      isPlaying: status.isPlaying,
-      isLoading: false,
-      isBuffering: status.isBuffering,
-      duration: status.durationMillis ? status.durationMillis / 1000 : 0,
-      position: status.positionMillis ? status.positionMillis / 1000 : 0,
-    }));
-
-    if (status.didJustFinish) {
-      onVideoEnd?.();
-    }
-  }, [onVideoEnd, onError]);
-
   // Toggle play/pause
-  const togglePlayPause = useCallback(async () => {
-    if (!videoRef.current) return;
+  const togglePlayPause = useCallback(() => {
+    if (!player) return;
     
-    try {
-      if (state.isPlaying) {
-        await videoRef.current.pauseAsync();
-      } else {
-        await videoRef.current.playAsync();
-        
-        // Log analytics event when trailer starts playing
-        if (mediaId && mediaType) {
-          logTrailerTap(mediaId, mediaType, sourceScreen);
-        }
+    if (state.isPlaying) {
+      player.pause();
+    } else {
+      player.play();
+      
+      // Log analytics event when trailer starts playing
+      if (mediaId && mediaType) {
+        logTrailerTap(mediaId, mediaType, sourceScreen);
       }
-      showControls();
-    } catch (error) {
-      console.error('Error toggling playback:', error);
     }
-  }, [state.isPlaying, showControls, mediaId, mediaType, sourceScreen]);
+    showControls();
+  }, [player, state.isPlaying, showControls, mediaId, mediaType, sourceScreen]);
 
   // Seek to position
-  const seekTo = useCallback(async (position: number) => {
-    if (!videoRef.current) return;
-    
-    try {
-      await videoRef.current.setPositionAsync(position * 1000);
-      showControls();
-    } catch (error) {
-      console.error('Error seeking:', error);
-    }
-  }, [showControls]);
+  const seekTo = useCallback((position: number) => {
+    if (!player) return;
+    player.currentTime = position;
+    showControls();
+  }, [player, showControls]);
 
   // Handle seek bar press
   const handleSeekBarPress = useCallback((event: { nativeEvent: { locationX: number } }) => {
@@ -195,7 +215,7 @@ export function TrailerPlayer({
   }, [state.duration, seekTo]);
 
   // Retry loading
-  const handleRetry = useCallback(async () => {
+  const handleRetry = useCallback(() => {
     setState(prev => ({
       ...prev,
       hasError: false,
@@ -203,25 +223,13 @@ export function TrailerPlayer({
       isLoading: true,
     }));
     
-    if (videoRef.current) {
-      try {
-        await videoRef.current.unloadAsync();
-        await videoRef.current.loadAsync(
-          { uri: getYouTubeEmbedUrl(videoKey) },
-          { shouldPlay: autoPlay }
-        );
-      } catch (error) {
-        const errorMsg = 'Failed to reload video';
-        setState(prev => ({
-          ...prev,
-          hasError: true,
-          errorMessage: errorMsg,
-          isLoading: false,
-        }));
-        onError?.(errorMsg);
+    if (player) {
+      player.replace(getYouTubeEmbedUrl(videoKey));
+      if (autoPlay) {
+        player.play();
       }
     }
-  }, [videoKey, autoPlay, onError]);
+  }, [player, videoKey, autoPlay]);
 
   const progress = calculateProgress(state.position, state.duration);
 
@@ -276,25 +284,19 @@ export function TrailerPlayer({
       testID={testID}
     >
       {/* Video Player */}
-      <Video
-        ref={videoRef}
-        source={{ uri: getYouTubeEmbedUrl(videoKey) }}
+      <VideoView
+        player={player}
         style={styles.video}
-        resizeMode={ResizeMode.CONTAIN}
-        shouldPlay={autoPlay}
-        isLooping={false}
-        onPlaybackStatusUpdate={handlePlaybackStatusUpdate}
-        useNativeControls={false}
+        contentFit="contain"
+        nativeControls={false}
         testID={testID ? `${testID}-video` : undefined}
       />
 
       {/* Loading Indicator */}
-      {(state.isLoading || state.isBuffering) && (
+      {state.isLoading && (
         <View style={styles.loadingOverlay}>
           <ActivityIndicator size="large" color="#FFFFFF" />
-          <Text style={styles.loadingText}>
-            {state.isBuffering ? 'Buffering...' : 'Loading...'}
-          </Text>
+          <Text style={styles.loadingText}>Loading...</Text>
         </View>
       )}
 

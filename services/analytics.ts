@@ -90,6 +90,11 @@ class AnalyticsService {
     eventName: AnalyticsEventName,
     properties: Record<string, string | number | boolean> = {}
   ): Promise<void> {
+    // Check if analytics is disabled via environment
+    if (process.env.EXPO_PUBLIC_DISABLE_ANALYTICS === 'true') {
+      return;
+    }
+
     // Check if analytics is enabled
     const preferences = usePreferencesStore.getState().preferences;
     if (!preferences.analyticsEnabled || !preferences.gdprConsentGiven) {
@@ -343,6 +348,12 @@ class AnalyticsService {
    * Send queued events to analytics endpoint
    */
   private async sendEvents(): Promise<void> {
+    // Check if analytics is disabled via environment
+    if (process.env.EXPO_PUBLIC_DISABLE_ANALYTICS === 'true') {
+      this.queue = [];
+      return;
+    }
+
     if (this.queue.length === 0 || !this.deviceId) {
       return;
     }

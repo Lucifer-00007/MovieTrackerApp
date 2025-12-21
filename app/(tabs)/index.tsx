@@ -46,6 +46,7 @@ function recentlyViewedToMediaItems(
 export default function HomeScreen() {
   const router = useRouter();
   const backgroundColor = useThemeColor({}, 'background');
+  const tintColor = useThemeColor({}, 'tint');
 
   // Stores
   const {
@@ -216,7 +217,7 @@ export default function HomeScreen() {
           <RefreshControl
             refreshing={isRefreshing}
             onRefresh={handleRefresh}
-            tintColor={useThemeColor({}, 'tint')}
+            tintColor={tintColor}
           />
         }
       >
