@@ -1,36 +1,41 @@
-# MovieStream MVP
+# MovieTracker
 
 A cross-platform mobile application for discovering and tracking movies, TV series, and anime content worldwide. Built with React Native and Expo SDK 54.
 
 ## Features
 
-- **Global Trending Feed** - Discover popular movies and series with hero carousel and infinite scroll
-- **Country Hubs** - Browse top-rated content from USA, Japan, India, China, Russia, Spain, and Germany
+- **Global Trending Feed** - Discover popular movies, TV series, and anime with hero carousel and infinite scroll
+- **Country Hubs** - Browse top-rated content from USA, Japan, India, China, Russia, Spain, Germany, and more
 - **Detailed Media Pages** - View synopsis, cast, trailers, streaming providers, and recommendations
 - **Search & Filters** - Find content by title, country, genre, and release year
-- **Watchlist** - Save titles for later viewing with offline persistence
-- **Downloads** - Download content for offline viewing with progress tracking
+- **Watchlist & Favorites** - Save titles for later viewing with offline persistence
+- **Offline Downloads** - Download content for offline viewing with progress tracking
 - **Personalization** - Recently viewed history and genre-based recommendations
+- **Multi-language Support** - Localization with region switching
 - **Themes** - Light and dark mode with system preference support
 - **Accessibility** - Screen reader support, dynamic type, and 44pt touch targets
 
 ## Tech Stack
 
-- **Framework**: React Native with Expo SDK 54
-- **Language**: TypeScript (strict mode)
-- **Navigation**: Expo Router 6 (file-based routing)
-- **State Management**: Zustand for local state, React Query for server state
-- **Styling**: React Native StyleSheet with custom theming
+- **Framework**: React Native with Expo SDK 54 (managed workflow)
+- **Language**: TypeScript with strict mode enabled
+- **Runtime**: React 19.1 with React Compiler enabled (experimental)
+- **Navigation**: Expo Router 6 (file-based routing) + React Navigation 7
+- **State Management**: Zustand for local state, React Query (TanStack Query) for server state
+- **Styling**: React Native StyleSheet with custom theming system
+- **Package Manager**: Bun (bun.lock present)
 - **Testing**: Jest with fast-check for property-based testing
 - **API**: TMDB (The Movie Database)
+- **Build**: New Architecture enabled (`newArchEnabled: true`)
 
 ## Getting Started
 
 ### Prerequisites
 
-- Node.js 18+ or Bun
+- Node.js 18+ or Bun (recommended)
 - iOS Simulator (macOS) or Android Emulator
 - Expo Go app (for physical device testing)
+- TMDB API key (free registration required)
 
 ### Installation
 
@@ -59,17 +64,21 @@ bun run web
 
 ```
 ├── app/                    # Expo Router screens
-│   ├── (tabs)/            # Tab navigation screens
+│   ├── (tabs)/            # Tab navigation screens (home, explore)
 │   ├── movie/[id].tsx     # Movie detail page
 │   ├── tv/[id].tsx        # TV series detail page
 │   ├── country/[code].tsx # Country hub page
-│   └── trailer/[key].tsx  # Fullscreen trailer player
+│   ├── trailer/[key].tsx  # Fullscreen trailer player
+│   ├── _layout.tsx        # Root layout with ThemeProvider
+│   └── modal.tsx          # Modal screen
 ├── components/            # Reusable UI components
 │   ├── detail/           # Detail page components
 │   ├── media/            # Media cards, carousels, players
 │   ├── search/           # Search utilities
-│   ├── ui/               # Base UI components
-│   └── watchlist/        # Watchlist utilities
+│   ├── ui/               # Base UI components (collapsible, icons)
+│   ├── watchlist/        # Watchlist utilities
+│   ├── themed-text.tsx   # Theme-aware text component
+│   └── themed-view.tsx   # Theme-aware view component
 ├── services/             # API clients and services
 │   ├── api/tmdb.ts       # TMDB API client
 │   ├── analytics.ts      # Analytics service
@@ -78,8 +87,16 @@ bun run web
 │   └── storage.ts        # AsyncStorage wrapper
 ├── stores/               # Zustand state stores
 ├── hooks/                # Custom React hooks
+│   ├── use-color-scheme.ts    # Native color scheme detection
+│   ├── use-color-scheme.web.ts # Web-specific implementation
+│   └── use-theme-color.ts     # Theme color accessor
 ├── types/                # TypeScript type definitions
 ├── constants/            # Theme and configuration
+│   └── theme.ts          # Colors and fonts for light/dark themes
+├── locales/              # Internationalization files
+├── assets/               # Static assets (images, icons)
+├── scripts/              # Build and utility scripts
+├── utils/                # Utility functions
 └── __tests__/            # Test files
 ```
 
