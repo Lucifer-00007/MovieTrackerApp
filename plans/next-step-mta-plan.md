@@ -156,7 +156,14 @@ Call Stack
 
 - [x] Make a detailed report md  with the RCA, challenges faced and solution implemeted based on the placeholder image issue in - ./md-docs/reports/
 
-- [] 
+- [x] Update/add the following file:
+	- update ./md-docs/README.md
+
+	- update ./README.md
+
+	- Add a readme to each folder in ./app/, ./assets/, ./components/, ./constants/, ./hooks/, ./locales/,  ./scripts/, ./services/, ./stores/, ./types/ and ./utils/
+
+
 - [] 
 - [] 
 
