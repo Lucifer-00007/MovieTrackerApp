@@ -125,11 +125,4 @@ curl --get "https://www.omdbapi.com/" \
   --data-urlencode "Season=1"
 ```
 
-If you want, I can:
-
-* generate a small Node.js / bash wrapper script that accepts title/ID and prints a nicely formatted output, or
-* produce these same examples as a ready-to-run shell script with argument parsing.
-
-Which one do you want next?
-
 [1]: https://www.omdbapi.com/ "OMDb API - The Open Movie Database"
