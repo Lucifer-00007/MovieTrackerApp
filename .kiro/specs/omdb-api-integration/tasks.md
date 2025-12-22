@@ -6,13 +6,13 @@ This implementation plan creates an OMDb API adapter that integrates seamlessly 
 
 ## Tasks
 
-- [ ] 1. Set up OMDb API client and configuration
+- [x] 1. Set up OMDb API client and configuration
   - Create `services/api/omdb.ts` with HTTP client and configuration
   - Add OMDb-specific TypeScript interfaces for API responses
   - Implement basic API key authentication and HTTPS endpoint configuration
   - _Requirements: 1.3, 1.4, 8.1_
 
-- [ ] 1.1 Write property test for HTTPS endpoint usage
+- [x] 1.1 Write property test for HTTPS endpoint usage
   - **Property 2: Interface compliance and HTTPS usage**
   - **Validates: Requirements 1.2, 1.4**
 
