@@ -228,8 +228,8 @@ describe('Feature: omdb-api-integration, Property 7: Fallback strategies for uns
     it('should handle unknown country codes gracefully', async () => {
       await fc.assert(
         fc.asyncProperty(
-          fc.stringOf(fc.constantFrom('A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K', 'L', 'M', 'N', 'O', 'P', 'Q', 'R', 'S', 'T', 'U', 'V', 'W', 'X', 'Y', 'Z'), { minLength: 2, maxLength: 2 }),
-          async (unknownCountryCode) => {
+          fc.stringMatching(/^[A-Z]{2}$/),
+          async (unknownCountryCode: string) => {
             // Should not throw for unknown country codes
             const result = await omdbAdapter.discoverByCountry('movie', unknownCountryCode, { page: 1 });
             
