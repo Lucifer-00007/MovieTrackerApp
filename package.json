@@ -12,7 +12,9 @@
     "lint": "expo lint",
     "test": "jest",
     "test:watch": "jest --watch",
-    "test:coverage": "jest --coverage"
+    "test:coverage": "jest --coverage",
+    "find:long-files": "node ./scripts/find-long-files.js",
+    "find:constants": "node ./scripts/find-hardcoded-constants.js"
   },
   "dependencies": {
     "@expo/vector-icons": "^15.0.3",

@@ -47,6 +47,14 @@ bun run type-check
 
 # Test coverage
 bun run test:coverage
+
+# Find code files longer than 500 lines
+bun run find:long-files
+# Or with custom threshold
+node scripts/find-long-files.js 300
+
+# Find hard-coded constants that should be centralized
+bun run find:constants
 ```
 
 ### Development Tools

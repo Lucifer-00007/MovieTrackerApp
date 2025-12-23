@@ -218,11 +218,30 @@ Failed to resolve the Android SDK path. Default install location not found: /Use
 
 ```
 
-- [] Add some scripts:
+- [x] Add some scripts:
   - To find code files longer than 500 lines. Ignore markdown or files that are not related to development. Follow these practices for future developments as well.
   - Find all the hard-coded constants throughout the codebase, that can be moved to constants folder such that we can follow the DRY principals.
 
-- [] 
+- [] Consider refactoring these files into smaller modules following best practice:
+
+   1300 lines │ __tests__/services/api/omdb.property.test.ts
+   1066 lines │ __tests__/services/api/omdb-mappers.property.test.ts
+    983 lines │ app/(tabs)/profile.tsx
+    885 lines │ services/api/omdb.ts
+    862 lines │ __tests__/components/DetailPage.property.test.ts
+    791 lines │ app/country/[code].tsx
+    751 lines │ __tests__/services/analytics.property.test.ts
+    741 lines │ components/media/TrailerPlayer.tsx
+    722 lines │ __tests__/services/api/omdb-adapter.property.test.ts
+    721 lines │ services/api/tmdb.ts
+    713 lines │ app/(tabs)/search.tsx
+    643 lines │ services/api/adapters/omdb-adapter.ts
+    625 lines │ __tests__/services/api/integration.test.ts
+    557 lines │ __tests__/services/api/adapter-compliance.test.ts
+    546 lines │ services/api/omdb-mappers.ts
+    544 lines │ services/analytics.ts
+
+
 - [] 
 - [] 
 - [] 
