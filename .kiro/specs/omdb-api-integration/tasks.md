@@ -36,29 +36,29 @@ This implementation plan creates an OMDb API adapter that integrates seamlessly 
     - **Property 5: Detail fetching with plot options**
     - **Validates: Requirements 3.1, 3.2, 3.3**
 
-- [ ] 3. Create data transformation layer
-  - [ ] 3.1 Implement OMDb to MediaItem mappers
+- [x] 3. Create data transformation layer
+  - [x] 3.1 Implement OMDb to MediaItem mappers
     - Create `mapOMDbToMediaItem()` function for search results
     - Create `mapOMDbToMediaDetails()` function for detail responses
     - Implement ID mapping strategy (IMDb ID to numeric ID)
     - _Requirements: 1.5, 3.4_
 
-  - [ ] 3.2 Write property test for data transformation
+  - [x] 3.2 Write property test for data transformation
     - **Property 3: Data transformation consistency**
     - **Validates: Requirements 1.5, 3.4**
 
-  - [ ] 3.3 Implement cast data parsing
+  - [x] 3.3 Implement cast data parsing
     - Create `parseCastString()` to convert comma-separated actors to CastMember array
     - Handle director and writer information in cast data
     - Implement graceful handling of limited cast information
     - _Requirements: 5.1, 5.2, 5.3, 5.4, 5.5_
 
-  - [ ] 3.4 Write property test for cast data parsing
+  - [x] 3.4 Write property test for cast data parsing
     - **Property 8: Cast data parsing and extraction**
     - **Validates: Requirements 5.1, 5.2, 5.3, 5.4, 5.5**
 
-- [ ] 4. Implement OMDb adapter class
-  - [ ] 4.1 Create OMDb adapter implementing MediaApiAdapter interface
+- [-] 4. Implement OMDb adapter class
+  - [-] 4.1 Create OMDb adapter implementing MediaApiAdapter interface
     - Create `services/api/adapters/omdb-adapter.ts`
     - Implement all required interface methods
     - Add adapter to `services/api/adapters/index.ts`
