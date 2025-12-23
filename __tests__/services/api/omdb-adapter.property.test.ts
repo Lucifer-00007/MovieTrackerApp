@@ -6,69 +6,75 @@
  */
 
 import * as fc from 'fast-check';
-import { omdbAdapter } from '@/services/api/adapters/omdb-adapter';
 import type { PaginatedResponse } from '@/services/api/types';
 import type { TrendingItem, MediaItem } from '@/types/media';
 
 // Mock the OMDb API client to avoid actual API calls
-jest.mock('@/services/api/omdb', () => {
-  const actual = jest.requireActual('@/services/api/omdb');
-  return {
-    ...actual,
-    searchContent: jest.fn().mockImplementation(async (params) => {
-      // Return mock search results
-      const mockItems = [
-        {
-          Title: 'Test Movie',
-          Year: '2023',
-          imdbID: 'tt1234567',
-          Type: 'movie' as const,
-          Poster: 'https://example.com/poster.jpg',
-        },
-        {
-          Title: 'Test Series',
-          Year: '2022',
-          imdbID: 'tt7654321',
-          Type: 'series' as const,
-          Poster: 'https://example.com/poster2.jpg',
-        },
-      ];
-      
-      return {
-        items: mockItems,
-        totalResults: 20,
-        page: params.page || 1,
-        totalPages: 2,
-      };
-    }),
-    getDetailsByImdbId: jest.fn().mockImplementation(async (params) => {
-      return {
+jest.mock('@/services/api/omdb', () => ({
+  searchContent: jest.fn().mockImplementation(async (params) => {
+    const mockItems = [
+      {
         Title: 'Test Movie',
         Year: '2023',
-        Rated: 'PG-13',
-        Released: '01 Jan 2023',
-        Runtime: '120 min',
-        Genre: 'Action, Drama',
-        Director: 'Test Director',
-        Writer: 'Test Writer',
-        Actors: 'Actor One, Actor Two',
-        Plot: 'A test plot',
-        Language: 'English',
-        Country: 'United States',
-        Awards: 'N/A',
-        Poster: 'https://example.com/poster.jpg',
-        Ratings: [],
-        Metascore: '75',
-        imdbRating: '7.5',
-        imdbVotes: '10,000',
-        imdbID: params.imdbId,
+        imdbID: 'tt1234567',
         Type: 'movie' as const,
-        Response: 'True' as const,
-      };
-    }),
-    getImdbIdFromNumeric: jest.fn().mockReturnValue('tt1234567'),
-  };
-});
+        Poster: 'https://example.com/poster.jpg',
+      },
+      {
+        Title: 'Test Series',
+        Year: '2022',
+        imdbID: 'tt7654321',
+        Type: 'series' as const,
+        Poster: 'https://example.com/poster2.jpg',
+      },
+    ];
+    
+    return {
+      items: mockItems,
+      totalResults: 20,
+      page: params.page || 1,
+      totalPages: 2,
+    };
+  }),
+  getDetailsByImdbId: jest.fn().mockImplementation(async (params) => {
+    return {
+      Title: 'Test Movie',
+      Year: '2023',
+      Rated: 'PG-13',
+      Released: '01 Jan 2023',
+      Runtime: '120 min',
+      Genre: 'Action, Drama',
+      Director: 'Test Director',
+      Writer: 'Test Writer',
+      Actors: 'Actor One, Actor Two',
+      Plot: 'A test plot',
+      Language: 'English',
+      Country: 'United States',
+      Awards: 'N/A',
+      Poster: 'https://example.com/poster.jpg',
+      Ratings: [],
+      Metascore: '75',
+      imdbRating: '7.5',
+      imdbVotes: '10,000',
+      imdbID: params.imdbId,
+      Type: 'movie' as const,
+      Response: 'True' as const,
+    };
+  }),
+  getImdbIdFromNumeric: jest.fn().mockReturnValue('tt1234567'),
+  generateNumericId: jest.fn().mockImplementation((imdbId: string) => {
+    let hash = 0;
+    for (let i = 0; i < imdbId.length; i++) {
+      const char = imdbId.charCodeAt(i);
+      hash = ((hash << 5) - hash) + char;
+      hash = hash & hash;
+    }
+    return Math.abs(hash);
+  }),
+}));
+
+// Import the adapter after mocking
+import { omdbAdapter } from '@/services/api/adapters/omdb-adapter';
 
 describe('Feature: omdb-api-integration, Property 7: Fallback strategies for unsupported features', () => {
   /**

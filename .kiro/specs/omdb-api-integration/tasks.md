@@ -57,7 +57,7 @@ This implementation plan creates an OMDb API adapter that integrates seamlessly 
     - **Property 8: Cast data parsing and extraction**
     - **Validates: Requirements 5.1, 5.2, 5.3, 5.4, 5.5**
 
-- [-] 4. Implement OMDb adapter class
+- [x] 4. Implement OMDb adapter class
   - [x] 4.1 Create OMDb adapter implementing MediaApiAdapter interface
     - Create `services/api/adapters/omdb-adapter.ts`
     - Implement all required interface methods
@@ -75,7 +75,7 @@ This implementation plan creates an OMDb API adapter that integrates seamlessly 
     - Add logging for fallback usage
     - _Requirements: 4.1, 4.2, 4.3, 4.4, 4.5_
 
-  - [-] 4.4 Write property test for fallback strategies
+  - [x] 4.4 Write property test for fallback strategies
     - **Property 7: Fallback strategies for unsupported features**
     - **Validates: Requirements 4.1, 4.2, 4.3, 4.4, 4.5**
 
