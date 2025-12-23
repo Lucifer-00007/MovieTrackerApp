@@ -163,10 +163,10 @@ Call Stack
 
 	- Add a readme to each folder in ./app/, ./assets/, ./components/, ./constants/, ./hooks/, ./locales/,  ./scripts/, ./services/, ./stores/, ./types/ and ./utils/
 
-- [] Use `./md-docs/info/OMDb-API.md` for API docs.
+- [x] Use `./md-docs/info/OMDb-API.md` for API docs.
 	- Implement the OMDb-API also without disturbing the codebase and use `EXPO_PUBLIC_API_PROVIDER=omdb` following best practices.
 
-- [] If adb is working and my mobile is detected then why am i getting errors:
+- [x] If adb is working and my mobile is detected then why am i getting errors:
 
 ```
 ➜  MovieTrackerApp git:(main) ✗ adb version                                                                          

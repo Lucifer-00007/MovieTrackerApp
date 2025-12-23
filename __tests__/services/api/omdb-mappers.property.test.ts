@@ -435,12 +435,13 @@ describe('Feature: omdb-api-integration, Property 3: Data transformation consist
       it('should correctly parse comma-separated genres', () => {
         fc.assert(
           fc.property(
-            fc.array(fc.string({ minLength: 1, maxLength: 20 }).filter(s => !s.includes(',')), { minLength: 1, maxLength: 5 }),
+            // Filter out strings that are empty after trimming (whitespace-only)
+            fc.array(fc.string({ minLength: 1, maxLength: 20 }).filter(s => !s.includes(',') && s.trim().length > 0), { minLength: 1, maxLength: 5 }),
             (genreNames) => {
               const genreString = genreNames.join(', ');
               const result = parseGenres(genreString);
 
-              // Should have same number of genres
+              // Should have same number of genres (all inputs are non-empty after trim)
               expect(result.length).toBe(genreNames.length);
 
               // Each genre should have id and name
