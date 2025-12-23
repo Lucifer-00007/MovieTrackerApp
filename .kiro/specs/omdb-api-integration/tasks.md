@@ -58,24 +58,24 @@ This implementation plan creates an OMDb API adapter that integrates seamlessly 
     - **Validates: Requirements 5.1, 5.2, 5.3, 5.4, 5.5**
 
 - [-] 4. Implement OMDb adapter class
-  - [-] 4.1 Create OMDb adapter implementing MediaApiAdapter interface
+  - [x] 4.1 Create OMDb adapter implementing MediaApiAdapter interface
     - Create `services/api/adapters/omdb-adapter.ts`
     - Implement all required interface methods
     - Add adapter to `services/api/adapters/index.ts`
     - _Requirements: 1.2_
 
-  - [ ] 4.2 Implement search and details methods
+  - [x] 4.2 Implement search and details methods
     - Wire up `searchMulti()`, `getMovieDetails()`, `getTvDetails()` methods
     - Integrate data transformation layer
     - _Requirements: 2.4, 3.4_
 
-  - [ ] 4.3 Implement fallback strategies for unsupported features
+  - [x] 4.3 Implement fallback strategies for unsupported features
     - Create fallback for `getTrending()` using popular search terms
     - Implement `discoverByCountry()` using search strategies
     - Add logging for fallback usage
     - _Requirements: 4.1, 4.2, 4.3, 4.4, 4.5_
 
-  - [ ] 4.4 Write property test for fallback strategies
+  - [-] 4.4 Write property test for fallback strategies
     - **Property 7: Fallback strategies for unsupported features**
     - **Validates: Requirements 4.1, 4.2, 4.3, 4.4, 4.5**
 
