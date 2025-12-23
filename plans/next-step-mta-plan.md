@@ -163,7 +163,52 @@ Call Stack
 
 	- Add a readme to each folder in ./app/, ./assets/, ./components/, ./constants/, ./hooks/, ./locales/,  ./scripts/, ./services/, ./stores/, ./types/ and ./utils/
 
+- [] Use `./md-docs/info/OMDb-API.md` for API docs.
+	- Implement the OMDb-API also without disturbing the codebase and use `EXPO_PUBLIC_API_PROVIDER=omdb` following best practices.
 
+- [] If adb is working and my mobile is detected then why am i getting errors:
+
+```
+➜  MovieTrackerApp git:(main) ✗ adb version                                                                          
+Android Debug Bridge version 1.0.41
+Version 36.0.0-13206524
+Installed as /opt/homebrew/bin/adb
+Running on Darwin 25.2.0 (arm64)
+➜  MovieTrackerApp git:(main) ✗ 
+➜  MovieTrackerApp git:(main) ✗ 
+➜  MovieTrackerApp git:(main) ✗ 
+➜  MovieTrackerApp git:(main) ✗ bun run android                                                                      
+$ expo start --android
+env: load .env
+env: export EXPO_PUBLIC_TMDB_API_KEY EXPO_PUBLIC_USE_MOCK_DATA EXPO_PUBLIC_API_PROVIDER EXPO_PUBLIC_DISABLE_ANALYTICS
+Starting project at /Users/ani/Developer/ANI/🍀 Projects&Orgs/1VibeCodeAI/AntiGravity/MovieTrackerApp
+React Compiler enabled
+Starting Metro Bundler
+Failed to resolve the Android SDK path. Default install location not found: /Users/ani/Library/Android/sdk. Use ANDROID_HOME to set the Android SDK location.
+Failed to resolve the Android SDK path. Default install location not found: /Users/ani/Library/Android/sdk. Use ANDROID_HOME to set the Android SDK location.
+Failed to resolve the Android SDK path. Default install location not found: /Users/ani/Library/Android/sdk. Use ANDROID_HOME to set the Android SDK location.
+Failed to resolve the Android SDK path. Default install location not found: /Users/ani/Library/Android/sdk. Use ANDROID_HOME to set the Android SDK location.
+Failed to resolve the Android SDK path. Default install location not found: /Users/ani/Library/Android/sdk. Use ANDROID_HOME to set the Android SDK location.
+Failed to resolve the Android SDK path. Default install location not found: /Users/ani/Library/Android/sdk. Use ANDROID_HOME to set the Android SDK location.
+Failed to resolve the Android SDK path. Default install location not found: /Users/ani/Library/Android/sdk. Use ANDROID_HOME to set the Android SDK location.
+Failed to resolve the Android SDK path. Default install location not found: /Users/ani/Library/Android/sdk. Use ANDROID_HOME to set the Android SDK location.
+› Opening exp://192.168.1.3:8081 on POCO_F1
+Failed to resolve the Android SDK path. Default install location not found: /Users/ani/Library/Android/sdk. Use ANDROID_HOME to set the Android SDK location.
+Failed to resolve the Android SDK path. Default install location not found: /Users/ani/Library/Android/sdk. Use ANDROID_HOME to set the Android SDK location.
+Failed to resolve the Android SDK path. Default install location not found: /Users/ani/Library/Android/sdk. Use ANDROID_HOME to set the Android SDK location.
+Failed to resolve the Android SDK path. Default install location not found: /Users/ani/Library/Android/sdk. Use ANDROID_HOME to set the Android SDK location.
+Failed to resolve the Android SDK path. Default install location not found: /Users/ani/Library/Android/sdk. Use ANDROID_HOME to set the Android SDK location.
+Failed to resolve the Android SDK path. Default install location not found: /Users/ani/Library/Android/sdk. Use ANDROID_HOME to set the Android SDK location.
+Failed to resolve the Android SDK path. Default install location not found: /Users/ani/Library/Android/sdk. Use ANDROID_HOME to set the Android SDK location.
+Failed to resolve the Android SDK path. Default install location not found: /Users/ani/Library/Android/sdk. Use ANDROID_HOME to set the Android SDK location.
+
+```
+
+--> Your ANDROID_HOME environment variable isn't set. Since adb is at /opt/homebrew/bin/adb, you likely installed it standalone via Homebrew (brew install android-platform-tools), which only gives you adb and fastboot — not the full SDK that Expo needs.
+
+- [] 
+- [] 
+- [] 
 - [] 
 - [] 
 

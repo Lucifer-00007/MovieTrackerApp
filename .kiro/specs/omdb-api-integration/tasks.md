@@ -16,23 +16,23 @@ This implementation plan creates an OMDb API adapter that integrates seamlessly 
   - **Property 2: Interface compliance and HTTPS usage**
   - **Validates: Requirements 1.2, 1.4**
 
-- [ ] 2. Implement core OMDb API methods
-  - [ ] 2.1 Implement search functionality with pagination
+- [x] 2. Implement core OMDb API methods
+  - [x] 2.1 Implement search functionality with pagination
     - Add `searchContent()` method with query, page, and type parameters
     - Handle OMDb search response format and pagination
     - _Requirements: 2.1, 2.2, 2.3_
 
-  - [ ] 2.2 Write property test for search functionality
+  - [x] 2.2 Write property test for search functionality
     - **Property 4: Search functionality with parameters**
     - **Validates: Requirements 2.1, 2.2, 2.3, 2.4**
 
-  - [ ] 2.3 Implement detail fetching methods
+  - [x] 2.3 Implement detail fetching methods
     - Add `getDetailsByImdbId()` and `getDetailsByTitle()` methods
     - Support both movie and series type filtering
     - Handle plot length parameter (short/full)
     - _Requirements: 3.1, 3.2, 3.3_
 
-  - [ ] 2.4 Write property test for detail fetching
+  - [x] 2.4 Write property test for detail fetching
     - **Property 5: Detail fetching with plot options**
     - **Validates: Requirements 3.1, 3.2, 3.3**
 

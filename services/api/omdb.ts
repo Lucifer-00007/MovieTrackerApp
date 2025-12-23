@@ -338,3 +338,181 @@ export function getImdbIdFromNumeric(numericId: number): string | undefined {
 export function clearIdMappingCache(): void {
   idMappingCache.clear();
 }
+
+// ============================================================================
+// SEARCH FUNCTIONALITY
+// ============================================================================
+
+/** Search type filter options */
+export type OMDbSearchType = 'movie' | 'series' | 'episode';
+
+/** Search parameters for OMDb API */
+export interface OMDbSearchParams {
+  query: string;
+  page?: number;
+  type?: OMDbSearchType;
+  year?: number;
+}
+
+/** Parsed search results with pagination info */
+export interface OMDbSearchResults {
+  items: OMDbSearchItem[];
+  totalResults: number;
+  page: number;
+  totalPages: number;
+}
+
+/** OMDb returns 10 results per page */
+const OMDB_RESULTS_PER_PAGE = 10;
+
+/**
+ * Search for content using OMDb API
+ * Handles pagination and type filtering
+ * 
+ * Requirements: 2.1, 2.2, 2.3
+ * 
+ * @param params - Search parameters
+ * @returns Parsed search results with pagination info
+ */
+export async function searchContent(params: OMDbSearchParams): Promise<OMDbSearchResults> {
+  const { query, page = 1, type, year } = params;
+  
+  // Validate query
+  if (!query || query.trim().length === 0) {
+    return {
+      items: [],
+      totalResults: 0,
+      page,
+      totalPages: 0,
+    };
+  }
+  
+  // Build URL with search parameters
+  const url = buildOMDbUrl({
+    s: query.trim(),
+    page,
+    type,
+    y: year,
+  });
+  
+  try {
+    const response = await fetchWithRetry<OMDbSearchResponse>(url);
+    
+    // Handle successful response
+    const items = response.Search || [];
+    const totalResults = parseInt(response.totalResults || '0', 10);
+    const totalPages = Math.ceil(totalResults / OMDB_RESULTS_PER_PAGE);
+    
+    return {
+      items,
+      totalResults,
+      page,
+      totalPages,
+    };
+  } catch (error) {
+    // Handle "Movie not found" as empty results, not an error
+    if (error instanceof OMDbApiError && error.code === 'NOT_FOUND') {
+      return {
+        items: [],
+        totalResults: 0,
+        page,
+        totalPages: 0,
+      };
+    }
+    
+    // Handle "Too many results" error
+    if (error instanceof OMDbApiError && error.code === 'TOO_MANY_RESULTS') {
+      console.warn('[OMDb] Search query too broad, returning empty results');
+      return {
+        items: [],
+        totalResults: 0,
+        page,
+        totalPages: 0,
+      };
+    }
+    
+    throw error;
+  }
+}
+
+// ============================================================================
+// DETAIL FETCHING
+// ============================================================================
+
+/** Plot length options for detail requests */
+export type OMDbPlotLength = 'short' | 'full';
+
+/** Parameters for fetching details by IMDb ID */
+export interface OMDbDetailByIdParams {
+  imdbId: string;
+  plot?: OMDbPlotLength;
+}
+
+/** Parameters for fetching details by title */
+export interface OMDbDetailByTitleParams {
+  title: string;
+  type?: OMDbSearchType;
+  year?: number;
+  plot?: OMDbPlotLength;
+}
+
+/**
+ * Get detailed information by IMDb ID
+ * 
+ * Requirements: 3.1, 3.2, 3.3
+ * 
+ * @param params - Parameters including IMDb ID and plot length
+ * @returns Detailed OMDb response
+ */
+export async function getDetailsByImdbId(params: OMDbDetailByIdParams): Promise<OMDbDetailResponse> {
+  const { imdbId, plot = 'full' } = params;
+  
+  // Validate IMDb ID format
+  if (!imdbId || !imdbId.startsWith('tt')) {
+    throw new OMDbApiError(
+      'Invalid IMDb ID format. Must start with "tt"',
+      'INVALID_IMDB_ID',
+      undefined,
+      false
+    );
+  }
+  
+  const url = buildOMDbUrl({
+    i: imdbId,
+    plot,
+  });
+  
+  return fetchWithRetry<OMDbDetailResponse>(url);
+}
+
+/**
+ * Get detailed information by title
+ * Supports type filtering and year specification
+ * 
+ * Requirements: 3.1, 3.2, 3.3
+ * 
+ * @param params - Parameters including title, type, year, and plot length
+ * @returns Detailed OMDb response
+ */
+export async function getDetailsByTitle(params: OMDbDetailByTitleParams): Promise<OMDbDetailResponse> {
+  const { title, type, year, plot = 'full' } = params;
+  
+  // Validate title
+  if (!title || title.trim().length === 0) {
+    throw new OMDbApiError(
+      'Title is required for detail lookup',
+      'INVALID_TITLE',
+      undefined,
+      false
+    );
+  }
+  
+  const url = buildOMDbUrl({
+    t: title.trim(),
+    type,
+    y: year,
+    plot,
+  });
+  
+  return fetchWithRetry<OMDbDetailResponse>(url);
+}
