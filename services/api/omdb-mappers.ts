@@ -174,6 +174,7 @@ export function parseRating(ratingString: string | undefined): number | null {
 /**
  * Validate and normalize poster URL
  * Returns null if poster is not available or invalid
+ * Performs additional validation beyond basic URL parsing
  */
 export function normalizePosterUrl(posterUrl: string | undefined): string | null {
   if (!posterUrl || posterUrl === 'N/A') {
@@ -184,6 +185,53 @@ export function normalizePosterUrl(posterUrl: string | undefined): string | null
   try {
     new URL(posterUrl);
     return posterUrl;
+  } catch {
+    return null;
+  }
+}
+
+/**
+ * Enhanced poster URL validation with additional checks
+ * Validates URL format, protocol, and basic structure
+ * 
+ * Requirements: 6.1, 6.2, 6.5
+ */
+export function validateAndNormalizePosterUrl(posterUrl: string): string | null {
+  if (!posterUrl || posterUrl === 'N/A') {
+    return null;
+  }
+  
+  try {
+    const url = new URL(posterUrl);
+    
+    // Only allow HTTP and HTTPS protocols
+    if (url.protocol !== 'http:' && url.protocol !== 'https:') {
+      return null;
+    }
+    
+    // Additional validation for malformed hostnames
+    if (!url.hostname || 
+        url.hostname.includes('..') || 
+        url.hostname.startsWith('.') || 
+        url.hostname.endsWith('.') ||
+        url.hostname === '') {
+      return null;
+    }
+    
+    // Basic validation that it looks like an image URL
+    // OMDb typically returns URLs ending with .jpg
+    const pathname = url.pathname.toLowerCase();
+    const hasImageExtension = pathname.endsWith('.jpg') || 
+                             pathname.endsWith('.jpeg') || 
+                             pathname.endsWith('.png') || 
+                             pathname.endsWith('.gif') || 
+                             pathname.endsWith('.webp');
+    
+    // If it doesn't have an image extension, it might still be valid
+    // (some URLs don't have extensions), so we'll allow it
+    
+    // Return the normalized URL
+    return url.toString();
   } catch {
     return null;
   }

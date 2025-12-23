@@ -79,18 +79,18 @@ This implementation plan creates an OMDb API adapter that integrates seamlessly 
     - **Property 7: Fallback strategies for unsupported features**
     - **Validates: Requirements 4.1, 4.2, 4.3, 4.4, 4.5**
 
-- [ ] 5. Implement image and media handling
-  - [ ] 5.1 Implement image URL handling
+- [x] 5. Implement image and media handling
+  - [x] 5.1 Implement image URL handling
     - Create `getImageUrl()` method for poster URLs
     - Add URL validation for OMDb poster URLs
     - Handle cases where no poster is available
     - _Requirements: 6.1, 6.2, 6.3, 6.5_
 
-  - [ ] 5.2 Write property test for image URL handling
+  - [x] 5.2 Write property test for image URL handling
     - **Property 9: Image URL handling**
     - **Validates: Requirements 6.1, 6.2, 6.5**
 
-  - [ ] 5.3 Implement remaining adapter methods
+  - [x] 5.3 Implement remaining adapter methods
     - Add `getMovieCredits()`, `getTvCredits()` using cast parsing
     - Implement `getWatchProviders()` with reasonable defaults
     - Add `getRecommendations()` and `getTrailerKey()` with fallbacks

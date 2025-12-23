@@ -76,6 +76,279 @@ jest.mock('@/services/api/omdb', () => ({
 // Import the adapter after mocking
 import { omdbAdapter } from '@/services/api/adapters/omdb-adapter';
 
+describe('Feature: omdb-api-integration, Property 9: Image URL handling', () => {
+  /**
+   * Property 9: Image URL handling
+   * For any OMDb response containing poster URLs, the image service should return 
+   * valid poster URLs via getImageUrl method without additional processing, and 
+   * should validate URLs before returning them
+   * 
+   * **Validates: Requirements 6.1, 6.2, 6.5**
+   */
+
+  describe('getImageUrl Method', () => {
+    it('should return null for null or undefined input', () => {
+      expect(omdbAdapter.getImageUrl(null)).toBeNull();
+      expect(omdbAdapter.getImageUrl(undefined as any)).toBeNull();
+    });
+
+    it('should return null for OMDb N/A response', () => {
+      expect(omdbAdapter.getImageUrl('N/A')).toBeNull();
+    });
+
+    it('should validate and return valid HTTPS URLs', async () => {
+      await fc.assert(
+        fc.property(
+          fc.constantFrom(
+            'https://example.com/poster.jpg',
+            'https://m.media-amazon.com/images/M/poster.jpg',
+            'https://images.example.com/movie-poster.png',
+            'https://cdn.example.com/image.jpeg'
+          ),
+          (validUrl) => {
+            const result = omdbAdapter.getImageUrl(validUrl);
+            
+            // Should return the URL for valid HTTPS URLs
+            expect(result).toBe(validUrl);
+            
+            // Result should be a valid URL
+            if (result) {
+              expect(() => new URL(result)).not.toThrow();
+              expect(result.startsWith('https://')).toBe(true);
+            }
+          }
+        ),
+        { numRuns: 100 }
+      );
+    });
+
+    it('should validate and return valid HTTP URLs', async () => {
+      await fc.assert(
+        fc.property(
+          fc.constantFrom(
+            'http://example.com/poster.jpg',
+            'http://images.example.com/movie.png',
+            'http://cdn.example.com/poster.gif'
+          ),
+          (validUrl) => {
+            const result = omdbAdapter.getImageUrl(validUrl);
+            
+            // Should return the URL for valid HTTP URLs
+            expect(result).toBe(validUrl);
+            
+            // Result should be a valid URL
+            if (result) {
+              expect(() => new URL(result)).not.toThrow();
+              expect(result.startsWith('http://')).toBe(true);
+            }
+          }
+        ),
+        { numRuns: 50 }
+      );
+    });
+
+    it('should return null for invalid URLs', async () => {
+      await fc.assert(
+        fc.property(
+          fc.constantFrom(
+            'not-a-url',
+            'ftp://example.com/poster.jpg',
+            'javascript:alert("xss")',
+            'data:image/png;base64,abc123',
+            '',
+            '   ',
+            'file:///local/image.jpg'
+          ),
+          (invalidUrl) => {
+            const result = omdbAdapter.getImageUrl(invalidUrl);
+            
+            // Should return null for invalid URLs or unsupported protocols
+            expect(result).toBeNull();
+          }
+        ),
+        { numRuns: 100 }
+      );
+    });
+
+    it('should handle URLs with various image extensions', async () => {
+      await fc.assert(
+        fc.property(
+          fc.constantFrom('.jpg', '.jpeg', '.png', '.gif', '.webp'),
+          fc.constantFrom('https://example.com', 'http://images.test.com'),
+          (extension, baseUrl) => {
+            const testUrl = `${baseUrl}/poster${extension}`;
+            const result = omdbAdapter.getImageUrl(testUrl);
+            
+            // Should return valid URLs with image extensions
+            expect(result).toBe(testUrl);
+            
+            if (result) {
+              expect(() => new URL(result)).not.toThrow();
+            }
+          }
+        ),
+        { numRuns: 100 }
+      );
+    });
+
+    it('should handle URLs without image extensions', async () => {
+      await fc.assert(
+        fc.property(
+          fc.constantFrom(
+            'https://example.com/poster',
+            'https://api.example.com/image/12345',
+            'http://cdn.example.com/media/poster-large'
+          ),
+          (urlWithoutExtension) => {
+            const result = omdbAdapter.getImageUrl(urlWithoutExtension);
+            
+            // Should still return valid URLs even without image extensions
+            expect(result).toBe(urlWithoutExtension);
+            
+            if (result) {
+              expect(() => new URL(result)).not.toThrow();
+            }
+          }
+        ),
+        { numRuns: 50 }
+      );
+    });
+
+    it('should handle URLs with query parameters and fragments', async () => {
+      await fc.assert(
+        fc.property(
+          fc.constantFrom(
+            'https://example.com/poster.jpg?size=large',
+            'https://example.com/image.png?width=300&height=450',
+            'https://example.com/poster.jpg#main',
+            'https://example.com/image.png?v=1.2.3&format=webp'
+          ),
+          (urlWithParams) => {
+            const result = omdbAdapter.getImageUrl(urlWithParams);
+            
+            // Should handle URLs with query parameters and fragments
+            expect(result).toBe(urlWithParams);
+            
+            if (result) {
+              expect(() => new URL(result)).not.toThrow();
+            }
+          }
+        ),
+        { numRuns: 50 }
+      );
+    });
+
+    it('should return null for malformed URLs', async () => {
+      await fc.assert(
+        fc.property(
+          fc.constantFrom(
+            'not-a-url',
+            'ftp://example.com/poster.jpg',
+            'javascript:alert("xss")',
+            'data:image/png;base64,abc123',
+            '',
+            '   ',
+            'file:///local/image.jpg',
+            'https://',
+            'http://',
+            'https:///',
+            'https://example..com/poster.jpg',
+            'https://..com/poster.jpg'
+          ),
+          (invalidUrl) => {
+            const result = omdbAdapter.getImageUrl(invalidUrl);
+            
+            // Should return null for invalid URLs or unsupported protocols
+            expect(result).toBeNull();
+          }
+        ),
+        { numRuns: 50 }
+      );
+    });
+
+    it('should ignore size parameter since OMDb returns direct URLs', async () => {
+      await fc.assert(
+        fc.property(
+          fc.constantFrom(
+            'https://example.com/poster.jpg',
+            'http://images.example.com/movie.png'
+          ),
+          fc.constantFrom('small', 'medium', 'large', 'original', 'w500'),
+          (validUrl, size) => {
+            const resultWithSize = omdbAdapter.getImageUrl(validUrl, size);
+            const resultWithoutSize = omdbAdapter.getImageUrl(validUrl);
+            
+            // Size parameter should be ignored for OMDb URLs
+            expect(resultWithSize).toBe(resultWithoutSize);
+            expect(resultWithSize).toBe(validUrl);
+          }
+        ),
+        { numRuns: 100 }
+      );
+    });
+  });
+
+  describe('URL Validation Edge Cases', () => {
+    it('should handle extremely long URLs', () => {
+      const longPath = 'a'.repeat(1000);
+      const longUrl = `https://example.com/${longPath}.jpg`;
+      
+      const result = omdbAdapter.getImageUrl(longUrl);
+      
+      // Should handle long URLs if they're valid
+      expect(result).toBe(longUrl);
+    });
+
+    it('should handle URLs with special characters', async () => {
+      await fc.assert(
+        fc.property(
+          fc.constantFrom(
+            'https://example.com/poster%20with%20spaces.jpg',
+            'https://example.com/poster-with-dashes.jpg',
+            'https://example.com/poster_with_underscores.jpg',
+            'https://example.com/poster.with.dots.jpg'
+          ),
+          (urlWithSpecialChars) => {
+            const result = omdbAdapter.getImageUrl(urlWithSpecialChars);
+            
+            // Should handle URLs with encoded special characters
+            expect(result).toBe(urlWithSpecialChars);
+            
+            if (result) {
+              expect(() => new URL(result)).not.toThrow();
+            }
+          }
+        ),
+        { numRuns: 50 }
+      );
+    });
+
+    it('should handle international domain names', async () => {
+      await fc.assert(
+        fc.property(
+          fc.constantFrom(
+            'https://example.co.uk/poster.jpg',
+            'https://example.com.au/image.png',
+            'https://example.de/poster.jpeg',
+            'https://sub.example.org/media.gif'
+          ),
+          (internationalUrl) => {
+            const result = omdbAdapter.getImageUrl(internationalUrl);
+            
+            // Should handle international domain names
+            expect(result).toBe(internationalUrl);
+            
+            if (result) {
+              expect(() => new URL(result)).not.toThrow();
+            }
+          }
+        ),
+        { numRuns: 50 }
+      );
+    });
+  });
+});
+
 describe('Feature: omdb-api-integration, Property 7: Fallback strategies for unsupported features', () => {
   /**
    * Property 7: Fallback strategies for unsupported features
@@ -272,18 +545,29 @@ describe('Feature: omdb-api-integration, Property 7: Fallback strategies for uns
   });
 
   describe('getWatchProviders Fallback', () => {
-    it('should return empty array for any media type and ID', async () => {
+    it('should return reasonable defaults for any media type and ID', async () => {
       await fc.assert(
         fc.asyncProperty(
           fc.constantFrom<'movie' | 'tv'>('movie', 'tv'),
           fc.integer({ min: 1, max: 1000000 }),
-          fc.constantFrom('US', 'GB', 'DE', 'FR'),
+          fc.constantFrom('US', 'GB', 'DE', 'FR', 'CA'),
           async (mediaType, mediaId, countryCode) => {
             const result = await omdbAdapter.getWatchProviders(mediaType, mediaId, countryCode);
             
-            // Should always return empty array (OMDb doesn't support this)
+            // Should return array of streaming providers (reasonable defaults)
             expect(Array.isArray(result)).toBe(true);
-            expect(result.length).toBe(0);
+            expect(result.length).toBeGreaterThanOrEqual(0);
+            expect(result.length).toBeLessThanOrEqual(4); // Max 4 providers per country
+            
+            // Each provider should have required properties
+            result.forEach(provider => {
+              expect(typeof provider.providerId).toBe('number');
+              expect(typeof provider.providerName).toBe('string');
+              expect(typeof provider.logoPath).toBe('string');
+              expect(typeof provider.link).toBe('string');
+              expect(['flatrate', 'rent', 'buy']).toContain(provider.type);
+              expect(typeof provider.isAvailable).toBe('boolean');
+            });
           }
         ),
         { numRuns: 100 }
