@@ -222,6 +222,7 @@ Failed to resolve the Android SDK path. Default install location not found: /Use
   - To find code files longer than 500 lines. Ignore markdown or files that are not related to development. Follow these practices for future developments as well.
   - Find all the hard-coded constants throughout the codebase, that can be moved to constants folder such that we can follow the DRY principals.
 
+
 - [] Consider refactoring these files into smaller modules following best practice:
 
    1300 lines │ __tests__/services/api/omdb.property.test.ts
@@ -242,7 +243,179 @@ Failed to resolve the Android SDK path. Default install location not found: /Use
     544 lines │ services/analytics.ts
 
 
-- [] 
+- [] Move constants to ./constants/ changes following best practices: 
+
+- Move colors to constants/colors.ts
+- Move API URLs to constants/api.ts
+- Move dimensions to constants/layout.ts
+- Move timing values to constants/animations.ts
+
+📁 DIMENSIONS (34 found)
+
+  "48"
+    └─ app/(tabs)/browse.tsx:179
+  "40"
+    └─ app/(tabs)/downloads.tsx:373, app/(tabs)/downloads.tsx:374
+  "100"
+    └─ app/(tabs)/explore.tsx:62, app/(tabs)/explore.tsx:62, app/country/[code].tsx:742 (+1 more)
+  "20"
+    └─ app/(tabs)/profile.tsx:958, app/(tabs)/profile.tsx:959, app/modal.tsx:23 (+1 more)
+  "24"
+    └─ app/(tabs)/profile.tsx:969, app/(tabs)/profile.tsx:970, app/country/[code].tsx:630
+  "44"
+    └─ app/country/[code].tsx:637, app/movie/[id].tsx:330, app/tv/[id].tsx:331 (+1 more)
+  "150"
+    └─ app/country/[code].tsx:743
+  "70"
+    └─ components/detail/DetailHeader.tsx:266, components/detail/DetailHeader.tsx:267, components/detail/DetailHeader.tsx:274 (+1 more)
+  "28"
+    └─ components/detail/DetailHeader.tsx:282, components/hello-wave.tsx:7
+  "16"
+    └─ components/media/TrailerPlayer.tsx:686, components/media/TrailerPlayer.tsx:687, components/themed-text.tsx:62 (+2 more)
+  "32"
+    └─ components/parallax-scroll-view.tsx:75, components/themed-text.tsx:71
+  "64"
+    └─ components/ui/GdprConsentModal.tsx:247, components/ui/GdprConsentModal.tsx:248
+
+📁 COLORS (75 found)
+
+  "#FFFFFF"
+    └─ app/(tabs)/downloads.tsx:140, app/(tabs)/downloads.tsx:149, app/(tabs)/downloads.tsx:178 (+40 more)
+  "#D0D0D0"
+    └─ app/(tabs)/explore.tsx:15
+  "#353636"
+    └─ app/(tabs)/explore.tsx:15
+  "#808080"
+    └─ app/(tabs)/explore.tsx:19, app/(tabs)/explore.tsx:103
+  "rgba(0, 0, 0, 0.5)"
+    └─ app/(tabs)/profile.tsx:961, components/media/TrailerPlayer.tsx:615, components/media/TrailerPlayer.tsx:637 (+2 more)
+  "#000"
+    └─ app/(tabs)/search.tsx:649, app/country/[code].tsx:695
+  "rgba(0,0,0,0.5)"
+    └─ app/movie/[id].tsx:207, app/movie/[id].tsx:218, app/tv/[id].tsx:208 (+1 more)
+  "#000000"
+    └─ app/trailer/[key].tsx:66, components/media/TrailerPlayer.tsx:110, components/media/TrailerPlayer.tsx:272 (+1 more)
+  "rgba(0,0,0,0.7)"
+    └─ components/detail/DetailHeader.tsx:140
+  "rgba(0,0,0,0.95)"
+    └─ components/detail/DetailHeader.tsx:140
+  "rgba(255,255,255,0.8)"
+    └─ components/detail/DetailHeader.tsx:331, components/media/HeroCarousel.tsx:171
+  "rgba(255,255,255,0.7)"
+    └─ components/detail/DetailHeader.tsx:337, components/detail/DetailHeader.tsx:342
+  "rgba(0,0,0,0.8)"
+    └─ components/media/HeroCarousel.tsx:151
+  "rgba(255,255,255,0.5)"
+    └─ components/media/HeroCarousel.tsx:201
+  "rgba(0, 0, 0, 0.6)"
+    └─ components/media/MediaCard.tsx:257
+  "rgba(0, 0, 0, 0.7)"
+    └─ components/media/TrailerPlayer.tsx:595
+  "rgba(255, 255, 255, 0.3)"
+    └─ components/media/TrailerPlayer.tsx:674
+  "#0a7ea4"
+    └─ components/themed-text.tsx:82
+  "rgba(255, 255, 255, 0.2)"
+    └─ components/ui/Skeleton.tsx:218
+
+📁 API-KEYS (28 found)
+
+  "phone-portrait-outline"
+    └─ app/(tabs)/downloads.tsx:192
+  "home-recently-viewed-row"
+    └─ app/(tabs)/index.tsx:239
+  "home-recommendations-row"
+    └─ app/(tabs)/index.tsx:249
+  "home-trending-movies-row"
+    └─ app/(tabs)/index.tsx:259
+  "home-trending-tv-row"
+    └─ app/(tabs)/index.tsx:269
+  "sync-status-indicator"
+    └─ app/(tabs)/profile.tsx:284
+  "notifications-section"
+    └─ app/(tabs)/profile.tsx:564
+  "notifications-toggle"
+    └─ app/(tabs)/profile.tsx:575
+  "notifications-setting"
+    └─ app/(tabs)/profile.tsx:578
+  "downloads-notifications-toggle"
+    └─ app/(tabs)/profile.tsx:593
+  "downloads-notifications-setting"
+    └─ app/(tabs)/profile.tsx:596
+  "new-releases-notifications-toggle"
+    └─ app/(tabs)/profile.tsx:609
+  "new-releases-notifications-setting"
+    └─ app/(tabs)/profile.tsx:612
+  "search-results-container"
+    └─ app/(tabs)/search.tsx:494
+  "search-movies-section"
+    └─ app/(tabs)/search.tsx:529
+  "country-hub-content-list"
+    └─ app/country/[code].tsx:599
+  "react-native-reanimated"
+    └─ app/movie/[id].tsx:22, app/tv/[id].tsx:23, components/detail/DetailHeader.tsx:24 (+2 more)
+  "movie-recommendations"
+    └─ app/movie/[id].tsx:276
+  "alert-circle-outline"
+    └─ components/ui/ErrorState.tsx:34, components/ui/error-state-utils.ts:86
+  "cloud-offline-outline"
+    └─ components/ui/OfflineBanner.tsx:48, components/ui/error-state-utils.ts:58
+  "X-RateLimit-Remaining"
+    └─ services/api/omdb.ts:370
+  "user_locale_preference"
+    └─ services/localization.ts:34
+
+📁 URLS (26 found)
+
+  "https://docs.expo.dev/router/introduction"
+    └─ app/(tabs)/explore.tsx:44
+  "https://reactnative.dev/docs/images"
+    └─ app/(tabs)/explore.tsx:64
+  "https://docs.expo.dev/develop/user-interface/co..."
+    └─ app/(tabs)/explore.tsx:74
+  "https://image.tmdb.org/t/p"
+    └─ components/detail/detail-utils.ts:12, components/media/HeroCarousel.tsx:31, components/media/media-card-utils.ts:12 (+1 more)
+  "https://www.youtube.com/embed/${videoKey}?autop..."
+    └─ components/media/trailer-utils.ts:17
+  "https://api.moviestream.app/analytics"
+    └─ services/analytics.ts:49
+  "https://netflix.com"
+    └─ services/api/adapters/omdb-adapter.ts:339, services/api/adapters/omdb-adapter.ts:376, services/api/adapters/omdb-adapter.ts:412 (+1 more)
+  "https://disneyplus.com"
+    └─ services/api/adapters/omdb-adapter.ts:347, services/api/adapters/omdb-adapter.ts:392, services/api/adapters/omdb-adapter.ts:428 (+1 more)
+  "https://hulu.com"
+    └─ services/api/adapters/omdb-adapter.ts:355
+  "https://primevideo.com"
+    └─ services/api/adapters/omdb-adapter.ts:363, services/api/adapters/omdb-adapter.ts:384, services/api/adapters/omdb-adapter.ts:420 (+1 more)
+  "https://bbc.co.uk/iplayer"
+    └─ services/api/adapters/omdb-adapter.ts:400
+  "https://crave.ca"
+    └─ services/api/adapters/omdb-adapter.ts:436
+  "https://www.omdbapi.com"
+    └─ services/api/omdb.ts:21
+  "https://api.themoviedb.org/3"
+    └─ services/api/tmdb.ts:22
+
+📁 TIMING (16 found)
+
+  "300"
+    └─ components/hello-wave.tsx:14, services/api/adapters/mock-adapter.ts:27
+  "5000"
+    └─ components/media/HeroCarousel.tsx:44, services/api/omdb.ts:324
+  "100"
+    └─ components/media/trailer-utils.ts:41
+  "30000"
+    └─ services/analytics.ts:42, services/analytics.ts:45
+  "1000"
+    └─ services/analytics.ts:44, services/api/omdb.ts:182, services/api/tmdb.ts:42 (+1 more)
+  "10000"
+    └─ services/api/omdb.ts:32, services/api/omdb.ts:183, services/api/omdb.ts:531 (+1 more)
+  "2000"
+    └─ services/api/omdb.ts:339
+
+──────────────────────────────────────────────────────────────────────
+
+
 - [] 
 - [] 
 - [] 
