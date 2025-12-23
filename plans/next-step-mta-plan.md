@@ -206,6 +206,24 @@ Failed to resolve the Android SDK path. Default install location not found: /Use
 
 --> Your ANDROID_HOME environment variable isn't set. Since adb is at /opt/homebrew/bin/adb, you likely installed it standalone via Homebrew (brew install android-platform-tools), which only gives you adb and fastboot — not the full SDK that Expo needs.
 
+- [x] Fix this issue as well, follow best practices.
+
+```
+
+- watchlistStore.property.test.ts and preferencesStore.property.test.ts have React Native Flow type import issues
+
+- MediaCard.property.test.ts has a PNG file parsing issue
+
+- analytics.property.test.ts has an unspecified error
+
+```
+
+- [] Add some scripts:
+  - To find code files longer than 500 lines. Ignore markdown or files that are not related to development. Follow these practices for future developments as well.
+  - Find all the hard-coded constants throughout the codebase, that can be moved to constants folder such that we can follow the DRY principals.
+
+- [] 
+- [] 
 - [] 
 - [] 
 - [] 

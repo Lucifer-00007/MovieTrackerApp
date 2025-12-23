@@ -55,8 +55,9 @@ describe('API Service - Configuration Validation', () => {
             validateProviderConfig('omdb');
             fail('Expected validation to throw an error');
           } catch (error) {
-            expect(error.message).toContain('OMDb API configuration error');
-            expect(error.message).toContain('EXPO_PUBLIC_OMDB_API_KEY');
+            const err = error as Error;
+            expect(err.message).toContain('OMDb API configuration error');
+            expect(err.message).toContain('EXPO_PUBLIC_OMDB_API_KEY');
           }
         }
       ),
@@ -122,10 +123,11 @@ describe('API Service - Configuration Validation', () => {
       validateProviderConfig('omdb');
       fail('Expected validation to throw an error');
     } catch (error) {
+      const err = error as Error;
       // Verify error message is clear and helpful
-      expect(error.message).toContain('EXPO_PUBLIC_OMDB_API_KEY is required');
-      expect(error.message).toContain('when using OMDb provider');
-      expect(error.message).toContain('environment variables');
+      expect(err.message).toContain('EXPO_PUBLIC_OMDB_API_KEY is required');
+      expect(err.message).toContain('when using OMDb provider');
+      expect(err.message).toContain('environment variables');
     }
   });
 
@@ -140,10 +142,11 @@ describe('API Service - Configuration Validation', () => {
       validateProviderConfig('omdb');
       fail('Expected validation to throw an error');
     } catch (error) {
+      const err = error as Error;
       // Verify error message is clear and helpful
-      expect(error.message).toContain('EXPO_PUBLIC_OMDB_API_KEY appears to be invalid');
-      expect(error.message).toContain('check your API key');
-      expect(error.message).toContain('omdbapi.com');
+      expect(err.message).toContain('EXPO_PUBLIC_OMDB_API_KEY appears to be invalid');
+      expect(err.message).toContain('check your API key');
+      expect(err.message).toContain('omdbapi.com');
     }
   });
 

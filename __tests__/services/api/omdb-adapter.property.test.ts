@@ -9,6 +9,21 @@ import * as fc from 'fast-check';
 import type { PaginatedResponse } from '@/services/api/types';
 import type { TrendingItem, MediaItem } from '@/types/media';
 
+// Create a real OMDbError class for the mock
+class MockOMDbError extends Error {
+  code: string;
+  isRetryable: boolean;
+  context?: Record<string, unknown>;
+  
+  constructor(message: string, code: string, isRetryable: boolean = false, context?: Record<string, unknown>) {
+    super(message);
+    this.name = 'OMDbError';
+    this.code = code;
+    this.isRetryable = isRetryable;
+    this.context = context;
+  }
+}
+
 // Mock the OMDb API client to avoid actual API calls
 jest.mock('@/services/api/omdb', () => ({
   searchContent: jest.fn().mockImplementation(async (params) => {
@@ -71,6 +86,7 @@ jest.mock('@/services/api/omdb', () => ({
     }
     return Math.abs(hash);
   }),
+  OMDbError: MockOMDbError,
 }));
 
 // Import the adapter after mocking

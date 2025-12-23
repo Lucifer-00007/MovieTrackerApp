@@ -6,8 +6,15 @@ module.exports = {
   testMatch: ['**/*.test.ts', '**/*.test.tsx', '**/*.property.test.ts', '**/*.property.test.tsx'],
   moduleFileExtensions: ['ts', 'tsx', 'js', 'jsx', 'json'],
   moduleNameMapper: {
+    // Mock image imports first (before path alias resolution)
+    '^@/assets/images/(.*)\\.(png|jpg|jpeg|gif|webp|svg)$': '<rootDir>/__tests__/__mocks__/fileMock.js',
+    // Path alias
     '^@/(.*)$': '<rootDir>/$1',
+    // React Native mocks
     '^react-native$': '<rootDir>/__tests__/__mocks__/react-native.js',
+    '^@react-native-community/netinfo$': '<rootDir>/__tests__/__mocks__/@react-native-community/netinfo.js',
+    // Generic image file mock (for non-aliased paths)
+    '\\.(png|jpg|jpeg|gif|webp|svg)$': '<rootDir>/__tests__/__mocks__/fileMock.js',
   },
   transform: {
     '^.+\\.tsx?$': ['ts-jest', {
@@ -27,6 +34,6 @@ module.exports = {
   ],
   setupFilesAfterEnv: ['<rootDir>/__tests__/setup.ts'],
   testPathIgnorePatterns: ['/node_modules/', '/.expo/'],
-  // Improve test isolation
+  // Improve test isolation - only clear mocks, don't reset implementations
   clearMocks: true,
 };

@@ -81,6 +81,7 @@ const analyticsEventArb = fc.record({
 describe('Feature: moviestream-mvp, Property 30: Analytics Event Logging', () => {
   beforeEach(() => {
     jest.clearAllMocks();
+    jest.useFakeTimers();
     
     // Default mocks
     mockAsyncStorageGetItem.mockResolvedValue(null);
@@ -91,6 +92,10 @@ describe('Feature: moviestream-mvp, Property 30: Analytics Event Logging', () =>
       status: 200,
       statusText: 'OK',
     } as Response);
+  });
+
+  afterEach(() => {
+    jest.useRealTimers();
   });
 
   /**
@@ -365,6 +370,7 @@ describe('Feature: moviestream-mvp, Property 30: Analytics Event Logging', () =>
 describe('Feature: moviestream-mvp, Property 31: Analytics Batching', () => {
   beforeEach(() => {
     jest.clearAllMocks();
+    jest.useFakeTimers();
     
     mockAsyncStorageGetItem.mockResolvedValue(null);
     mockAsyncStorageSetItem.mockResolvedValue(undefined);
@@ -374,6 +380,10 @@ describe('Feature: moviestream-mvp, Property 31: Analytics Batching', () => {
       status: 200,
       statusText: 'OK',
     } as Response);
+  });
+
+  afterEach(() => {
+    jest.useRealTimers();
   });
 
   /**
@@ -587,6 +597,7 @@ describe('Feature: moviestream-mvp, Property 31: Analytics Batching', () => {
 describe('Feature: moviestream-mvp, Property 32: Analytics Opt-Out', () => {
   beforeEach(() => {
     jest.clearAllMocks();
+    jest.useFakeTimers();
     
     mockAsyncStorageGetItem.mockResolvedValue(null);
     mockAsyncStorageSetItem.mockResolvedValue(undefined);
@@ -596,6 +607,10 @@ describe('Feature: moviestream-mvp, Property 32: Analytics Opt-Out', () => {
       status: 200,
       statusText: 'OK',
     } as Response);
+  });
+
+  afterEach(() => {
+    jest.useRealTimers();
   });
 
   /**
