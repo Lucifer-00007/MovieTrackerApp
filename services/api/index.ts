@@ -10,6 +10,7 @@
 import type { MediaApiAdapter } from './types';
 import { tmdbAdapter } from './adapters/tmdb-adapter';
 import { mockAdapter } from './adapters/mock-adapter';
+import { omdbAdapter } from './adapters/omdb-adapter';
 
 /** Check if mock data mode is enabled */
 export function useMockData(): boolean {
@@ -22,6 +23,42 @@ export function getApiProvider(): string {
   return process.env.EXPO_PUBLIC_API_PROVIDER || 'tmdb';
 }
 
+/** Validate OMDb configuration */
+function validateOMDbConfig(): void {
+  const apiKey = process.env.EXPO_PUBLIC_OMDB_API_KEY;
+  
+  if (!apiKey || apiKey.trim() === '') {
+    throw new Error(
+      'OMDb API configuration error: EXPO_PUBLIC_OMDB_API_KEY is required when using OMDb provider. ' +
+      'Please set your OMDb API key in the environment variables.'
+    );
+  }
+  
+  if (apiKey.length < 8) {
+    throw new Error(
+      'OMDb API configuration error: EXPO_PUBLIC_OMDB_API_KEY appears to be invalid. ' +
+      'Please check your API key from http://www.omdbapi.com/apikey.aspx'
+    );
+  }
+}
+
+/** Validate configuration for the specified provider */
+export function validateProviderConfig(provider: string): void {
+  switch (provider) {
+    case 'omdb':
+      validateOMDbConfig();
+      break;
+    case 'tmdb':
+      // TMDB validation could be added here if needed
+      break;
+    case 'mock':
+      // No validation needed for mock adapter
+      break;
+    default:
+      console.warn(`[API] Unknown provider "${provider}", no validation available`);
+  }
+}
+
 /** Get the appropriate API adapter based on configuration */
 function getAdapter(): MediaApiAdapter {
   // Mock data takes precedence
@@ -32,10 +69,23 @@ function getAdapter(): MediaApiAdapter {
 
   const provider = getApiProvider();
   
+  // Validate configuration for the selected provider
+  try {
+    validateProviderConfig(provider);
+  } catch (error) {
+    console.error(`[API] Configuration validation failed for provider "${provider}":`, error);
+    throw error;
+  }
+  
   switch (provider) {
     case 'tmdb':
+      console.log('[API] Using TMDB adapter');
       return tmdbAdapter;
+    case 'omdb':
+      console.log('[API] Using OMDb adapter');
+      return omdbAdapter;
     case 'mock':
+      console.log('[API] Using mock data adapter');
       return mockAdapter;
     default:
       console.warn(`[API] Unknown provider "${provider}", falling back to TMDB`);

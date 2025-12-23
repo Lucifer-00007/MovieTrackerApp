@@ -117,28 +117,28 @@ This implementation plan creates an OMDb API adapter that integrates seamlessly 
     - **Property 10: Retry logic with exponential backoff**
     - **Validates: Requirements 7.2**
 
-- [ ] 7. Update environment configuration and adapter selection
-  - [ ] 7.1 Update API service to support OMDb provider
+- [x] 7. Update environment configuration and adapter selection
+  - [x] 7.1 Update API service to support OMDb provider
     - Modify `services/api/index.ts` to handle "omdb" provider
     - Add OMDb adapter to provider selection logic
     - _Requirements: 8.2_
 
-  - [ ] 7.2 Add configuration validation
+  - [x] 7.2 Add configuration validation
     - Validate EXPO_PUBLIC_OMDB_API_KEY when using OMDb
     - Provide clear error messages for missing configuration
     - Support both development and production configurations
     - _Requirements: 8.3, 8.4, 8.5_
 
-  - [ ] 7.3 Write property test for environment-based adapter selection
+  - [x] 7.3 Write property test for environment-based adapter selection
     - **Property 1: Environment-based adapter selection**
     - **Validates: Requirements 1.1, 1.3, 8.1, 8.2**
 
-  - [ ] 7.4 Write property test for configuration validation
+  - [x] 7.4 Write property test for configuration validation
     - **Property 11: Configuration validation**
     - **Validates: Requirements 8.3, 8.5**
 
-- [ ] 8. Update environment configuration files
-  - [ ] 8.1 Add OMDb configuration to .env files
+- [x] 8. Update environment configuration files
+  - [x] 8.1 Add OMDb configuration to .env files
     - Add `EXPO_PUBLIC_OMDB_API_KEY` to `.env` and `.env.example`
     - Update API provider options documentation
     - _Requirements: 8.1, 8.5_
