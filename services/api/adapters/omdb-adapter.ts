@@ -20,6 +20,7 @@ import {
   getDetailsByImdbId,
   getDetailsByTitle,
   getImdbIdFromNumeric,
+  OMDbError,
   type OMDbSearchType,
 } from '../omdb';
 import {
@@ -65,12 +66,61 @@ const COUNTRY_SEARCH_TERMS: Record<string, string[]> = {
 // LOGGING UTILITIES
 // ============================================================================
 
+// ============================================================================
+// LOGGING UTILITIES
+// ============================================================================
+
 /**
  * Log when a fallback strategy is being used
  * Requirement: 4.5
  */
 function logFallbackUsage(feature: string, strategy: string): void {
   console.warn(`[OMDb Adapter] Fallback: ${feature} - using ${strategy}`);
+}
+
+/**
+ * Handle errors gracefully and provide fallback responses
+ */
+function handleAdapterError(error: unknown, operation: string, fallbackValue: any = null): any {
+  if (error instanceof OMDbError) {
+    // Log the error with context
+    console.error(`[OMDb Adapter] ${operation} failed:`, {
+      code: error.code,
+      message: error.message,
+      isRetryable: error.isRetryable,
+      context: error.context,
+    });
+    
+    // For certain errors, provide graceful fallbacks
+    if (error.code === 'NOT_FOUND' && operation.includes('search')) {
+      return {
+        items: [],
+        totalPages: 0,
+        totalResults: 0,
+      };
+    }
+    
+    if (error.code === 'NOT_FOUND' && operation.includes('details')) {
+      throw new Error(`Content not found: ${error.message}`);
+    }
+    
+    if (error.code === 'INVALID_API_KEY') {
+      throw new Error('OMDb API key is invalid or missing. Please check your EXPO_PUBLIC_OMDB_API_KEY environment variable.');
+    }
+    
+    if (error.code === 'RATE_LIMIT') {
+      throw new Error('OMDb API rate limit exceeded. Please try again later.');
+    }
+  }
+  
+  // For unknown errors, log and re-throw or return fallback
+  console.error(`[OMDb Adapter] ${operation} error:`, error);
+  
+  if (fallbackValue !== null) {
+    return fallbackValue;
+  }
+  
+  throw error;
 }
 
 // ============================================================================
@@ -147,12 +197,11 @@ export const omdbAdapter: MediaApiAdapter = {
         totalResults: results.totalResults,
       };
     } catch (error) {
-      console.error('[OMDb Adapter] getTrending error:', error);
-      return {
+      return handleAdapterError(error, 'getTrending', {
         items: [],
         totalPages: 0,
         totalResults: 0,
-      };
+      });
     }
   },
 
@@ -162,17 +211,21 @@ export const omdbAdapter: MediaApiAdapter = {
    * Requirements: 3.4
    */
   async getMovieDetails(movieId: number): Promise<MediaDetails> {
-    // Try to get IMDb ID from cache
-    const imdbId = getImdbIdFromNumeric(movieId);
-    
-    if (imdbId) {
-      const details = await getDetailsByImdbId({ imdbId, plot: 'full' });
-      return mapOMDbToMediaDetails(details);
+    try {
+      // Try to get IMDb ID from cache
+      const imdbId = getImdbIdFromNumeric(movieId);
+      
+      if (imdbId) {
+        const details = await getDetailsByImdbId({ imdbId, plot: 'full' });
+        return mapOMDbToMediaDetails(details);
+      }
+      
+      // If no cached IMDb ID, we need to throw an error
+      // In practice, items should be fetched via search first which populates the cache
+      throw new Error(`Cannot resolve movie ID ${movieId} to IMDb ID. Item must be fetched via search first.`);
+    } catch (error) {
+      return handleAdapterError(error, 'getMovieDetails');
     }
-    
-    // If no cached IMDb ID, we need to throw an error
-    // In practice, items should be fetched via search first which populates the cache
-    throw new Error(`Cannot resolve movie ID ${movieId} to IMDb ID. Item must be fetched via search first.`);
   },
 
   /**
@@ -181,16 +234,20 @@ export const omdbAdapter: MediaApiAdapter = {
    * Requirements: 3.4
    */
   async getTvDetails(tvId: number): Promise<MediaDetails> {
-    // Try to get IMDb ID from cache
-    const imdbId = getImdbIdFromNumeric(tvId);
-    
-    if (imdbId) {
-      const details = await getDetailsByImdbId({ imdbId, plot: 'full' });
-      return mapOMDbToMediaDetails(details);
+    try {
+      // Try to get IMDb ID from cache
+      const imdbId = getImdbIdFromNumeric(tvId);
+      
+      if (imdbId) {
+        const details = await getDetailsByImdbId({ imdbId, plot: 'full' });
+        return mapOMDbToMediaDetails(details);
+      }
+      
+      // If no cached IMDb ID, we need to throw an error
+      throw new Error(`Cannot resolve TV ID ${tvId} to IMDb ID. Item must be fetched via search first.`);
+    } catch (error) {
+      return handleAdapterError(error, 'getTvDetails');
     }
-    
-    // If no cached IMDb ID, we need to throw an error
-    throw new Error(`Cannot resolve TV ID ${tvId} to IMDb ID. Item must be fetched via search first.`);
   },
 
   /**
@@ -199,8 +256,17 @@ export const omdbAdapter: MediaApiAdapter = {
    * Requirements: 2.4
    */
   async searchMulti(query: string, page: number): Promise<SearchResults> {
-    const results = await searchContent({ query, page });
-    return mapOMDbSearchToSearchResults(results, page);
+    try {
+      const results = await searchContent({ query, page });
+      return mapOMDbSearchToSearchResults(results, page);
+    } catch (error) {
+      return handleAdapterError(error, 'searchMulti', {
+        results: [],
+        totalResults: 0,
+        totalPages: 0,
+        page,
+      });
+    }
   },
 
   /**
@@ -209,19 +275,18 @@ export const omdbAdapter: MediaApiAdapter = {
    * Requirements: 5.1, 5.4
    */
   async getMovieCredits(movieId: number): Promise<CastMember[]> {
-    const imdbId = getImdbIdFromNumeric(movieId);
-    
-    if (!imdbId) {
-      console.warn(`[OMDb Adapter] Cannot get credits for movie ${movieId}: IMDb ID not found`);
-      return [];
-    }
-    
     try {
+      const imdbId = getImdbIdFromNumeric(movieId);
+      
+      if (!imdbId) {
+        console.warn(`[OMDb Adapter] Cannot get credits for movie ${movieId}: IMDb ID not found`);
+        return [];
+      }
+      
       const details = await getDetailsByImdbId({ imdbId, plot: 'short' });
       return getCastMembers(details);
     } catch (error) {
-      console.error('[OMDb Adapter] getMovieCredits error:', error);
-      return [];
+      return handleAdapterError(error, 'getMovieCredits', []);
     }
   },
 
@@ -231,19 +296,18 @@ export const omdbAdapter: MediaApiAdapter = {
    * Requirements: 5.1, 5.4
    */
   async getTvCredits(tvId: number): Promise<CastMember[]> {
-    const imdbId = getImdbIdFromNumeric(tvId);
-    
-    if (!imdbId) {
-      console.warn(`[OMDb Adapter] Cannot get credits for TV ${tvId}: IMDb ID not found`);
-      return [];
-    }
-    
     try {
+      const imdbId = getImdbIdFromNumeric(tvId);
+      
+      if (!imdbId) {
+        console.warn(`[OMDb Adapter] Cannot get credits for TV ${tvId}: IMDb ID not found`);
+        return [];
+      }
+      
       const details = await getDetailsByImdbId({ imdbId, plot: 'short' });
       return getCastMembers(details);
     } catch (error) {
-      console.error('[OMDb Adapter] getTvCredits error:', error);
-      return [];
+      return handleAdapterError(error, 'getTvCredits', []);
     }
   },
 
@@ -425,53 +489,61 @@ export const omdbAdapter: MediaApiAdapter = {
   ): Promise<PaginatedResponse<MediaItem>> {
     logFallbackUsage('getRecommendations', 'genre-based search');
     
-    // Try to get the original item's details for genre-based search
-    const imdbId = getImdbIdFromNumeric(mediaId);
-    
-    if (imdbId) {
-      try {
-        const details = await getDetailsByImdbId({ imdbId, plot: 'short' });
-        
-        // Use the first genre as search term
-        if (details.Genre && details.Genre !== 'N/A') {
-          const firstGenre = details.Genre.split(',')[0].trim();
-          const omdbType: OMDbSearchType = mediaType === 'tv' ? 'series' : 'movie';
+    try {
+      // Try to get the original item's details for genre-based search
+      const imdbId = getImdbIdFromNumeric(mediaId);
+      
+      if (imdbId) {
+        try {
+          const details = await getDetailsByImdbId({ imdbId, plot: 'short' });
           
-          const results = await searchContent({
-            query: firstGenre,
-            page,
-            type: omdbType,
-          });
-          
-          // Filter out the original item
-          const items = results.items
-            .map(mapOMDbToMediaItem)
-            .filter(item => item.id !== mediaId);
-          
-          return {
-            items,
-            totalPages: results.totalPages,
-            totalResults: results.totalResults,
-          };
+          // Use the first genre as search term
+          if (details.Genre && details.Genre !== 'N/A') {
+            const firstGenre = details.Genre.split(',')[0].trim();
+            const omdbType: OMDbSearchType = mediaType === 'tv' ? 'series' : 'movie';
+            
+            const results = await searchContent({
+              query: firstGenre,
+              page,
+              type: omdbType,
+            });
+            
+            // Filter out the original item
+            const items = results.items
+              .map(mapOMDbToMediaItem)
+              .filter(item => item.id !== mediaId);
+            
+            return {
+              items,
+              totalPages: results.totalPages,
+              totalResults: results.totalResults,
+            };
+          }
+        } catch (detailError) {
+          console.warn('[OMDb Adapter] Could not get details for recommendations, using fallback');
         }
-      } catch (error) {
-        console.error('[OMDb Adapter] getRecommendations error:', error);
       }
+      
+      // Default fallback: search by media type
+      const searchTerm = mediaType === 'tv' ? 'series' : 'movie';
+      const results = await searchContent({
+        query: searchTerm,
+        page,
+        type: mediaType === 'tv' ? 'series' : 'movie',
+      });
+      
+      return {
+        items: results.items.map(mapOMDbToMediaItem),
+        totalPages: results.totalPages,
+        totalResults: results.totalResults,
+      };
+    } catch (error) {
+      return handleAdapterError(error, 'getRecommendations', {
+        items: [],
+        totalPages: 0,
+        totalResults: 0,
+      });
     }
-    
-    // Default fallback: search by media type
-    const searchTerm = mediaType === 'tv' ? 'series' : 'movie';
-    const results = await searchContent({
-      query: searchTerm,
-      page,
-      type: mediaType === 'tv' ? 'series' : 'movie',
-    });
-    
-    return {
-      items: results.items.map(mapOMDbToMediaItem),
-      totalPages: results.totalPages,
-      totalResults: results.totalResults,
-    };
   },
 
   /**
@@ -518,12 +590,11 @@ export const omdbAdapter: MediaApiAdapter = {
         totalResults: results.totalResults,
       };
     } catch (error) {
-      console.error('[OMDb Adapter] discoverByCountry error:', error);
-      return {
+      return handleAdapterError(error, 'discoverByCountry', {
         items: [],
         totalPages: 0,
         totalResults: 0,
-      };
+      });
     }
   },
 

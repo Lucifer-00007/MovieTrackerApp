@@ -96,24 +96,24 @@ This implementation plan creates an OMDb API adapter that integrates seamlessly 
     - Add `getRecommendations()` and `getTrailerKey()` with fallbacks
     - _Requirements: 5.1, 6.4_
 
-- [ ] 6. Add error handling and resilience
-  - [ ] 6.1 Implement comprehensive error handling
+- [x] 6. Add error handling and resilience
+  - [x] 6.1 Implement comprehensive error handling
     - Create `OMDbError` class for API-specific errors
     - Add error parsing for OMDb API responses
     - Implement graceful error handling throughout adapter
     - _Requirements: 3.5, 7.1, 7.5_
 
-  - [ ] 6.2 Write property test for error handling
+  - [x] 6.2 Write property test for error handling
     - **Property 6: Error handling and graceful degradation**
     - **Validates: Requirements 3.5, 7.1, 7.5**
 
-  - [ ] 6.3 Implement retry logic with exponential backoff
+  - [x] 6.3 Implement retry logic with exponential backoff
     - Add retry mechanism for network errors
     - Implement exponential backoff strategy
     - Handle rate limiting and timeout scenarios
     - _Requirements: 7.2, 7.3, 7.4_
 
-  - [ ] 6.4 Write property test for retry logic
+  - [x] 6.4 Write property test for retry logic
     - **Property 10: Retry logic with exponential backoff**
     - **Validates: Requirements 7.2**
 

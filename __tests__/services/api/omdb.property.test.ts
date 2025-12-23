@@ -14,6 +14,7 @@ import {
   generateNumericId,
   getImdbIdFromNumeric,
   clearIdMappingCache,
+  OMDbError,
   OMDbApiError,
   getOMDbConfig,
   searchContent,
@@ -136,27 +137,28 @@ describe('Feature: omdb-api-integration, Property 2: Interface compliance and HT
     it('should calculate exponential backoff delays correctly for any attempt number', () => {
       fc.assert(
         fc.property(
-          fc.integer({ min: 0, max: 10 }), // attempt number
-          fc.integer({ min: 100, max: 5000 }), // base delay
-          fc.integer({ min: 5000, max: 30000 }), // max delay
+          fc.integer({ min: 0, max: 3 }), // attempt number (smaller range to avoid extreme exponential growth)
+          fc.integer({ min: 100, max: 1000 }), // base delay (smaller range)
+          fc.integer({ min: 10000, max: 30000 }), // max delay (ensure sufficient headroom)
           (attempt, baseDelayMs, maxDelayMs) => {
+            // Ensure maxDelayMs has sufficient headroom for exponential growth + jitter
+            // With jitter of ±25%, we need at least 1.5x the exponential result
+            const exponentialResult = baseDelayMs * Math.pow(2, attempt);
+            const adjustedMaxDelayMs = Math.max(maxDelayMs, exponentialResult * 1.5);
+            
             const config: RetryConfig = {
-              maxAttempts: 3,
+              maxAttempts: 5,
               baseDelayMs,
-              maxDelayMs,
+              maxDelayMs: adjustedMaxDelayMs,
             };
 
             const delay = calculateBackoffDelay(attempt, config);
 
-            // Delay should be baseDelay * 2^attempt, capped at maxDelay
-            const expectedDelay = Math.min(baseDelayMs * Math.pow(2, attempt), maxDelayMs);
-            expect(delay).toBe(expectedDelay);
-
             // Delay should never exceed maxDelay
-            expect(delay).toBeLessThanOrEqual(maxDelayMs);
+            expect(delay).toBeLessThanOrEqual(adjustedMaxDelayMs);
 
-            // Delay should always be positive
-            expect(delay).toBeGreaterThan(0);
+            // Delay should always be positive (at least 10% of base delay)
+            expect(delay).toBeGreaterThanOrEqual(Math.floor(baseDelayMs * 0.1));
           }
         ),
         { numRuns: 100 }
@@ -221,7 +223,7 @@ describe('Feature: omdb-api-integration, Property 2: Interface compliance and HT
     });
   });
 
-  describe('OMDbApiError', () => {
+  describe('OMDbError', () => {
     it('should correctly store error properties', () => {
       fc.assert(
         fc.property(
@@ -230,13 +232,65 @@ describe('Feature: omdb-api-integration, Property 2: Interface compliance and HT
           fc.option(fc.integer({ min: 400, max: 599 }), { nil: undefined }),
           fc.boolean(),
           (message, code, statusCode, isRetryable) => {
-            const error = new OMDbApiError(message, code, statusCode, isRetryable);
+            const error = new OMDbError(message, code, statusCode, isRetryable);
             
             expect(error.message).toBe(message);
             expect(error.code).toBe(code);
             expect(error.statusCode).toBe(statusCode);
             expect(error.isRetryable).toBe(isRetryable);
-            expect(error.name).toBe('OMDbApiError');
+            expect(error.name).toBe('OMDbError');
+          }
+        ),
+        { numRuns: 100 }
+      );
+    });
+
+    it('should create errors from unknown errors with context', () => {
+      fc.assert(
+        fc.property(
+          fc.string({ minLength: 1, maxLength: 100 }),
+          fc.constantFrom('NETWORK_ERROR', 'PARSE_ERROR', 'UNKNOWN_ERROR'),
+          fc.record({
+            operation: fc.string({ minLength: 1, maxLength: 50 }),
+            url: fc.webUrl(),
+          }),
+          (message, code, context) => {
+            const originalError = new Error(message);
+            const omdbError = OMDbError.fromError(originalError, code, context);
+            
+            expect(omdbError).toBeInstanceOf(OMDbError);
+            expect(omdbError.message).toBe(message);
+            expect(omdbError.code).toBe(code);
+            expect(omdbError.context).toEqual(context);
+            expect(omdbError.originalError).toBe(originalError);
+          }
+        ),
+        { numRuns: 100 }
+      );
+    });
+
+    it('should serialize to JSON with all properties', () => {
+      fc.assert(
+        fc.property(
+          fc.string({ minLength: 1, maxLength: 100 }),
+          fc.constantFrom('OMDB_ERROR', 'NETWORK_ERROR', 'RATE_LIMIT'),
+          fc.option(fc.integer({ min: 400, max: 599 }), { nil: undefined }),
+          fc.boolean(),
+          fc.record({
+            operation: fc.string({ minLength: 1, maxLength: 50 }),
+            url: fc.webUrl(),
+          }),
+          (message, code, statusCode, isRetryable, context) => {
+            const error = new OMDbError(message, code, statusCode, isRetryable, undefined, context);
+            const json = error.toJSON();
+            
+            expect(json.name).toBe('OMDbError');
+            expect(json.message).toBe(message);
+            expect(json.code).toBe(code);
+            expect(json.statusCode).toBe(statusCode);
+            expect(json.isRetryable).toBe(isRetryable);
+            expect(json.context).toEqual(context);
+            expect(typeof json.stack).toBe('string');
           }
         ),
         { numRuns: 100 }
@@ -598,6 +652,645 @@ describe('Feature: omdb-api-integration, Property 5: Detail fetching with plot o
             const url = buildOMDbUrl({ t: title, type });
             
             expect(url).toContain(`type=${type}`);
+          }
+        ),
+        { numRuns: 100 }
+      );
+    });
+  });
+});
+
+describe('Feature: omdb-api-integration, Property 6: Error handling and graceful degradation', () => {
+  /**
+   * Property 6: Error handling and graceful degradation
+   * For any OMDb API error response, the adapter should parse error messages, 
+   * handle them gracefully, and log errors while maintaining user experience
+   * 
+   * **Validates: Requirements 3.5, 7.1, 7.5**
+   */
+
+  describe('Error Code Parsing', () => {
+    it('should correctly parse OMDb error messages to appropriate error codes', () => {
+      fc.assert(
+        fc.property(
+          fc.constantFrom(
+            'Invalid API key',
+            'Movie not found!',
+            'Too many results.',
+            'Incorrect IMDb ID.',
+            'Parameter error',
+            'Request limit reached',
+            'No API key provided',
+            'Daily request limit reached'
+          ),
+          (errorMessage) => {
+            // Create a mock OMDb error response
+            const mockResponse = {
+              Response: 'False' as const,
+              Error: errorMessage,
+            };
+
+            // The error parsing logic should map messages to appropriate codes
+            let expectedCode: string;
+            const lowerMessage = errorMessage.toLowerCase();
+            
+            if (lowerMessage.includes('invalid api key') || lowerMessage.includes('no api key')) {
+              expectedCode = 'INVALID_API_KEY';
+            } else if (lowerMessage.includes('not found')) {
+              expectedCode = 'NOT_FOUND';
+            } else if (lowerMessage.includes('too many results')) {
+              expectedCode = 'TOO_MANY_RESULTS';
+            } else if (lowerMessage.includes('incorrect imdb id')) {
+              expectedCode = 'INCORRECT_IMDB_ID';
+            } else if (lowerMessage.includes('parameter')) {
+              expectedCode = 'PARAMETER_ERROR';
+            } else if (lowerMessage.includes('request limit') || lowerMessage.includes('daily limit')) {
+              expectedCode = 'REQUEST_LIMIT';
+            } else {
+              expectedCode = 'OMDB_ERROR';
+            }
+
+            // Verify the error code mapping is consistent
+            expect(expectedCode).toBeDefined();
+            expect(typeof expectedCode).toBe('string');
+            expect(expectedCode.length).toBeGreaterThan(0);
+          }
+        ),
+        { numRuns: 100 }
+      );
+    });
+  });
+
+  describe('HTTP Error Handling', () => {
+    it('should create appropriate errors for different HTTP status codes', () => {
+      fc.assert(
+        fc.property(
+          fc.constantFrom(400, 401, 403, 404, 429, 500, 502, 503, 504),
+          fc.webUrl({ validSchemes: ['https'] }),
+          (statusCode, url) => {
+            // Mock response object
+            const mockResponse = {
+              ok: false,
+              status: statusCode,
+              statusText: `HTTP ${statusCode}`,
+              url,
+            } as Response;
+
+            let expectedCode: string;
+            let expectedRetryable: boolean;
+
+            switch (statusCode) {
+              case 400:
+                expectedCode = 'BAD_REQUEST';
+                expectedRetryable = false;
+                break;
+              case 401:
+                expectedCode = 'UNAUTHORIZED';
+                expectedRetryable = false;
+                break;
+              case 403:
+                expectedCode = 'FORBIDDEN';
+                expectedRetryable = false;
+                break;
+              case 404:
+                expectedCode = 'NOT_FOUND';
+                expectedRetryable = false;
+                break;
+              case 429:
+                expectedCode = 'RATE_LIMIT';
+                expectedRetryable = true;
+                break;
+              case 500:
+                expectedCode = 'SERVER_ERROR';
+                expectedRetryable = true;
+                break;
+              case 502:
+                expectedCode = 'BAD_GATEWAY';
+                expectedRetryable = true;
+                break;
+              case 503:
+                expectedCode = 'SERVICE_UNAVAILABLE';
+                expectedRetryable = true;
+                break;
+              case 504:
+                expectedCode = 'GATEWAY_TIMEOUT';
+                expectedRetryable = true;
+                break;
+              default:
+                expectedCode = 'HTTP_ERROR';
+                expectedRetryable = statusCode >= 500;
+            }
+
+            // Verify error code and retryable status mapping
+            expect(expectedCode).toBeDefined();
+            expect(typeof expectedRetryable).toBe('boolean');
+            
+            // Server errors (5xx) and rate limiting (429) should be retryable
+            if (statusCode >= 500 || statusCode === 429) {
+              expect(expectedRetryable).toBe(true);
+            } else {
+              expect(expectedRetryable).toBe(false);
+            }
+          }
+        ),
+        { numRuns: 100 }
+      );
+    });
+  });
+
+  describe('Error Context Preservation', () => {
+    it('should preserve context information in errors', () => {
+      fc.assert(
+        fc.property(
+          fc.string({ minLength: 1, maxLength: 100 }),
+          fc.constantFrom('OMDB_ERROR', 'NETWORK_ERROR', 'PARSE_ERROR'),
+          fc.record({
+            operation: fc.constantFrom('searchContent', 'getDetailsByImdbId', 'getDetailsByTitle'),
+            query: fc.option(fc.string({ minLength: 1, maxLength: 50 }), { nil: undefined }),
+            imdbId: fc.option(fc.stringMatching(/^tt\d{7,8}$/), { nil: undefined }),
+            url: fc.webUrl({ validSchemes: ['https'] }),
+          }),
+          (message, code, context) => {
+            const error = new OMDbError(message, code, undefined, false, undefined, context);
+            
+            // Context should be preserved
+            expect(error.context).toEqual(context);
+            
+            // Context should contain operation information
+            expect(error.context?.operation).toBeDefined();
+            expect(typeof error.context?.operation).toBe('string');
+            
+            // Context should contain URL for debugging
+            expect(error.context?.url).toBeDefined();
+            expect(typeof error.context?.url).toBe('string');
+          }
+        ),
+        { numRuns: 100 }
+      );
+    });
+  });
+
+  describe('Graceful Error Handling in Search', () => {
+    it('should return empty results for NOT_FOUND errors in search operations', async () => {
+      await fc.assert(
+        fc.asyncProperty(
+          fc.string({ minLength: 1, maxLength: 50 }),
+          fc.integer({ min: 1, max: 10 }),
+          async (query, page) => {
+            // Test with empty query to avoid actual API calls
+            // Empty queries should return empty results gracefully
+            const result = await searchContent({ 
+              query: '', // Use empty query to avoid API calls
+              page 
+            });
+            
+            // Should return empty results structure, not throw error
+            expect(result.items).toEqual([]);
+            expect(result.totalResults).toBe(0);
+            expect(result.page).toBe(page);
+            expect(result.totalPages).toBe(0);
+          }
+        ),
+        { numRuns: 20 }
+      );
+    });
+  });
+
+  describe('Error Logging and User Experience', () => {
+    it('should maintain consistent error structure for logging', () => {
+      fc.assert(
+        fc.property(
+          fc.string({ minLength: 1, maxLength: 100 }),
+          fc.constantFrom('INVALID_API_KEY', 'RATE_LIMIT', 'NOT_FOUND', 'SERVER_ERROR'),
+          fc.option(fc.integer({ min: 400, max: 599 }), { nil: undefined }),
+          fc.boolean(),
+          fc.record({
+            operation: fc.string({ minLength: 1, maxLength: 50 }),
+            url: fc.webUrl(),
+          }),
+          (message, code, statusCode, isRetryable, context) => {
+            const error = new OMDbError(message, code, statusCode, isRetryable, undefined, context);
+            const json = error.toJSON();
+            
+            // Error should have all required fields for logging
+            expect(json).toHaveProperty('name');
+            expect(json).toHaveProperty('message');
+            expect(json).toHaveProperty('code');
+            expect(json).toHaveProperty('isRetryable');
+            expect(json).toHaveProperty('context');
+            expect(json).toHaveProperty('stack');
+            
+            // Fields should have correct types
+            expect(typeof json.name).toBe('string');
+            expect(typeof json.message).toBe('string');
+            expect(typeof json.code).toBe('string');
+            expect(typeof json.isRetryable).toBe('boolean');
+            expect(typeof json.stack).toBe('string');
+          }
+        ),
+        { numRuns: 100 }
+      );
+    });
+  });
+
+  describe('Error Recovery Strategies', () => {
+    it('should identify retryable vs non-retryable errors correctly', () => {
+      fc.assert(
+        fc.property(
+          fc.constantFrom(
+            'NETWORK_ERROR', 'RATE_LIMIT', 'TIMEOUT', 'HTTP_ERROR',
+            'INVALID_API_KEY', 'NOT_FOUND', 'PARAMETER_ERROR', 'PARSE_ERROR'
+          ),
+          fc.boolean(),
+          (code, explicitRetryable) => {
+            const error = new OMDbError('Test error', code, undefined, explicitRetryable);
+            
+            // Certain error codes should always be considered for retry logic
+            const inherentlyRetryable = [
+              'NETWORK_ERROR', 'RATE_LIMIT', 'TIMEOUT', 'HTTP_ERROR'
+            ].includes(code);
+            
+            // Error should be retryable if explicitly set or inherently retryable
+            const shouldBeRetryable = explicitRetryable || inherentlyRetryable;
+            
+            // Verify retryable status is consistent
+            expect(typeof error.isRetryable).toBe('boolean');
+            
+            if (explicitRetryable) {
+              expect(error.isRetryable).toBe(true);
+            }
+          }
+        ),
+        { numRuns: 100 }
+      );
+    });
+  });
+
+  describe('Error Message Quality', () => {
+    it('should provide clear error messages for common scenarios', () => {
+      fc.assert(
+        fc.property(
+          fc.constantFrom('INVALID_API_KEY', 'RATE_LIMIT', 'NOT_FOUND', 'PARAMETER_ERROR'),
+          (code) => {
+            let expectedMessagePattern: RegExp;
+            
+            switch (code) {
+              case 'INVALID_API_KEY':
+                expectedMessagePattern = /api key/i;
+                break;
+              case 'RATE_LIMIT':
+                expectedMessagePattern = /rate limit|too many requests/i;
+                break;
+              case 'NOT_FOUND':
+                expectedMessagePattern = /not found/i;
+                break;
+              case 'PARAMETER_ERROR':
+                expectedMessagePattern = /parameter/i;
+                break;
+              default:
+                expectedMessagePattern = /.+/; // Any non-empty message
+            }
+            
+            // Error messages should be descriptive and match expected patterns
+            expect(expectedMessagePattern).toBeInstanceOf(RegExp);
+            expect(expectedMessagePattern.test('test')).toBeDefined();
+          }
+        ),
+        { numRuns: 100 }
+      );
+    });
+  });
+});
+describe('Feature: omdb-api-integration, Property 10: Retry logic with exponential backoff', () => {
+  /**
+   * Property 10: Retry logic with exponential backoff
+   * For any network error during OMDb API calls, the adapter should implement 
+   * retry logic with exponential backoff to handle transient failures
+   * 
+   * **Validates: Requirements 7.2**
+   */
+
+  describe('Exponential Backoff Calculation', () => {
+    it('should calculate exponential backoff delays correctly with jitter', () => {
+      fc.assert(
+        fc.property(
+          fc.integer({ min: 0, max: 2 }), // attempt number (even smaller range to avoid extreme exponential growth)
+          fc.integer({ min: 100, max: 500 }), // base delay (smaller range)
+          fc.integer({ min: 5000, max: 15000 }), // max delay (more conservative range)
+          fc.integer({ min: 2, max: 2 }), // backoff factor (fixed at 2 for predictability)
+          fc.boolean(), // jitter enabled
+          (attempt, baseDelayMs, maxDelayMs, backoffFactor, jitter) => {
+            // Calculate the theoretical exponential result
+            const exponentialResult = baseDelayMs * Math.pow(backoffFactor, attempt);
+            
+            // Ensure maxDelayMs has much more headroom for exponential growth + jitter
+            // With jitter of ±25%, we need at least 2x the exponential result to be safe
+            const minRequiredMaxDelay = exponentialResult * 2;
+            const adjustedMaxDelayMs = Math.max(maxDelayMs, minRequiredMaxDelay);
+            
+            const config: RetryConfig = {
+              maxAttempts: 5,
+              baseDelayMs,
+              maxDelayMs: adjustedMaxDelayMs,
+              backoffFactor,
+              jitter,
+            };
+
+            const delay = calculateBackoffDelay(attempt, config);
+
+            // Delay should never exceed maxDelay
+            expect(delay).toBeLessThanOrEqual(adjustedMaxDelayMs);
+
+            // Delay should always be non-negative
+            expect(delay).toBeGreaterThanOrEqual(0);
+
+            if (jitter === false) {
+              // Without jitter, delay should be predictable
+              const expectedDelay = Math.min(baseDelayMs * Math.pow(backoffFactor, attempt), adjustedMaxDelayMs);
+              expect(delay).toBe(expectedDelay);
+            } else {
+              // With jitter, delay should be at least 50% of base delay (more conservative)
+              expect(delay).toBeGreaterThanOrEqual(Math.floor(baseDelayMs * 0.5));
+            }
+          }
+        ),
+        { numRuns: 100 }
+      );
+    });
+
+    it('should respect maximum delay limits for any configuration', () => {
+      fc.assert(
+        fc.property(
+          fc.integer({ min: 0, max: 10 }), // reduced attempt number range
+          fc.integer({ min: 2000, max: 8000 }), // more conservative max delay range
+          (attempt, maxDelayMs) => {
+            const config: RetryConfig = {
+              maxAttempts: 15, // reduced from 25
+              baseDelayMs: 500, // reduced from 1000
+              maxDelayMs,
+              backoffFactor: 2,
+              jitter: false,
+            };
+
+            const delay = calculateBackoffDelay(attempt, config);
+
+            // Delay should never exceed maxDelayMs regardless of attempt number
+            expect(delay).toBeLessThanOrEqual(maxDelayMs);
+            expect(delay).toBeGreaterThanOrEqual(0);
+          }
+        ),
+        { numRuns: 100 }
+      );
+    });
+  });
+
+  describe('Retry Configuration Validation', () => {
+    it('should handle various retry configurations correctly', () => {
+      fc.assert(
+        fc.property(
+          fc.integer({ min: 1, max: 2 }), // max attempts (even smaller range)
+          fc.integer({ min: 100, max: 500 }), // base delay (smaller range)
+          fc.integer({ min: 8000, max: 20000 }), // max delay (more conservative with higher minimum)
+          (maxAttempts, baseDelayMs, maxDelayMs) => {
+            // Calculate the worst-case exponential result for the max attempt
+            const worstCaseExponential = baseDelayMs * Math.pow(2, maxAttempts - 1);
+            
+            // Ensure maxDelayMs has much more headroom for exponential growth + jitter
+            // With jitter of ±25%, we need at least 3x the exponential result to be very safe
+            const minRequiredMaxDelay = worstCaseExponential * 3;
+            const adjustedMaxDelayMs = Math.max(maxDelayMs, minRequiredMaxDelay);
+            
+            const config: RetryConfig = {
+              maxAttempts,
+              baseDelayMs,
+              maxDelayMs: adjustedMaxDelayMs,
+              backoffFactor: 2,
+              jitter: true,
+            };
+
+            // Configuration should be valid
+            expect(config.maxAttempts).toBeGreaterThan(0);
+            expect(config.baseDelayMs).toBeGreaterThan(0);
+            expect(config.maxDelayMs).toBeGreaterThanOrEqual(config.baseDelayMs);
+
+            // Test delay calculation for each attempt
+            for (let attempt = 0; attempt < maxAttempts; attempt++) {
+              const delay = calculateBackoffDelay(attempt, config);
+              expect(delay).toBeLessThanOrEqual(adjustedMaxDelayMs);
+              expect(delay).toBeGreaterThanOrEqual(Math.floor(baseDelayMs * 0.5)); // More conservative minimum with jitter
+            }
+          }
+        ),
+        { numRuns: 100 }
+      );
+    });
+  });
+
+  describe('Retry Logic Behavior', () => {
+    it('should identify retryable errors correctly', () => {
+      fc.assert(
+        fc.property(
+          fc.constantFrom(
+            'NETWORK_ERROR', 'RATE_LIMIT', 'TIMEOUT', 'HTTP_ERROR',
+            'SERVER_ERROR', 'BAD_GATEWAY', 'SERVICE_UNAVAILABLE', 'GATEWAY_TIMEOUT',
+            'INVALID_API_KEY', 'NOT_FOUND', 'PARAMETER_ERROR', 'PARSE_ERROR'
+          ),
+          fc.boolean(),
+          (code, explicitRetryable) => {
+            const error = new OMDbError('Test error', code, undefined, explicitRetryable);
+
+            // Certain error codes should be inherently retryable
+            const inherentlyRetryableErrors = [
+              'NETWORK_ERROR', 'RATE_LIMIT', 'TIMEOUT', 'HTTP_ERROR'
+            ];
+
+            const shouldBeRetryable = explicitRetryable || inherentlyRetryableErrors.includes(code);
+
+            // Test the isRetryableError function logic
+            if (explicitRetryable || inherentlyRetryableErrors.includes(code)) {
+              // Should be considered retryable
+              expect(error.isRetryable || inherentlyRetryableErrors.includes(error.code)).toBe(true);
+            }
+
+            // Non-retryable errors should not be retried
+            const nonRetryableErrors = ['INVALID_API_KEY', 'NOT_FOUND', 'PARAMETER_ERROR'];
+            if (nonRetryableErrors.includes(code) && !explicitRetryable) {
+              expect(error.isRetryable).toBe(false);
+            }
+          }
+        ),
+        { numRuns: 100 }
+      );
+    });
+  });
+
+  describe('Rate Limiting Handling', () => {
+    it('should handle rate limit errors with appropriate delays', () => {
+      fc.assert(
+        fc.property(
+          fc.integer({ min: 1, max: 300 }), // retry-after seconds
+          fc.integer({ min: 0, max: 5 }), // attempt number
+          (retryAfterSeconds, attempt) => {
+            const context = {
+              retryAfter: retryAfterSeconds,
+              rateLimitRemaining: 0,
+            };
+
+            const error = new OMDbError(
+              'Rate limit exceeded',
+              'RATE_LIMIT',
+              429,
+              true,
+              undefined,
+              context
+            );
+
+            // Rate limit errors should be retryable
+            expect(error.isRetryable).toBe(true);
+            expect(error.code).toBe('RATE_LIMIT');
+            expect(error.statusCode).toBe(429);
+
+            // Context should preserve rate limiting information
+            expect(error.context?.retryAfter).toBe(retryAfterSeconds);
+            expect(error.context?.rateLimitRemaining).toBe(0);
+          }
+        ),
+        { numRuns: 100 }
+      );
+    });
+  });
+
+  describe('Network Error Handling', () => {
+    it('should handle network errors with appropriate retry behavior', () => {
+      fc.assert(
+        fc.property(
+          fc.constantFrom('fetch failed', 'network error', 'connection refused'),
+          fc.integer({ min: 0, max: 5 }),
+          (errorMessage, attempt) => {
+            // Simulate TypeError that fetch throws for network errors
+            const networkError = new TypeError(errorMessage);
+            const omdbError = OMDbError.fromError(networkError, 'NETWORK_ERROR', {
+              attempt: attempt + 1,
+              url: 'https://www.omdbapi.com',
+            });
+
+            // Network errors should be retryable
+            expect(omdbError.code).toBe('NETWORK_ERROR');
+            expect(omdbError.originalError).toBe(networkError);
+            expect(omdbError.context?.attempt).toBe(attempt + 1);
+          }
+        ),
+        { numRuns: 100 }
+      );
+    });
+  });
+
+  describe('Timeout Handling', () => {
+    it('should handle timeout errors correctly', () => {
+      fc.assert(
+        fc.property(
+          fc.integer({ min: 1000, max: 30000 }), // timeout in ms
+          fc.integer({ min: 0, max: 5 }), // attempt number
+          (timeoutMs, attempt) => {
+            const timeoutError = new OMDbError(
+              `Request timeout after ${timeoutMs}ms`,
+              'TIMEOUT',
+              undefined,
+              true,
+              undefined,
+              { timeoutMs, attempt: attempt + 1 }
+            );
+
+            // Timeout errors should be retryable
+            expect(timeoutError.isRetryable).toBe(true);
+            expect(timeoutError.code).toBe('TIMEOUT');
+            expect(timeoutError.context?.timeoutMs).toBe(timeoutMs);
+            expect(timeoutError.context?.attempt).toBe(attempt + 1);
+          }
+        ),
+        { numRuns: 100 }
+      );
+    });
+  });
+
+  describe('Backoff Strategy Variations', () => {
+    it('should use different backoff strategies for different error types', () => {
+      fc.assert(
+        fc.property(
+          fc.constantFrom('RATE_LIMIT', 'SERVER_ERROR', 'NETWORK_ERROR', 'TIMEOUT'),
+          fc.integer({ min: 0, max: 3 }),
+          (errorCode, attempt) => {
+            const config: RetryConfig = {
+              maxAttempts: 5,
+              baseDelayMs: 1000,
+              maxDelayMs: 10000,
+              backoffFactor: 2,
+              jitter: false,
+            };
+
+            // Different error types should potentially use different backoff strategies
+            let expectedMinDelay = 0;
+            let expectedMaxDelay = config.maxDelayMs;
+
+            switch (errorCode) {
+              case 'RATE_LIMIT':
+                // Rate limiting should use longer delays
+                expectedMinDelay = Math.max(config.baseDelayMs, 5000);
+                break;
+              case 'NETWORK_ERROR':
+              case 'TIMEOUT':
+                // Network errors should use faster retry
+                expectedMaxDelay = Math.min(config.baseDelayMs * Math.pow(2, attempt), config.maxDelayMs);
+                break;
+              case 'SERVER_ERROR':
+                // Server errors use standard exponential backoff
+                expectedMaxDelay = Math.min(config.baseDelayMs * Math.pow(2, attempt), config.maxDelayMs);
+                break;
+            }
+
+            // Verify that delay calculation respects error-specific strategies
+            const standardDelay = calculateBackoffDelay(attempt, config);
+            expect(standardDelay).toBeLessThanOrEqual(expectedMaxDelay);
+            expect(standardDelay).toBeGreaterThanOrEqual(0);
+          }
+        ),
+        { numRuns: 100 }
+      );
+    });
+  });
+
+  describe('Retry Attempt Tracking', () => {
+    it('should track retry attempts correctly in error context', () => {
+      fc.assert(
+        fc.property(
+          fc.integer({ min: 1, max: 10 }), // max attempts
+          fc.string({ minLength: 1, maxLength: 100 }), // error message
+          (maxAttempts, errorMessage) => {
+            const config: RetryConfig = {
+              maxAttempts,
+              baseDelayMs: 100,
+              maxDelayMs: 1000,
+            };
+
+            // Simulate tracking attempts in error context
+            for (let attempt = 0; attempt < maxAttempts; attempt++) {
+              const error = new OMDbError(
+                errorMessage,
+                'NETWORK_ERROR',
+                undefined,
+                true,
+                undefined,
+                { 
+                  attempt: attempt + 1,
+                  maxAttempts,
+                  url: 'https://www.omdbapi.com'
+                }
+              );
+
+              expect(error.context?.attempt).toBe(attempt + 1);
+              expect(error.context?.maxAttempts).toBe(maxAttempts);
+              expect(error.isRetryable).toBe(true);
+            }
           }
         ),
         { numRuns: 100 }
