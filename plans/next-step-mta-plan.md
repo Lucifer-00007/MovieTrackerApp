@@ -413,22 +413,14 @@ Failed to resolve the Android SDK path. Default install location not found: /Use
   "2000"
     └─ services/api/omdb.ts:339
 
-──────────────────────────────────────────────────────────────────────
 
-
-- [] 
-- [] 
-- [] 
-- [] 
-- [] 
-
-
-#### Priority Lv: P1
 - []
-- [] 
-- [] 
-- [] 
+- []
+- []
+- []
 
+
+──────────────────────────────────────────────────────────────────────
 
 ## Mobile View
 
