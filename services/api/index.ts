@@ -11,6 +11,7 @@ import type { MediaApiAdapter } from './types';
 import { tmdbAdapter } from './adapters/tmdb-adapter';
 import { mockAdapter } from './adapters/mock-adapter';
 import { omdbAdapter } from './adapters/omdb-adapter';
+import { cloudflareAdapter } from './adapters/cloudflare-adapter';
 
 /** Check if mock data mode is enabled */
 export function useMockData(): boolean {
@@ -51,6 +52,9 @@ export function validateProviderConfig(provider: string): void {
     case 'tmdb':
       // TMDB validation could be added here if needed
       break;
+    case 'cloudflare':
+      // Cloudflare Worker API doesn't require API key
+      break;
     case 'mock':
       // No validation needed for mock adapter
       break;
@@ -84,6 +88,9 @@ function getAdapter(): MediaApiAdapter {
     case 'omdb':
       console.log('[API] Using OMDb adapter');
       return omdbAdapter;
+    case 'cloudflare':
+      console.log('[API] Using Cloudflare Worker adapter');
+      return cloudflareAdapter;
     case 'mock':
       console.log('[API] Using mock data adapter');
       return mockAdapter;

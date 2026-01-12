@@ -6,6 +6,8 @@ This directory contains service layer implementations for the MovieTracker app, 
 
 ### API Services
 - **api/tmdb.ts** - TMDB (The Movie Database) API client
+- **api/cloudflare.ts** - Cloudflare Worker API client (TMDB + IMDB data)
+- **api/cloudflare-extended.ts** - Extended Cloudflare features (IMDB, seasons, regions)
 - **api/streaming.ts** - Streaming service availability API
 - **api/subtitles.ts** - Subtitle and caption services
 
@@ -74,6 +76,30 @@ const trending = await tmdb.getTrendingMovies();
 
 // Search for content
 const results = await tmdb.search('Inception');
+```
+
+### Cloudflare Worker API Service
+```typescript
+// Use the unified adapter (auto-switches based on EXPO_PUBLIC_API_PROVIDER)
+import { mediaApi } from '@/services/api';
+
+// Get trending content
+const trending = await mediaApi.getTrending('all', 'week', 1);
+
+// Or use Cloudflare-specific features directly
+import * as cfExtended from '@/services/api/cloudflare-extended';
+
+// Get IMDB upcoming movies by region
+const upcoming = await cfExtended.getIMDBUpcoming('IN');
+
+// Get IMDB entertainment news
+const news = await cfExtended.getIMDBNews(10);
+
+// Get TV season details
+const season = await cfExtended.getSeasonDetails(tvId, 1);
+
+// Discover by region (bollywood, korean, anime, etc.)
+const bollywood = await cfExtended.discoverMovies({ region: 'bollywood' });
 ```
 
 ### Storage Service

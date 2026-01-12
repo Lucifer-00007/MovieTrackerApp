@@ -6,3 +6,4 @@
 export { tmdbAdapter } from './tmdb-adapter';
 export { mockAdapter } from './mock-adapter';
 export { omdbAdapter } from './omdb-adapter';
+export { cloudflareAdapter } from './cloudflare-adapter';
