@@ -20,6 +20,7 @@ import { LinearGradient } from 'expo-linear-gradient';
 
 import { useEffectiveColorScheme } from '@/hooks/use-effective-color-scheme';
 import { Colors, Spacing, Typography, BorderRadius } from '@/constants/theme';
+import { COUNTRY_GRADIENTS, OVERLAY_COLORS } from '@/constants/colors';
 import { SUPPORTED_COUNTRIES, type CountryConfig } from '@/types/media';
 
 const { width: SCREEN_WIDTH } = Dimensions.get('window');
@@ -30,16 +31,11 @@ const CARD_WIDTH = (SCREEN_WIDTH - GRID_PADDING * 2 - GRID_GAP * (NUM_COLUMNS - 
 
 /** Get gradient colors for each country */
 function getCountryGradient(code: string, isDark: boolean): [string, string] {
-  const gradients: Record<string, [string, string]> = {
-    US: isDark ? ['#1a365d', '#2c5282'] : ['#ebf8ff', '#bee3f8'],
-    JP: isDark ? ['#742a2a', '#9b2c2c'] : ['#fff5f5', '#fed7d7'],
-    IN: isDark ? ['#744210', '#975a16'] : ['#fffff0', '#fefcbf'],
-    CN: isDark ? ['#742a2a', '#9b2c2c'] : ['#fff5f5', '#fed7d7'],
-    RU: isDark ? ['#1a365d', '#2c5282'] : ['#ebf8ff', '#bee3f8'],
-    ES: isDark ? ['#744210', '#975a16'] : ['#fffff0', '#fefcbf'],
-    DE: isDark ? ['#1c4532', '#276749'] : ['#f0fff4', '#c6f6d5'],
-  };
-  return gradients[code] || (isDark ? ['#2d3748', '#4a5568'] : ['#f7fafc', '#edf2f7']);
+  const countryGradient = COUNTRY_GRADIENTS[code as keyof typeof COUNTRY_GRADIENTS];
+  if (countryGradient) {
+    return isDark ? countryGradient.dark : countryGradient.light;
+  }
+  return isDark ? COUNTRY_GRADIENTS.default.dark : COUNTRY_GRADIENTS.default.light;
 }
 
 /** Get icon for each country's content type */
@@ -123,7 +119,7 @@ function CountryCard({ country, onPress, colors, isDark }: CountryCardProps) {
           <Text style={styles.countryFlag} accessibilityLabel={`${country.name} flag`}>
             {country.flag}
           </Text>
-          <View style={[styles.iconBadge, { backgroundColor: isDark ? 'rgba(255,255,255,0.1)' : 'rgba(0,0,0,0.05)' }]}>
+          <View style={[styles.iconBadge, { backgroundColor: isDark ? OVERLAY_COLORS.WHITE_10 : OVERLAY_COLORS.BLACK_05 }]}>
             <Ionicons name={icon} size={16} color={colors.textSecondary} />
           </View>
         </View>
@@ -140,7 +136,7 @@ function CountryCard({ country, onPress, colors, isDark }: CountryCardProps) {
 
         {/* Footer with count */}
         <View style={styles.cardFooter}>
-          <View style={[styles.countBadge, { backgroundColor: isDark ? 'rgba(255,255,255,0.1)' : 'rgba(0,0,0,0.05)' }]}>
+          <View style={[styles.countBadge, { backgroundColor: isDark ? OVERLAY_COLORS.WHITE_10 : OVERLAY_COLORS.BLACK_05 }]}>
             <Ionicons name="play-circle" size={12} color={colors.tint} />
             <Text style={[styles.countText, { color: colors.textMuted }]}>
               {getContentCount(country.code)}
