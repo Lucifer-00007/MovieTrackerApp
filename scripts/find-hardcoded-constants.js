@@ -26,6 +26,20 @@ const IGNORE_FILES = [
   'babel.config.js', 'setup.ts'
 ];
 
+// Known acceptable values that shouldn't be flagged
+// These are package names, class names, or math constants - not hardcoded values
+const ACCEPTABLE_VALUES = [
+  'react-native-reanimated',  // Package import name
+  'AnalyticsNetworkError',    // Error class name
+];
+
+// Acceptable timing values in specific contexts
+const ACCEPTABLE_TIMING_CONTEXTS = [
+  { value: '5000', context: 'default:' },      // JSDoc default value comments
+  { value: '100', context: '* 100' },          // Percentage calculations (x / y * 100)
+  { value: '100', context: '/ 100' },          // Percentage calculations (x / 100)
+];
+
 // Patterns to detect hard-coded constants
 const PATTERNS = [
   {
@@ -117,6 +131,17 @@ function analyzeFile(filePath) {
         // Apply ignore filters
         if (pattern.ignore?.some(ig => value.toLowerCase().includes(ig.toLowerCase()))) continue;
         if (pattern.minValue && parseInt(value) < pattern.minValue) continue;
+        
+        // Skip known acceptable values (package names, class names, etc.)
+        if (ACCEPTABLE_VALUES.includes(value)) continue;
+        
+        // Skip acceptable timing values in specific contexts
+        if (pattern.category === 'timing') {
+          const isAcceptable = ACCEPTABLE_TIMING_CONTEXTS.some(
+            ctx => ctx.value === value && line.includes(ctx.context)
+          );
+          if (isAcceptable) continue;
+        }
         
         findings.push({
           type: pattern.name,
