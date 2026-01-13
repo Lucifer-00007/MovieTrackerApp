@@ -276,13 +276,6 @@ export default function DownloadsScreen() {
     return (
       <View style={[styles.storageCard, { backgroundColor: colors.card, borderColor: colors.cardBorder }]}>
         <View style={styles.storageHeader}>
-          <View style={[styles.storageIconContainer, { backgroundColor: isLowStorage ? colors.errorLight : colors.backgroundTertiary }]}>
-            <Ionicons
-              name="cloud-download-outline"
-              size={24}
-              color={isLowStorage ? colors.error : colors.tint}
-            />
-          </View>
           <View style={styles.storageHeaderText}>
             <Text style={[styles.storageTitle, { color: colors.text }]}>
               Storage
@@ -441,16 +434,19 @@ const styles = StyleSheet.create({
   },
   header: {
     paddingHorizontal: Spacing.md,
-    paddingTop: Spacing.xl,
+    paddingTop: Spacing.xxl,
     paddingBottom: Spacing.md,
+    alignItems: 'center',
   },
   headerTitle: {
     fontSize: Typography.sizes.xxl,
     fontWeight: Typography.weights.bold,
+    textAlign: 'center',
   },
   headerSubtitle: {
     fontSize: Typography.sizes.md,
     marginTop: Spacing.xs,
+    textAlign: 'center',
   },
   scrollView: {
     flex: 1,

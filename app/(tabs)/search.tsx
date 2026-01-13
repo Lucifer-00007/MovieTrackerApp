@@ -183,19 +183,20 @@ export default function SearchScreen() {
     data: searchResults,
     isLoading,
     isFetching,
-  } = useQuery({
+  } = useQuery<SearchResults>({
     queryKey: ['search', debouncedQuery],
-    queryFn: () => searchMulti(debouncedQuery),
+    queryFn: () => searchMulti(debouncedQuery, 1),
     enabled: isValidSearchQuery(debouncedQuery),
     staleTime: 5 * 60 * 1000,
-    onSuccess: (data) => {
-      // Log analytics event when search completes
-      if (isValidSearchQuery(debouncedQuery)) {
-        const totalResults = (data?.movies?.length || 0) + (data?.tvShows?.length || 0);
-        logSearchQuery(debouncedQuery, totalResults);
-      }
-    },
   });
+
+  // Log analytics when search completes
+  useEffect(() => {
+    if (searchResults && isValidSearchQuery(debouncedQuery)) {
+      const totalResults = (searchResults.movies?.length || 0) + (searchResults.tvShows?.length || 0);
+      logSearchQuery(debouncedQuery, totalResults);
+    }
+  }, [searchResults, debouncedQuery]);
 
   // Apply filters to results
   const filteredResults = useMemo<SearchResults>(() => {
@@ -277,15 +278,12 @@ export default function SearchScreen() {
       {/* Search Header */}
       <View style={styles.header}>
         <View style={styles.headerRow}>
-          <View style={[styles.headerIcon, { backgroundColor: colors.backgroundSecondary }]}>
-            <Ionicons name="search" size={22} color={colors.tint} />
-          </View>
           <View style={styles.headerText}>
             <Text style={[styles.title, { color: textColor }]} accessibilityRole="header">
-              Search
+              What's in your mind?
             </Text>
             <Text style={[styles.subtitle, { color: textSecondary }]}>
-              Movies, series & more
+              Search movies, series & more
             </Text>
           </View>
         </View>
@@ -592,11 +590,10 @@ const styles = StyleSheet.create({
   },
   header: {
     paddingHorizontal: Spacing.md,
-    paddingTop: Spacing.lg,
+    paddingTop: Spacing.xxl,
     paddingBottom: Spacing.sm,
   },
   headerRow: {
-    flexDirection: 'row',
     alignItems: 'center',
   },
   headerIcon: {
@@ -605,18 +602,20 @@ const styles = StyleSheet.create({
     borderRadius: BorderRadius.md,
     alignItems: 'center',
     justifyContent: 'center',
-    marginRight: Spacing.sm,
+    marginBottom: Spacing.sm,
   },
   headerText: {
-    flex: 1,
+    alignItems: 'center',
   },
   title: {
     fontSize: Typography.sizes.xl,
     fontWeight: Typography.weights.bold,
+    textAlign: 'center',
   },
   subtitle: {
     fontSize: Typography.sizes.sm,
     marginTop: 2,
+    textAlign: 'center',
   },
   searchContainer: {
     paddingHorizontal: Spacing.md,

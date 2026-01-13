@@ -171,9 +171,6 @@ export default function BrowseScreen() {
       {/* Header */}
       <View style={styles.header}>
         <View style={styles.headerTop}>
-          <View style={[styles.headerIcon, { backgroundColor: colors.backgroundSecondary }]}>
-            <Ionicons name="globe" size={24} color={colors.tint} />
-          </View>
           <View style={styles.headerText}>
             <Text style={[styles.title, { color: colors.text }]} accessibilityRole="header">
               Browse by Country
@@ -235,11 +232,10 @@ const styles = StyleSheet.create({
   },
   header: {
     paddingHorizontal: Spacing.md,
-    paddingTop: Spacing.lg,
+    paddingTop: Spacing.xxl,
     paddingBottom: Spacing.md,
   },
   headerTop: {
-    flexDirection: 'row',
     alignItems: 'center',
     marginBottom: Spacing.md,
   },
@@ -249,18 +245,20 @@ const styles = StyleSheet.create({
     borderRadius: BorderRadius.md,
     alignItems: 'center',
     justifyContent: 'center',
-    marginRight: Spacing.sm,
+    marginBottom: Spacing.sm,
   },
   headerText: {
-    flex: 1,
+    alignItems: 'center',
   },
   title: {
     fontSize: Typography.sizes.xl,
     fontWeight: Typography.weights.bold,
+    textAlign: 'center',
   },
   subtitle: {
     fontSize: Typography.sizes.sm,
     marginTop: 2,
+    textAlign: 'center',
   },
   statsRow: {
     flexDirection: 'row',

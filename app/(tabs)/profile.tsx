@@ -755,7 +755,7 @@ const styles = StyleSheet.create({
   },
   tabHeader: {
     paddingHorizontal: Spacing.md,
-    paddingTop: Spacing.xl,
+    paddingTop: Spacing.xxl,
     paddingBottom: Spacing.md,
   },
   tabContainer: {
