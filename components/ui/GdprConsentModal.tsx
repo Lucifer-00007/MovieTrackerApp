@@ -19,7 +19,7 @@ import {
 } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 
-import { useColorScheme } from '@/hooks/use-color-scheme';
+import { useEffectiveColorScheme } from '@/hooks/use-effective-color-scheme';
 import { useLocalization } from '@/hooks/use-localization';
 import { Colors, Spacing, Typography, BorderRadius } from '@/constants/theme';
 
@@ -36,7 +36,7 @@ export function GdprConsentModal({
   onDecline,
   isLoading = false,
 }: GdprConsentModalProps) {
-  const colorScheme = useColorScheme() ?? 'light';
+  const colorScheme = useEffectiveColorScheme();
   const colors = Colors[colorScheme];
   const { t } = useLocalization();
   const [showDetails, setShowDetails] = useState(false);

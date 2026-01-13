@@ -20,7 +20,7 @@ import { useRouter } from 'expo-router';
 import { useQuery } from '@tanstack/react-query';
 import { Ionicons } from '@expo/vector-icons';
 
-import { useColorScheme } from '@/hooks/use-color-scheme';
+import { useEffectiveColorScheme } from '@/hooks/use-effective-color-scheme';
 import { useThemeColor } from '@/hooks/use-theme-color';
 import { Colors, Spacing, Typography, BorderRadius } from '@/constants/theme';
 import { MediaCard } from '@/components/media/MediaCard';
@@ -142,7 +142,7 @@ function ResultSection({ title, items, onItemPress, testID }: ResultSectionProps
 
 export default function SearchScreen() {
   const router = useRouter();
-  const colorScheme = useColorScheme() ?? 'light';
+  const colorScheme = useEffectiveColorScheme();
   const colors = Colors[colorScheme];
   const tintColor = useThemeColor({}, 'tint');
   const textColor = useThemeColor({}, 'text');

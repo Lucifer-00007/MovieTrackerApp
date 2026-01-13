@@ -22,7 +22,7 @@ import Animated, {
   useAnimatedScrollHandler,
 } from 'react-native-reanimated';
 
-import { useColorScheme } from '@/hooks/use-color-scheme';
+import { useEffectiveColorScheme } from '@/hooks/use-effective-color-scheme';
 import { Colors, Spacing, Typography, BorderRadius } from '@/constants/theme';
 import { IconSymbol } from '@/components/ui/icon-symbol';
 import { ErrorState } from '@/components/ui/ErrorState';
@@ -50,7 +50,7 @@ export default function TvDetailScreen() {
   const { id } = useLocalSearchParams<{ id: string }>();
   const tvId = parseInt(id || '0', 10);
   
-  const colorScheme = useColorScheme() ?? 'light';
+  const colorScheme = useEffectiveColorScheme();
   const colors = Colors[colorScheme];
 
   // State

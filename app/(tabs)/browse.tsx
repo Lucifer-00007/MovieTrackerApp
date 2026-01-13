@@ -16,7 +16,7 @@ import {
 } from 'react-native';
 import { useRouter } from 'expo-router';
 
-import { useColorScheme } from '@/hooks/use-color-scheme';
+import { useEffectiveColorScheme } from '@/hooks/use-effective-color-scheme';
 import { useThemeColor } from '@/hooks/use-theme-color';
 import { Colors, Spacing, Typography, BorderRadius } from '@/constants/theme';
 import { SUPPORTED_COUNTRIES, type CountryConfig } from '@/types/media';
@@ -86,7 +86,7 @@ function getRegionLabel(code: string): string {
 
 export default function BrowseScreen() {
   const router = useRouter();
-  const colorScheme = useColorScheme() ?? 'light';
+  const colorScheme = useEffectiveColorScheme();
   const colors = Colors[colorScheme];
   const textColor = useThemeColor({}, 'text');
   const textSecondary = useThemeColor({}, 'textSecondary');

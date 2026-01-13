@@ -4,12 +4,11 @@ import React from 'react';
 import { HapticTab } from '@/components/haptic-tab';
 import { IconSymbol } from '@/components/ui/icon-symbol';
 import { Colors } from '@/constants/theme';
-import { useColorScheme } from '@/hooks/use-color-scheme';
-import { getAccessibilityRole } from '@/hooks/use-accessibility';
+import { useEffectiveColorScheme } from '@/hooks/use-effective-color-scheme';
 
 export default function TabLayout() {
-  const colorScheme = useColorScheme();
-  const colors = Colors[colorScheme ?? 'light'];
+  const colorScheme = useEffectiveColorScheme();
+  const colors = Colors[colorScheme];
 
   return (
     <Tabs

@@ -29,7 +29,7 @@ import {
 import { useRouter } from 'expo-router';
 import { Ionicons } from '@expo/vector-icons';
 
-import { useColorScheme } from '@/hooks/use-color-scheme';
+import { useEffectiveColorScheme } from '@/hooks/use-effective-color-scheme';
 import { Colors, Spacing, Typography, BorderRadius } from '@/constants/theme';
 import { useWatchlistStore } from '@/stores/watchlistStore';
 import { usePreferencesStore } from '@/stores/preferencesStore';
@@ -73,7 +73,7 @@ function SettingsSection({
   children: React.ReactNode; 
   testID?: string;
 }) {
-  const colorScheme = useColorScheme() ?? 'light';
+  const colorScheme = useEffectiveColorScheme();
   const colors = Colors[colorScheme];
 
   return (
@@ -102,7 +102,7 @@ function SettingsRow({
   rightElement?: React.ReactNode;
   testID?: string;
 }) {
-  const colorScheme = useColorScheme() ?? 'light';
+  const colorScheme = useEffectiveColorScheme();
   const colors = Colors[colorScheme];
 
   return (
@@ -146,7 +146,7 @@ function LanguageModal({
   onSelect: (language: string) => void;
   onClose: () => void;
 }) {
-  const colorScheme = useColorScheme() ?? 'light';
+  const colorScheme = useEffectiveColorScheme();
   const colors = Colors[colorScheme];
 
   return (
@@ -206,7 +206,7 @@ function ThemeModal({
   onSelect: (theme: ThemeMode) => void;
   onClose: () => void;
 }) {
-  const colorScheme = useColorScheme() ?? 'light';
+  const colorScheme = useEffectiveColorScheme();
   const colors = Colors[colorScheme];
 
   return (
@@ -261,7 +261,7 @@ function ThemeModal({
 
 /** Sync status indicator component */
 function SyncStatusIndicator({ status }: { status: WatchlistSyncStatus }) {
-  const colorScheme = useColorScheme() ?? 'light';
+  const colorScheme = useEffectiveColorScheme();
   const colors = Colors[colorScheme];
 
   const getStatusConfig = () => {
@@ -298,7 +298,7 @@ function WatchlistItemCard({
   onPress: () => void;
   onRemove: () => void;
 }) {
-  const colorScheme = useColorScheme() ?? 'light';
+  const colorScheme = useEffectiveColorScheme();
   const colors = Colors[colorScheme];
 
   const handleLongPress = () => {
@@ -379,7 +379,7 @@ function WatchlistItemCard({
 }
 
 export default function ProfileScreen() {
-  const colorScheme = useColorScheme() ?? 'light';
+  const colorScheme = useEffectiveColorScheme();
   const colors = Colors[colorScheme];
   const router = useRouter();
 

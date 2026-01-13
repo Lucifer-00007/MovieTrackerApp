@@ -26,14 +26,14 @@ export interface UserPreferences {
 export const DEFAULT_USER_PREFERENCES: UserPreferences = {
   themeMode: 'system',
   language: 'en',
-  analyticsEnabled: false,
+  analyticsEnabled: true,
   notificationsEnabled: true,
   notificationTypes: {
     downloads: true,
     newReleases: true,
   },
-  gdprConsentGiven: false,
-  gdprConsentDate: null,
+  gdprConsentGiven: true,
+  gdprConsentDate: new Date().toISOString(),
 };
 
 /** Search filters for content discovery */

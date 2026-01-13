@@ -223,7 +223,7 @@ Failed to resolve the Android SDK path. Default install location not found: /Use
   - Find all the hard-coded constants throughout the codebase, that can be moved to constants folder such that we can follow the DRY principals.
 
 
-- [] Consider refactoring these files into smaller modules following best practice:
+- [x] Consider refactoring these files into smaller modules following best practice:
 
    1300 lines │ __tests__/services/api/omdb.property.test.ts
    1066 lines │ __tests__/services/api/omdb-mappers.property.test.ts
@@ -243,7 +243,7 @@ Failed to resolve the Android SDK path. Default install location not found: /Use
     544 lines │ services/analytics.ts
 
 
-- [] Move constants to ./constants/ changes following best practices: 
+- [x] Move constants to ./constants/ changes following best practices: 
 
 - Move colors to constants/colors.ts
 - Move API URLs to constants/api.ts
@@ -414,6 +414,24 @@ Failed to resolve the Android SDK path. Default install location not found: /Use
     └─ services/api/omdb.ts:339
 
 
+- [x] Add if any of the following is missing from the home page.
+  - `Trending This Week` - Will have all the top trending movies/web-series/etc of the week from all regions
+  - `Top Rated` - Will have the top IMDB rated overall from global region
+  - Popular Movies
+  - Top Box Office Weekend
+  - Top Web Series
+  - Recommended for You
+
+- [] Hide/disable the `No Thanks` and `Accept` popup that appears for analytics that comes every-time when we first open the app. Also there is no text in this popup card only 2 buttons so fix this
+
+- [] Enhance the overall app UI in light mode. In some of the pages even when i set the theme to light its showing dark mode. Fix these issues while following best practices.
+
+- [] Enhance the UI/UX of the download page.
+
+- []
+- []
+- []
+- []
 - []
 - []
 - []

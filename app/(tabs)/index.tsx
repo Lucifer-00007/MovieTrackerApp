@@ -17,12 +17,52 @@ import { Skeleton } from '@/components/ui/Skeleton';
 import { ErrorState } from '@/components/ui/ErrorState';
 import { Spacing } from '@/constants/theme';
 import { getTrending, getRecommendations } from '@/services/api';
+import {
+  getPopularMovies,
+  getTopRatedMovies,
+  getTopRatedTVShows,
+} from '@/services/api/cloudflare-extended';
+import type { CFMovieResult, CFTVShowResult } from '@/services/api/cloudflare-types';
 import { useRecentlyViewedStore } from '@/stores/recentlyViewedStore';
 import { useWatchlistStore } from '@/stores/watchlistStore';
 import type { TrendingItem, MediaItem } from '@/types/media';
 
 /** Number of hero items to display */
 const HERO_ITEMS_COUNT = 5;
+
+/** Convert Cloudflare movie result to MediaItem */
+function cfMovieToMediaItem(movie: CFMovieResult): MediaItem {
+  return {
+    id: movie.id,
+    title: movie.title,
+    originalTitle: movie.title,
+    posterPath: movie.posterPath,
+    backdropPath: movie.backdropPath,
+    overview: movie.overview,
+    releaseDate: movie.releaseDate,
+    voteAverage: movie.voteAverage,
+    voteCount: movie.voteCount,
+    mediaType: 'movie',
+    genreIds: movie.genreIds,
+  };
+}
+
+/** Convert Cloudflare TV result to MediaItem */
+function cfTVToMediaItem(tv: CFTVShowResult): MediaItem {
+  return {
+    id: tv.id,
+    title: tv.name,
+    originalTitle: tv.name,
+    posterPath: tv.posterPath,
+    backdropPath: tv.backdropPath,
+    overview: tv.overview,
+    releaseDate: tv.firstAirDate,
+    voteAverage: tv.voteAverage,
+    voteCount: tv.voteCount,
+    mediaType: 'tv',
+    genreIds: tv.genreIds,
+  };
+}
 
 /** Convert recently viewed items to MediaItem format */
 function recentlyViewedToMediaItems(
@@ -118,6 +158,36 @@ export default function HomeScreen() {
     staleTime: 5 * 60 * 1000,
   });
 
+  // Fetch popular movies
+  const {
+    data: popularMoviesData,
+    refetch: refetchPopular,
+  } = useQuery({
+    queryKey: ['popular', 'movies'],
+    queryFn: () => getPopularMovies(1),
+    staleTime: 5 * 60 * 1000,
+  });
+
+  // Fetch top rated movies (global IMDB-style ratings)
+  const {
+    data: topRatedMoviesData,
+    refetch: refetchTopRated,
+  } = useQuery({
+    queryKey: ['top-rated', 'movies'],
+    queryFn: () => getTopRatedMovies(1),
+    staleTime: 5 * 60 * 1000,
+  });
+
+  // Fetch top rated TV shows (Top Web Series)
+  const {
+    data: topRatedTVData,
+    refetch: refetchTopRatedTV,
+  } = useQuery({
+    queryKey: ['top-rated', 'tv'],
+    queryFn: () => getTopRatedTVShows(1),
+    staleTime: 5 * 60 * 1000,
+  });
+
   // Derived state
   const isLoading = isLoadingMovies || isLoadingTv || isLoadingAll;
   const hasError = moviesError || tvError || allError;
@@ -148,6 +218,21 @@ export default function HomeScreen() {
     return recommendationsData?.items || [];
   }, [recommendationsData]);
 
+  // Popular movies
+  const popularMovies: MediaItem[] = useMemo(() => {
+    return (popularMoviesData?.data || []).map(cfMovieToMediaItem);
+  }, [popularMoviesData]);
+
+  // Top rated movies (global ratings)
+  const topRatedMovies: MediaItem[] = useMemo(() => {
+    return (topRatedMoviesData?.data || []).map(cfMovieToMediaItem);
+  }, [topRatedMoviesData]);
+
+  // Top web series (top rated TV)
+  const topWebSeries: MediaItem[] = useMemo(() => {
+    return (topRatedTVData?.data || []).map(cfTVToMediaItem);
+  }, [topRatedTVData]);
+
   // Check if we should show recommendations row
   const showRecommendations = watchlistItems.length > 0 && recommendations.length > 0;
 
@@ -168,8 +253,15 @@ export default function HomeScreen() {
 
   // Refresh handler
   const handleRefresh = useCallback(async () => {
-    await Promise.all([refetchAll(), refetchMovies(), refetchTv()]);
-  }, [refetchAll, refetchMovies, refetchTv]);
+    await Promise.all([
+      refetchAll(),
+      refetchMovies(),
+      refetchTv(),
+      refetchPopular(),
+      refetchTopRated(),
+      refetchTopRatedTV(),
+    ]);
+  }, [refetchAll, refetchMovies, refetchTv, refetchPopular, refetchTopRated, refetchTopRatedTV]);
 
   // Retry handler for errors
   const handleRetry = useCallback(() => {
@@ -253,10 +345,40 @@ export default function HomeScreen() {
         {/* Trending Movies Row */}
         {trendingMovies.length > 0 && (
           <ContentRow
-            title="Trending Movies"
+            title="Trending This Week"
             items={trendingMovies}
             onItemPress={handleItemPress}
             testID="home-trending-movies-row"
+          />
+        )}
+
+        {/* Top Rated Movies (Global) */}
+        {topRatedMovies.length > 0 && (
+          <ContentRow
+            title="Top Rated"
+            items={topRatedMovies}
+            onItemPress={handleItemPress}
+            testID="home-top-rated-row"
+          />
+        )}
+
+        {/* Popular Movies */}
+        {popularMovies.length > 0 && (
+          <ContentRow
+            title="Popular Movies"
+            items={popularMovies}
+            onItemPress={handleItemPress}
+            testID="home-popular-movies-row"
+          />
+        )}
+
+        {/* Top Web Series (Top Rated TV) */}
+        {topWebSeries.length > 0 && (
+          <ContentRow
+            title="Top Web Series"
+            items={topWebSeries}
+            onItemPress={handleItemPress}
+            testID="home-top-web-series-row"
           />
         )}
 

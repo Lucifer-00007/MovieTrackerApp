@@ -19,7 +19,7 @@ import { useLocalSearchParams, router } from 'expo-router';
 import { useQuery } from '@tanstack/react-query';
 import { Image } from 'expo-image';
 
-import { useColorScheme } from '@/hooks/use-color-scheme';
+import { useEffectiveColorScheme } from '@/hooks/use-effective-color-scheme';
 import { useThemeColor } from '@/hooks/use-theme-color';
 import { Colors, Spacing, Typography, BorderRadius, ComponentTokens } from '@/constants/theme';
 import { IconSymbol } from '@/components/ui/icon-symbol';
@@ -221,7 +221,7 @@ function ContentItem({ item, onPress }: ContentItemProps) {
 
 export default function CountryHubScreen() {
   const { code } = useLocalSearchParams<{ code: string }>();
-  const colorScheme = useColorScheme() ?? 'light';
+  const colorScheme = useEffectiveColorScheme();
   const colors = Colors[colorScheme];
   const tintColor = useThemeColor({}, 'tint');
 
