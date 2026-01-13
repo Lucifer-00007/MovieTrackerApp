@@ -18,7 +18,7 @@ import {
 
 import { useThemeColor } from '@/hooks/use-theme-color';
 import { Spacing, Typography, ComponentTokens } from '@/constants/theme';
-import { shouldSynopsisExpand, SYNOPSIS_EXPAND_THRESHOLD } from './detail-utils';
+import { shouldSynopsisExpand } from './detail-utils';
 
 // Enable LayoutAnimation on Android
 if (Platform.OS === 'android' && UIManager.setLayoutAnimationEnabledExperimental) {

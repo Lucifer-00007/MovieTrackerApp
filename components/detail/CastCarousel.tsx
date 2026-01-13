@@ -51,11 +51,6 @@ export function CastCarousel({
   const cardBackground = useThemeColor({}, 'card');
   const cardBorder = useThemeColor({}, 'cardBorder');
 
-  // Don't render if no cast
-  if (!shouldShowCast(cast)) {
-    return null;
-  }
-
   const limitedCast = getLimitedCast(cast, maxDisplay);
 
   const renderCastMember = useCallback(
@@ -110,6 +105,11 @@ export function CastCarousel({
     },
     [textColor, textSecondary, cardBackground, cardBorder, testID]
   );
+
+  // Don't render if no cast
+  if (!shouldShowCast(cast)) {
+    return null;
+  }
 
   return (
     <View style={styles.container} testID={testID}>

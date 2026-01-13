@@ -12,12 +12,11 @@ import Animated, {
   useAnimatedStyle,
   withRepeat,
   withTiming,
-  interpolate,
   Easing,
 } from 'react-native-reanimated';
 
 import { useThemeColor } from '@/hooks/use-theme-color';
-import { Spacing, BorderRadius, ComponentTokens, AnimationDurations } from '@/constants/theme';
+import { Spacing, BorderRadius, ComponentTokens } from '@/constants/theme';
 
 const { width: SCREEN_WIDTH } = Dimensions.get('window');
 

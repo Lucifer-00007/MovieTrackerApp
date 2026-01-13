@@ -5,7 +5,7 @@
  * Requirements: 7.4, 7.5, 7.6
  */
 
-import type { WatchlistItem, WatchlistSyncStatus } from '@/types/watchlist';
+import type { WatchlistItem } from '@/types/watchlist';
 
 /**
  * Grid configuration for watchlist display

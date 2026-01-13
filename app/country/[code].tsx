@@ -21,7 +21,7 @@ import { Image } from 'expo-image';
 
 import { useEffectiveColorScheme } from '@/hooks/use-effective-color-scheme';
 import { useThemeColor } from '@/hooks/use-theme-color';
-import { Colors, Spacing, Typography, BorderRadius, ComponentTokens } from '@/constants/theme';
+import { Colors, Spacing, Typography, BorderRadius } from '@/constants/theme';
 import { IconSymbol } from '@/components/ui/icon-symbol';
 import { Skeleton } from '@/components/ui/Skeleton';
 import { ErrorState } from '@/components/ui/ErrorState';

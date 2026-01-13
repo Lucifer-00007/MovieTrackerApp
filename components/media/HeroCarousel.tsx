@@ -66,8 +66,6 @@ export function HeroCarousel({
   const flatListRef = useRef<FlatList<TrendingItem>>(null);
   const autoAdvanceRef = useRef<ReturnType<typeof setInterval> | null>(null);
   
-  const textColor = useThemeColor({}, 'text');
-  const textSecondary = useThemeColor({}, 'textSecondary');
   const tintColor = useThemeColor({}, 'tint');
   const backgroundColor = useThemeColor({}, 'background');
 
@@ -206,6 +204,7 @@ export function HeroCarousel({
         ))}
       </View>
     );
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [items.length, currentIndex, tintColor]);
 
   if (items.length === 0) {

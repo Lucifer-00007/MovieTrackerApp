@@ -422,14 +422,20 @@ Failed to resolve the Android SDK path. Default install location not found: /Use
   - Top Web Series
   - Recommended for You
 
-- [] Hide/disable the `No Thanks` and `Accept` popup that appears for analytics that comes every-time when we first open the app. Also there is no text in this popup card only 2 buttons so fix this
+- [x] Hide/disable the `No Thanks` and `Accept` popup that appears for analytics that comes every-time when we first open the app. Also there is no text in this popup card only 2 buttons so fix this
 
-- [] Enhance the overall app UI in light mode. In some of the pages even when i set the theme to light its showing dark mode. Fix these issues while following best practices.
+- [x] Enhance the overall app UI in light mode. In some of the pages even when i set the theme to light its showing dark mode. Fix these issues while following best practices.
 
-- [] Enhance the UI/UX of the download page.
+- [x] Enhance the UI/UX of the download page.
 
-- []
-- []
+- [x] Change flash screen image.
+
+- [] Fix these issues
+- Fix all linting errors.
+- Move all the hard-coded constants to ./constants folder following DRY principles(use bun run find:long-files). Follow this practice in future developments as well.
+- Check the codebase and find if any file is longer than 500 line(use bun run find:long-files). If so break into modules. Ignore the 
+-
+
 - []
 - []
 - []

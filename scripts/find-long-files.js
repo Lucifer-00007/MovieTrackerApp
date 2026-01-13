@@ -22,7 +22,7 @@ const CODE_EXTENSIONS = [
 // Directories to ignore
 const IGNORE_DIRS = [
   'node_modules', '.git', '.expo', 'dist', 'build',
-  'coverage', '.next', 'android', 'ios', 'assets'
+  'coverage', '.next', 'android', 'ios', 'assets', '__tests__'
 ];
 
 // Files to ignore

@@ -3,13 +3,6 @@
  * Displays user settings and watchlist management
  * 
  * Requirements: 7.4, 7.5, 7.6, 9.2, 11.3, 15.3, 19.3
- * - Display all saved titles in grid layout
- * - Add remove functionality with immediate UI update
- * - Implement sync status indicators
- * - Add theme mode toggle (light/dark/system)
- * - Add language selection
- * - Add notification settings
- * - Add privacy/analytics settings
  */
 
 import { useEffect, useCallback, useState } from 'react';
@@ -20,363 +13,30 @@ import {
   FlatList,
   Pressable,
   RefreshControl,
-  Alert,
-  Dimensions,
   ScrollView,
   Switch,
-  Modal,
 } from 'react-native';
 import { useRouter } from 'expo-router';
 import { Ionicons } from '@expo/vector-icons';
 
 import { useEffectiveColorScheme } from '@/hooks/use-effective-color-scheme';
 import { Colors, Spacing, Typography, BorderRadius } from '@/constants/theme';
+import { PROFILE_GRID, getLanguageName, getThemeLabel } from '@/constants/profile';
 import { useWatchlistStore } from '@/stores/watchlistStore';
 import { usePreferencesStore } from '@/stores/preferencesStore';
-import { MediaCard } from '@/components/media/MediaCard';
 import { EmptyState } from '@/components/ui/EmptyState';
 import { ErrorState } from '@/components/ui/ErrorState';
 import { Skeleton } from '@/components/ui/Skeleton';
-import type { WatchlistItem, WatchlistSyncStatus } from '@/types/watchlist';
+import {
+  SettingsSection,
+  SettingsRow,
+  SettingsSeparator,
+  LanguageModal,
+  ThemeModal,
+  WatchlistCard,
+} from '@/components/profile';
+import type { WatchlistItem } from '@/types/watchlist';
 import type { ThemeMode } from '@/types/user';
-
-const { width: SCREEN_WIDTH } = Dimensions.get('window');
-const NUM_COLUMNS = 3;
-const CARD_SPACING = Spacing.sm;
-const CARD_WIDTH = (SCREEN_WIDTH - Spacing.md * 2 - CARD_SPACING * (NUM_COLUMNS - 1)) / NUM_COLUMNS;
-const CARD_HEIGHT = CARD_WIDTH * 1.5;
-
-/** Available languages */
-const LANGUAGES = [
-  { code: 'en', name: 'English' },
-  { code: 'es', name: 'Español' },
-  { code: 'fr', name: 'Français' },
-  { code: 'de', name: 'Deutsch' },
-  { code: 'ja', name: '日本語' },
-  { code: 'zh', name: '中文' },
-];
-
-/** Theme mode options */
-const THEME_MODES: { value: ThemeMode; label: string; description: string }[] = [
-  { value: 'light', label: 'Light', description: 'Always use light theme' },
-  { value: 'dark', label: 'Dark', description: 'Always use dark theme' },
-  { value: 'system', label: 'System', description: 'Follow device setting' },
-];
-
-/** Settings section component */
-function SettingsSection({ 
-  title, 
-  children, 
-  testID 
-}: { 
-  title: string; 
-  children: React.ReactNode; 
-  testID?: string;
-}) {
-  const colorScheme = useEffectiveColorScheme();
-  const colors = Colors[colorScheme];
-
-  return (
-    <View style={styles.settingsSection} testID={testID}>
-      <Text style={[styles.sectionTitle, { color: colors.text }]}>{title}</Text>
-      <View style={[styles.sectionContent, { backgroundColor: colors.card, borderColor: colors.cardBorder }]}>
-        {children}
-      </View>
-    </View>
-  );
-}
-
-/** Settings row component */
-function SettingsRow({
-  title,
-  subtitle,
-  icon,
-  onPress,
-  rightElement,
-  testID,
-}: {
-  title: string;
-  subtitle?: string;
-  icon: string;
-  onPress?: () => void;
-  rightElement?: React.ReactNode;
-  testID?: string;
-}) {
-  const colorScheme = useEffectiveColorScheme();
-  const colors = Colors[colorScheme];
-
-  return (
-    <Pressable
-      onPress={onPress}
-      style={({ pressed }) => [
-        styles.settingsRow,
-        { opacity: pressed ? 0.7 : 1 },
-      ]}
-      accessibilityRole="button"
-      accessibilityLabel={title}
-      testID={testID}
-    >
-      <View style={styles.settingsRowLeft}>
-        <Ionicons name={icon as any} size={20} color={colors.tint} />
-        <View style={styles.settingsRowText}>
-          <Text style={[styles.settingsRowTitle, { color: colors.text }]}>{title}</Text>
-          {subtitle && (
-            <Text style={[styles.settingsRowSubtitle, { color: colors.textSecondary }]}>
-              {subtitle}
-            </Text>
-          )}
-        </View>
-      </View>
-      {rightElement || (
-        <Ionicons name="chevron-forward" size={16} color={colors.textSecondary} />
-      )}
-    </Pressable>
-  );
-}
-
-/** Language selection modal */
-function LanguageModal({
-  visible,
-  currentLanguage,
-  onSelect,
-  onClose,
-}: {
-  visible: boolean;
-  currentLanguage: string;
-  onSelect: (language: string) => void;
-  onClose: () => void;
-}) {
-  const colorScheme = useEffectiveColorScheme();
-  const colors = Colors[colorScheme];
-
-  return (
-    <Modal
-      visible={visible}
-      animationType="slide"
-      presentationStyle="pageSheet"
-      onRequestClose={onClose}
-    >
-      <View style={[styles.modalContainer, { backgroundColor: colors.background }]}>
-        <View style={styles.modalHeader}>
-          <Text style={[styles.modalTitle, { color: colors.text }]}>Select Language</Text>
-          <Pressable onPress={onClose} style={styles.modalCloseButton}>
-            <Ionicons name="close" size={24} color={colors.text} />
-          </Pressable>
-        </View>
-        
-        <ScrollView style={styles.modalContent}>
-          {LANGUAGES.map((language) => (
-            <Pressable
-              key={language.code}
-              onPress={() => {
-                onSelect(language.code);
-                onClose();
-              }}
-              style={({ pressed }) => [
-                styles.languageOption,
-                { 
-                  backgroundColor: pressed ? colors.backgroundSecondary : 'transparent',
-                  borderBottomColor: colors.cardBorder,
-                },
-              ]}
-            >
-              <Text style={[styles.languageOptionText, { color: colors.text }]}>
-                {language.name}
-              </Text>
-              {currentLanguage === language.code && (
-                <Ionicons name="checkmark" size={20} color={colors.tint} />
-              )}
-            </Pressable>
-          ))}
-        </ScrollView>
-      </View>
-    </Modal>
-  );
-}
-
-/** Theme selection modal */
-function ThemeModal({
-  visible,
-  currentTheme,
-  onSelect,
-  onClose,
-}: {
-  visible: boolean;
-  currentTheme: ThemeMode;
-  onSelect: (theme: ThemeMode) => void;
-  onClose: () => void;
-}) {
-  const colorScheme = useEffectiveColorScheme();
-  const colors = Colors[colorScheme];
-
-  return (
-    <Modal
-      visible={visible}
-      animationType="slide"
-      presentationStyle="pageSheet"
-      onRequestClose={onClose}
-    >
-      <View style={[styles.modalContainer, { backgroundColor: colors.background }]}>
-        <View style={styles.modalHeader}>
-          <Text style={[styles.modalTitle, { color: colors.text }]}>Select Theme</Text>
-          <Pressable onPress={onClose} style={styles.modalCloseButton}>
-            <Ionicons name="close" size={24} color={colors.text} />
-          </Pressable>
-        </View>
-        
-        <ScrollView style={styles.modalContent}>
-          {THEME_MODES.map((theme) => (
-            <Pressable
-              key={theme.value}
-              onPress={() => {
-                onSelect(theme.value);
-                onClose();
-              }}
-              style={({ pressed }) => [
-                styles.themeOption,
-                { 
-                  backgroundColor: pressed ? colors.backgroundSecondary : 'transparent',
-                  borderBottomColor: colors.cardBorder,
-                },
-              ]}
-            >
-              <View style={styles.themeOptionContent}>
-                <Text style={[styles.themeOptionTitle, { color: colors.text }]}>
-                  {theme.label}
-                </Text>
-                <Text style={[styles.themeOptionDescription, { color: colors.textSecondary }]}>
-                  {theme.description}
-                </Text>
-              </View>
-              {currentTheme === theme.value && (
-                <Ionicons name="checkmark" size={20} color={colors.tint} />
-              )}
-            </Pressable>
-          ))}
-        </ScrollView>
-      </View>
-    </Modal>
-  );
-}
-
-/** Sync status indicator component */
-function SyncStatusIndicator({ status }: { status: WatchlistSyncStatus }) {
-  const colorScheme = useEffectiveColorScheme();
-  const colors = Colors[colorScheme];
-
-  const getStatusConfig = () => {
-    switch (status) {
-      case 'synced':
-        return { icon: 'checkmark-circle' as const, color: colors.success, label: 'Synced' };
-      case 'pending':
-        return { icon: 'cloud-upload' as const, color: colors.warning, label: 'Syncing' };
-      case 'error':
-        return { icon: 'alert-circle' as const, color: colors.error, label: 'Sync error' };
-    }
-  };
-
-  const config = getStatusConfig();
-
-  return (
-    <View
-      style={styles.syncIndicator}
-      accessibilityLabel={config.label}
-      testID="sync-status-indicator"
-    >
-      <Ionicons name={config.icon} size={16} color={config.color} />
-    </View>
-  );
-}
-
-/** Watchlist item card with remove functionality */
-function WatchlistItemCard({
-  item,
-  onPress,
-  onRemove,
-}: {
-  item: WatchlistItem;
-  onPress: () => void;
-  onRemove: () => void;
-}) {
-  const colorScheme = useEffectiveColorScheme();
-  const colors = Colors[colorScheme];
-
-  const handleLongPress = () => {
-    Alert.alert(
-      'Remove from Watchlist',
-      `Remove "${item.title}" from your watchlist?`,
-      [
-        { text: 'Cancel', style: 'cancel' },
-        { text: 'Remove', style: 'destructive', onPress: onRemove },
-      ]
-    );
-  };
-
-  return (
-    <View style={styles.cardWrapper} testID={`watchlist-item-${item.id}`}>
-      <Pressable
-        onPress={onPress}
-        onLongPress={handleLongPress}
-        accessibilityRole="button"
-        accessibilityLabel={`${item.title}. Long press to remove from watchlist`}
-        accessibilityHint="Double tap to view details, long press to remove"
-        style={({ pressed }) => [
-          styles.cardContainer,
-          { opacity: pressed ? 0.8 : 1 },
-        ]}
-      >
-        <View style={[styles.cardInner, { backgroundColor: colors.card, borderColor: colors.cardBorder }]}>
-          {item.posterPath ? (
-            <MediaCard
-              id={item.id}
-              title={item.title}
-              posterPath={item.posterPath}
-              rating={null}
-              ageRating={null}
-              variant="small"
-              onPress={onPress}
-              onLongPress={handleLongPress}
-            />
-          ) : (
-            <View style={[styles.placeholder, { backgroundColor: colors.backgroundSecondary }]}>
-              <Text
-                style={[styles.placeholderText, { color: colors.textSecondary }]}
-                numberOfLines={3}
-              >
-                {item.title}
-              </Text>
-            </View>
-          )}
-        </View>
-      </Pressable>
-      
-      {/* Sync status indicator */}
-      <SyncStatusIndicator status={item.syncStatus} />
-      
-      {/* Remove button */}
-      <Pressable
-        onPress={onRemove}
-        accessibilityRole="button"
-        accessibilityLabel={`Remove ${item.title} from watchlist`}
-        style={({ pressed }) => [
-          styles.removeButton,
-          { backgroundColor: colors.error, opacity: pressed ? 0.8 : 1 },
-        ]}
-        testID={`remove-button-${item.id}`}
-      >
-        <Ionicons name="close" size={14} color="#FFFFFF" />
-      </Pressable>
-      
-      {/* Title below card */}
-      <Text
-        style={[styles.cardTitle, { color: colors.text }]}
-        numberOfLines={2}
-      >
-        {item.title}
-      </Text>
-    </View>
-  );
-}
 
 export default function ProfileScreen() {
   const colorScheme = useEffectiveColorScheme();
@@ -467,18 +127,8 @@ export default function ProfileScreen() {
     await setNotificationType(type, enabled);
   }, [setNotificationType]);
 
-  const getCurrentLanguageName = () => {
-    const language = LANGUAGES.find(lang => lang.code === preferences.language);
-    return language?.name || 'English';
-  };
-
-  const getCurrentThemeName = () => {
-    const theme = THEME_MODES.find(mode => mode.value === preferences.themeMode);
-    return theme?.label || 'System';
-  };
-
   const renderItem = useCallback(({ item }: { item: WatchlistItem }) => (
-    <WatchlistItemCard
+    <WatchlistCard
       item={item}
       onPress={() => handleItemPress(item)}
       onRemove={() => handleRemoveItem(item)}
@@ -545,15 +195,15 @@ export default function ProfileScreen() {
       <SettingsSection title="Appearance" testID="appearance-section">
         <SettingsRow
           title="Theme"
-          subtitle={getCurrentThemeName()}
+          subtitle={getThemeLabel(preferences.themeMode)}
           icon="color-palette"
           onPress={() => setShowThemeModal(true)}
           testID="theme-setting"
         />
-        <View style={[styles.separator, { backgroundColor: colors.cardBorder }]} />
+        <SettingsSeparator />
         <SettingsRow
           title="Language"
-          subtitle={getCurrentLanguageName()}
+          subtitle={getLanguageName(preferences.language)}
           icon="language"
           onPress={() => setShowLanguageModal(true)}
           testID="language-setting"
@@ -579,7 +229,7 @@ export default function ProfileScreen() {
         />
         {preferences.notificationsEnabled && (
           <>
-            <View style={[styles.separator, { backgroundColor: colors.cardBorder }]} />
+            <SettingsSeparator />
             <SettingsRow
               title="Download Complete"
               subtitle="Notify when downloads finish"
@@ -595,7 +245,7 @@ export default function ProfileScreen() {
               }
               testID="downloads-notifications-setting"
             />
-            <View style={[styles.separator, { backgroundColor: colors.cardBorder }]} />
+            <SettingsSeparator />
             <SettingsRow
               title="New Releases"
               subtitle="Notify about new content"
@@ -679,7 +329,6 @@ export default function ProfileScreen() {
       {activeTab === 'settings' ? (
         renderSettings()
       ) : (
-        // Watchlist content
         <>
           {items.length === 0 ? (
             <EmptyState
@@ -712,7 +361,7 @@ export default function ProfileScreen() {
                 data={items}
                 renderItem={renderItem}
                 keyExtractor={keyExtractor}
-                numColumns={NUM_COLUMNS}
+                numColumns={PROFILE_GRID.NUM_COLUMNS}
                 contentContainerStyle={styles.listContent}
                 columnWrapperStyle={styles.columnWrapper}
                 showsVerticalScrollIndicator={false}
@@ -802,60 +451,16 @@ const styles = StyleSheet.create({
     paddingBottom: Spacing.xl,
   },
   columnWrapper: {
-    gap: CARD_SPACING,
+    gap: PROFILE_GRID.CARD_SPACING,
     marginBottom: Spacing.md,
   },
   skeletonContainer: {
     flex: 1,
     padding: Spacing.md,
   },
-  
-  // Settings styles
   settingsContainer: {
     flex: 1,
     paddingHorizontal: Spacing.md,
-  },
-  settingsSection: {
-    marginBottom: Spacing.lg,
-  },
-  sectionTitle: {
-    fontSize: Typography.sizes.lg,
-    fontWeight: Typography.weights.semibold,
-    marginBottom: Spacing.sm,
-  },
-  sectionContent: {
-    borderRadius: BorderRadius.md,
-    borderWidth: 1,
-    overflow: 'hidden',
-  },
-  settingsRow: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'space-between',
-    paddingVertical: Spacing.md,
-    paddingHorizontal: Spacing.md,
-    minHeight: 60,
-  },
-  settingsRowLeft: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    flex: 1,
-  },
-  settingsRowText: {
-    marginLeft: Spacing.md,
-    flex: 1,
-  },
-  settingsRowTitle: {
-    fontSize: Typography.sizes.md,
-    fontWeight: Typography.weights.medium,
-  },
-  settingsRowSubtitle: {
-    fontSize: Typography.sizes.sm,
-    marginTop: Spacing.xs,
-  },
-  separator: {
-    height: 1,
-    marginLeft: Spacing.md + 20 + Spacing.md, // Icon width + margin
   },
   consentInfo: {
     paddingHorizontal: Spacing.md,
@@ -864,119 +469,6 @@ const styles = StyleSheet.create({
   },
   consentText: {
     fontSize: Typography.sizes.xs,
-    textAlign: 'center',
-  },
-
-  // Modal styles
-  modalContainer: {
-    flex: 1,
-  },
-  modalHeader: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'space-between',
-    paddingHorizontal: Spacing.md,
-    paddingTop: Spacing.xl,
-    paddingBottom: Spacing.md,
-  },
-  modalTitle: {
-    fontSize: Typography.sizes.xl,
-    fontWeight: Typography.weights.bold,
-  },
-  modalCloseButton: {
-    padding: Spacing.sm,
-    minWidth: 44,
-    minHeight: 44,
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
-  modalContent: {
-    flex: 1,
-  },
-  languageOption: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'space-between',
-    paddingVertical: Spacing.md,
-    paddingHorizontal: Spacing.md,
-    borderBottomWidth: 1,
-    minHeight: 60,
-  },
-  languageOptionText: {
-    fontSize: Typography.sizes.md,
-  },
-  themeOption: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'space-between',
-    paddingVertical: Spacing.md,
-    paddingHorizontal: Spacing.md,
-    borderBottomWidth: 1,
-    minHeight: 80,
-  },
-  themeOptionContent: {
-    flex: 1,
-  },
-  themeOptionTitle: {
-    fontSize: Typography.sizes.md,
-    fontWeight: Typography.weights.medium,
-  },
-  themeOptionDescription: {
-    fontSize: Typography.sizes.sm,
-    marginTop: Spacing.xs,
-  },
-
-  // Watchlist card styles
-  cardWrapper: {
-    width: CARD_WIDTH,
-    position: 'relative',
-  },
-  cardContainer: {
-    width: '100%',
-  },
-  cardInner: {
-    width: '100%',
-    height: CARD_HEIGHT,
-    borderRadius: BorderRadius.md,
-    borderWidth: 1,
-    overflow: 'hidden',
-  },
-  placeholder: {
-    flex: 1,
-    alignItems: 'center',
-    justifyContent: 'center',
-    padding: Spacing.sm,
-  },
-  placeholderText: {
-    fontSize: Typography.sizes.xs,
-    textAlign: 'center',
-  },
-  syncIndicator: {
-    position: 'absolute',
-    top: Spacing.xs,
-    left: Spacing.xs,
-    width: 20,
-    height: 20,
-    borderRadius: 10,
-    backgroundColor: 'rgba(0, 0, 0, 0.5)',
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
-  removeButton: {
-    position: 'absolute',
-    top: Spacing.xs,
-    right: Spacing.xs,
-    width: 24,
-    height: 24,
-    borderRadius: 12,
-    alignItems: 'center',
-    justifyContent: 'center',
-    minWidth: 44,
-    minHeight: 44,
-  },
-  cardTitle: {
-    fontSize: Typography.sizes.xs,
-    marginTop: Spacing.xs,
     textAlign: 'center',
   },
 });

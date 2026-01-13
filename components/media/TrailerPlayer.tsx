@@ -78,18 +78,16 @@ function MockTrailerPlayer({
   onVideoEnd,
   testID,
 }: Pick<TrailerPlayerProps, 'onClose' | 'onVideoEnd' | 'testID'>) {
-  const textColor = useThemeColor({}, 'text');
-  const textSecondary = useThemeColor({}, 'textSecondary');
   const tintColor = useThemeColor({}, 'tint');
   const [isPlaying, setIsPlaying] = useState(false);
-  const [progress, setProgress] = useState(0);
+  const [mockProgress, setMockProgress] = useState(0);
 
   // Simulate playback progress
   useEffect(() => {
     if (!isPlaying) return;
 
     const interval = setInterval(() => {
-      setProgress(prev => {
+      setMockProgress(prev => {
         if (prev >= 100) {
           setIsPlaying(false);
           onVideoEnd?.();
@@ -159,10 +157,10 @@ function MockTrailerPlayer({
 
         {/* Progress Bar */}
         <View style={styles.bottomBar}>
-          <Text style={styles.timeText}>{formatTime((progress / 100) * 120)}</Text>
+          <Text style={styles.timeText}>{formatTime((mockProgress / 100) * 120)}</Text>
           <View style={styles.seekBarContainer}>
             <View style={styles.seekBarBackground}>
-              <View style={[styles.seekBarProgress, { width: `${progress}%` }]} />
+              <View style={[styles.seekBarProgress, { width: `${mockProgress}%` }]} />
             </View>
           </View>
           <Text style={styles.timeText}>{formatTime(120)}</Text>
@@ -237,34 +235,16 @@ function RealTrailerPlayer({
     loadVideoComponents();
   }, [onError]);
 
-  // Auto-hide controls after 3 seconds
-  const resetControlsTimeout = useCallback(() => {
-    if (controlsTimeoutRef.current) {
-      clearTimeout(controlsTimeoutRef.current);
-    }
-    controlsTimeoutRef.current = setTimeout(() => {
-      if (state.isPlaying) {
-        setState(prev => ({ ...prev, showControls: false }));
-      }
-    }, 3000);
-  }, [state.isPlaying]);
-
-  // Show controls and reset timeout
-  const showControls = useCallback(() => {
-    setState(prev => ({ ...prev, showControls: true }));
-    resetControlsTimeout();
-  }, [resetControlsTimeout]);
-
   // Cleanup timeout on unmount
   useEffect(() => {
+    const timeoutRef = controlsTimeoutRef.current;
     return () => {
-      if (controlsTimeoutRef.current) {
-        clearTimeout(controlsTimeoutRef.current);
+      if (timeoutRef) {
+        clearTimeout(timeoutRef);
       }
     };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
-
-  const progress = calculateProgress(state.position, state.duration);
 
   // Loading video components
   if (!VideoComponents) {
@@ -428,9 +408,10 @@ function VideoPlayerContent({
         setState(prev => ({ ...prev, showControls: false }));
       }
     }, 3000);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [state.isPlaying]);
 
-  const showControls = useCallback(() => {
+  const handleShowControls = useCallback(() => {
     setState(prev => ({ ...prev, showControls: true }));
     resetControlsTimeout();
   }, [resetControlsTimeout]);
@@ -441,6 +422,7 @@ function VideoPlayerContent({
         clearTimeout(controlsTimeoutRef.current);
       }
     };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   const togglePlayPause = useCallback(() => {
@@ -454,14 +436,14 @@ function VideoPlayerContent({
         logTrailerTap(mediaId, mediaType, sourceScreen ?? 'trailer_player');
       }
     }
-    showControls();
-  }, [player, state.isPlaying, showControls, mediaId, mediaType, sourceScreen]);
+    handleShowControls();
+  }, [player, state.isPlaying, handleShowControls, mediaId, mediaType, sourceScreen]);
 
   const seekTo = useCallback((position: number) => {
     if (!player) return;
     player.currentTime = position;
-    showControls();
-  }, [player, showControls]);
+    handleShowControls();
+  }, [player, handleShowControls]);
 
   const handleSeekBarPress = useCallback((event: { nativeEvent: { locationX: number } }) => {
     const seekBarWidth = SCREEN_WIDTH - Spacing.lg * 2;
@@ -500,7 +482,7 @@ function VideoPlayerContent({
   return (
     <Pressable
       style={[styles.container, { backgroundColor: '#000000' }]}
-      onPress={showControls}
+      onPress={handleShowControls}
       testID={testID}
     >
       <VideoView

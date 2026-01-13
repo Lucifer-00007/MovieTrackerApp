@@ -4,3 +4,4 @@
  */
 
 export * from './search-utils';
+export * from './SearchComponents';

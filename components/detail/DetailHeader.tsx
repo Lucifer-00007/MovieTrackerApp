@@ -24,7 +24,7 @@ import Animated, {
 } from 'react-native-reanimated';
 
 import { useThemeColor } from '@/hooks/use-theme-color';
-import { Spacing, BorderRadius, Typography, ComponentTokens } from '@/constants/theme';
+import { Spacing, BorderRadius, Typography } from '@/constants/theme';
 import type { MediaDetails } from '@/types/media';
 import {
   getBackdropUrl,
@@ -62,8 +62,6 @@ export function DetailHeader({
   onPlayPress,
   testID,
 }: DetailHeaderProps) {
-  const textColor = useThemeColor({}, 'text');
-  const textSecondary = useThemeColor({}, 'textSecondary');
   const tintColor = useThemeColor({}, 'tint');
   const backgroundColor = useThemeColor({}, 'background');
   const ratingBadgeColor = useThemeColor({}, 'ratingBadge');
