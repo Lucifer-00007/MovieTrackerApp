@@ -12,6 +12,7 @@ import { Image } from 'expo-image';
 import { useThemeColor } from '@/hooks/use-theme-color';
 import { Spacing, BorderRadius, Typography } from '@/constants/theme';
 import { SOLID_COLORS, OVERLAY_COLORS, ComponentTokens } from '@/constants/colors';
+import { DIMENSIONS } from '@/constants/layout';
 import { IconSymbol } from '@/components/ui/icon-symbol';
 import { formatTime } from '../trailer-utils';
 
@@ -206,7 +207,7 @@ const styles = StyleSheet.create({
   },
   seekBarContainer: {
     flex: 1,
-    height: 40,
+    height: DIMENSIONS.SEEK_BAR_TOUCH_HEIGHT,
     justifyContent: 'center',
   },
   seekBarBackground: {

@@ -278,9 +278,9 @@ const styles = StyleSheet.create({
     gap: Spacing.xs,
   },
   playButton: {
-    width: 44,
-    height: 44,
-    borderRadius: 22,
+    width: DIMENSIONS.CIRCLE_LG,
+    height: DIMENSIONS.CIRCLE_LG,
+    borderRadius: DIMENSIONS.CIRCLE_LG / 2,
     justifyContent: 'center',
     alignItems: 'center',
   },

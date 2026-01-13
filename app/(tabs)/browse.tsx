@@ -21,6 +21,7 @@ import { LinearGradient } from 'expo-linear-gradient';
 import { useEffectiveColorScheme } from '@/hooks/use-effective-color-scheme';
 import { Colors, Spacing, Typography, BorderRadius } from '@/constants/theme';
 import { COUNTRY_GRADIENTS, OVERLAY_COLORS } from '@/constants/colors';
+import { DIMENSIONS } from '@/constants/layout';
 import {
   SUPPORTED_COUNTRIES,
   getCountryIcon,
@@ -200,8 +201,8 @@ const styles = StyleSheet.create({
     marginBottom: Spacing.md,
   },
   headerIcon: {
-    width: 48,
-    height: 48,
+    width: DIMENSIONS.BROWSE_HEADER_ICON,
+    height: DIMENSIONS.BROWSE_HEADER_ICON,
     borderRadius: BorderRadius.md,
     alignItems: 'center',
     justifyContent: 'center',
@@ -241,7 +242,7 @@ const styles = StyleSheet.create({
   },
   statDivider: {
     width: 1,
-    height: 30,
+    height: DIMENSIONS.BROWSE_STAT_DIVIDER,
   },
   scrollView: {
     flex: 1,
@@ -271,11 +272,11 @@ const styles = StyleSheet.create({
     marginBottom: Spacing.sm,
   },
   countryFlag: {
-    fontSize: 40,
+    fontSize: DIMENSIONS.BROWSE_FLAG_SIZE,
   },
   iconBadge: {
-    width: 28,
-    height: 28,
+    width: DIMENSIONS.ICON_LG,
+    height: DIMENSIONS.ICON_LG,
     borderRadius: BorderRadius.full,
     alignItems: 'center',
     justifyContent: 'center',

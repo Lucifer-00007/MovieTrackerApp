@@ -11,6 +11,7 @@ import { StyleSheet, View, Text, Pressable, ActivityIndicator, Dimensions } from
 import { useThemeColor } from '@/hooks/use-theme-color';
 import { Spacing, Typography } from '@/constants/theme';
 import { SOLID_COLORS, OVERLAY_COLORS, ComponentTokens } from '@/constants/colors';
+import { DIMENSIONS } from '@/constants/layout';
 import { IconSymbol } from '@/components/ui/icon-symbol';
 import { logTrailerTap } from '@/services/analytics';
 import {
@@ -337,7 +338,7 @@ const styles = StyleSheet.create({
   },
   seekBarContainer: {
     flex: 1,
-    height: 40,
+    height: DIMENSIONS.SEEK_BAR_TOUCH_HEIGHT,
     justifyContent: 'center',
   },
   seekBarBackground: {

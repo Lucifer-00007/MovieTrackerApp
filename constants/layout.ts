@@ -58,6 +58,23 @@ export const DIMENSIONS = {
   /** GDPR Modal */
   GDPR_MODAL_MAX_WIDTH: 400,
   GDPR_ICON_CONTAINER_SIZE: 64,
+  
+  /** Browse screen */
+  BROWSE_HEADER_ICON: 48,
+  BROWSE_STAT_DIVIDER: 30,
+  BROWSE_FLAG_SIZE: 40,
+  
+  /** Rank badge */
+  RANK_BADGE_SIZE: 32,
+  
+  /** Seek bar */
+  SEEK_BAR_TOUCH_HEIGHT: 40,
+  
+  /** Demo/example image */
+  DEMO_IMAGE_SIZE: 100,
+  
+  /** Modal spacing */
+  MODAL_SPACING: 20,
 } as const;
 
 /** Z-index values */
