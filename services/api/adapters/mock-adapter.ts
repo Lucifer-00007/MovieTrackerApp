@@ -12,6 +12,7 @@ import type {
   MediaItem,
 } from '@/types/media';
 import type { SearchResults } from '@/types/user';
+import { ANIMATION_DURATION } from '@/constants/animations';
 import {
   MOCK_TRENDING_ALL,
   MOCK_TRENDING_MOVIES,
@@ -24,7 +25,7 @@ import {
 } from '@/constants/mock-data';
 
 /** Simulated network delay for realistic behavior */
-const MOCK_DELAY_MS = 300;
+const MOCK_DELAY_MS = ANIMATION_DURATION.FAST;
 
 function delay(ms: number): Promise<void> {
   return new Promise(resolve => setTimeout(resolve, ms));

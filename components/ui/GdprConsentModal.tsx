@@ -23,6 +23,7 @@ import { useEffectiveColorScheme } from '@/hooks/use-effective-color-scheme';
 import { useLocalization } from '@/hooks/use-localization';
 import { Colors, Spacing, Typography, BorderRadius } from '@/constants/theme';
 import { SOLID_COLORS } from '@/constants/colors';
+import { DIMENSIONS } from '@/constants/layout';
 
 interface GdprConsentModalProps {
   visible: boolean;
@@ -245,9 +246,9 @@ const styles = StyleSheet.create({
     paddingBottom: Spacing.lg,
   },
   iconContainer: {
-    width: 64,
-    height: 64,
-    borderRadius: 32,
+    width: DIMENSIONS.GDPR_ICON_CONTAINER_SIZE,
+    height: DIMENSIONS.GDPR_ICON_CONTAINER_SIZE,
+    borderRadius: DIMENSIONS.GDPR_ICON_CONTAINER_SIZE / 2,
     alignItems: 'center',
     justifyContent: 'center',
     marginBottom: Spacing.md,

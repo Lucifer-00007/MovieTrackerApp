@@ -11,6 +11,7 @@ import { Image } from 'expo-image';
 import { router } from 'expo-router';
 import { useThemeColor } from '@/hooks/use-theme-color';
 import { Colors, Spacing, Typography, BorderRadius } from '@/constants/theme';
+import { DIMENSIONS } from '@/constants/layout';
 import { EmptyState } from '@/components/ui/EmptyState';
 import type { DownloadItem } from '@/types/downloads';
 
@@ -215,8 +216,8 @@ const styles = StyleSheet.create({
     gap: Spacing.sm,
   },
   poster: {
-    width: 60,
-    height: 90,
+    width: DIMENSIONS.POSTER_SMALL_WIDTH,
+    height: DIMENSIONS.POSTER_SMALL_HEIGHT,
     borderRadius: BorderRadius.sm,
   },
   contentInfo: {

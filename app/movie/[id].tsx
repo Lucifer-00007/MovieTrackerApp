@@ -24,6 +24,7 @@ import Animated, {
 import { useEffectiveColorScheme } from '@/hooks/use-effective-color-scheme';
 import { Colors, Spacing, Typography, BorderRadius } from '@/constants/theme';
 import { SOLID_COLORS, OVERLAY_COLORS, ComponentTokens } from '@/constants/colors';
+import { COMPONENT_TEST_IDS } from '@/constants/test-ids';
 import { IconSymbol } from '@/components/ui/icon-symbol';
 import { ErrorState } from '@/components/ui/ErrorState';
 import {
@@ -274,7 +275,7 @@ export default function MovieDetailScreen() {
         <RecommendationsRow
           recommendations={recommendations}
           onItemPress={handleRecommendationPress}
-          testID="movie-recommendations"
+          testID={COMPONENT_TEST_IDS.MOVIE_RECOMMENDATIONS}
         />
 
         {/* Bottom padding */}

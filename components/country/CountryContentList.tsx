@@ -25,6 +25,8 @@ import { ErrorState } from '@/components/ui/ErrorState';
 import { EmptyState } from '@/components/ui/EmptyState';
 import { Colors, Spacing, Typography, BorderRadius } from '@/constants/theme';
 import { SOLID_COLORS } from '@/constants/colors';
+import { COMPONENT_TEST_IDS } from '@/constants/test-ids';
+import { DIMENSIONS } from '@/constants/layout';
 import { getImageUrl } from '@/services/api';
 import type { TrendingItem } from '@/types/media';
 
@@ -245,7 +247,7 @@ export function CountryContentList({
       onEndReached={handleEndReached}
       onEndReachedThreshold={0.5}
       ListFooterComponent={renderFooter}
-      testID="country-hub-content-list"
+      testID={COMPONENT_TEST_IDS.COUNTRY_HUB_CONTENT_LIST}
       removeClippedSubviews={true}
       maxToRenderPerBatch={10}
       windowSize={10}
@@ -282,8 +284,8 @@ const styles = StyleSheet.create({
     fontWeight: Typography.weights.bold,
   },
   poster: {
-    width: 80,
-    height: 120,
+    width: DIMENSIONS.POSTER_CARD_WIDTH,
+    height: DIMENSIONS.POSTER_CARD_HEIGHT,
     borderRadius: BorderRadius.sm,
     marginRight: Spacing.sm,
   },

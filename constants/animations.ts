@@ -36,6 +36,16 @@ export const ANIMATION_DURATION = {
   /** Retry delays */
   API_RETRY_DELAY: 1000,
   OMDB_RETRY_DELAY: 2000,
+  
+  /** Hello wave animation */
+  WAVE_DURATION: 300,
+} as const;
+
+/** Download service configuration */
+export const DOWNLOAD_CONFIG = {
+  MAX_CONCURRENT: 3,
+  RETRY_ATTEMPTS: 3,
+  RETRY_DELAY_MS: 1000,
 } as const;
 
 /** Easing functions */

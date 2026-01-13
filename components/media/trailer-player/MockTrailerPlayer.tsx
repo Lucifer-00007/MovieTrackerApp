@@ -173,9 +173,9 @@ const styles = StyleSheet.create({
     gap: Spacing.md,
   },
   playPauseButton: {
-    width: 80,
-    height: 80,
-    borderRadius: 40,
+    width: ComponentTokens.playButtonLarge.size,
+    height: ComponentTokens.playButtonLarge.size,
+    borderRadius: ComponentTokens.playButtonLarge.size / 2,
     alignItems: 'center',
     justifyContent: 'center',
     shadowColor: SOLID_COLORS.BLACK,

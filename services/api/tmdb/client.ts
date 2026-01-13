@@ -6,6 +6,7 @@
  */
 
 import { API_BASE_URLS } from '@/constants/api';
+import { ANIMATION_DURATION } from '@/constants/animations';
 
 // TMDB API Configuration
 const TMDB_BASE_URL = API_BASE_URLS.TMDB;
@@ -25,8 +26,8 @@ export interface RetryConfig {
 
 export const DEFAULT_RETRY_CONFIG: RetryConfig = {
   maxAttempts: 3,
-  baseDelayMs: 1000,
-  maxDelayMs: 10000,
+  baseDelayMs: ANIMATION_DURATION.SLOW,
+  maxDelayMs: ANIMATION_DURATION.API_TIMEOUT,
 };
 
 /** API Error with status code */

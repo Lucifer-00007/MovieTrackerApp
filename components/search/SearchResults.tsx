@@ -13,8 +13,9 @@ import { useThemeColor } from '@/hooks/use-theme-color';
 import { useEffectiveColorScheme } from '@/hooks/use-effective-color-scheme';
 import { Colors, Spacing, Typography, BorderRadius } from '@/constants/theme';
 import { SOLID_COLORS } from '@/constants/colors';
+import { DIMENSIONS } from '@/constants/layout';
 import { EmptyState } from '@/components/ui/EmptyState';
-import { Skeleton } from '@/components/ui/Skeleton';
+import { SkeletonBox } from '@/components/ui/Skeleton';
 import { getImageUrl } from '@/services/api';
 import type { SearchResults, SearchFilters } from '@/types/user';
 import type { MediaItem } from '@/types/media';
@@ -156,11 +157,11 @@ function LoadingSkeleton() {
     <View style={styles.loadingContainer}>
       {Array.from({ length: 6 }).map((_, index) => (
         <View key={index} style={styles.skeletonCard}>
-          <Skeleton width={80} height={120} style={styles.skeletonPoster} />
+          <SkeletonBox width={DIMENSIONS.POSTER_CARD_WIDTH} height={DIMENSIONS.POSTER_CARD_HEIGHT} style={styles.skeletonPoster} />
           <View style={styles.skeletonContent}>
-            <Skeleton width="80%" height={16} style={{ marginBottom: 8 }} />
-            <Skeleton width="60%" height={14} style={{ marginBottom: 4 }} />
-            <Skeleton width="40%" height={14} />
+            <SkeletonBox width="80%" height={16} style={{ marginBottom: 8 }} />
+            <SkeletonBox width="60%" height={14} style={{ marginBottom: 4 }} />
+            <SkeletonBox width="40%" height={14} />
           </View>
         </View>
       ))}
@@ -207,7 +208,7 @@ export function SearchResultsComponent({
         <EmptyState
           title="Start Searching"
           message="Enter a movie or TV show name to find content"
-          iconName="search"
+          icon="search"
           suggestions={[
             'Try "Avengers" for action movies',
             'Search "Breaking Bad" for TV series',
@@ -224,7 +225,7 @@ export function SearchResultsComponent({
         <EmptyState
           title="No Results Found"
           message={`No content found for "${query}"`}
-          iconName="search"
+          icon="search"
           suggestions={[
             'Check your spelling',
             'Try different keywords',
@@ -278,10 +279,13 @@ export function applySearchFilters(results: SearchResults, filters: SearchFilter
         return false;
       }
 
-      // Year filter
-      if (filters.year && item.releaseDate) {
+      // Year range filter
+      if (item.releaseDate) {
         const itemYear = new Date(item.releaseDate).getFullYear();
-        if (itemYear !== filters.year) {
+        if (filters.yearFrom && itemYear < filters.yearFrom) {
+          return false;
+        }
+        if (filters.yearTo && itemYear > filters.yearTo) {
           return false;
         }
       }
@@ -350,13 +354,13 @@ const styles = StyleSheet.create({
     flexShrink: 0,
   },
   poster: {
-    width: 80,
-    height: 120,
+    width: DIMENSIONS.POSTER_CARD_WIDTH,
+    height: DIMENSIONS.POSTER_CARD_HEIGHT,
     borderRadius: BorderRadius.sm,
   },
   posterPlaceholder: {
-    width: 80,
-    height: 120,
+    width: DIMENSIONS.POSTER_CARD_WIDTH,
+    height: DIMENSIONS.POSTER_CARD_HEIGHT,
     borderRadius: BorderRadius.sm,
     alignItems: 'center',
     justifyContent: 'center',

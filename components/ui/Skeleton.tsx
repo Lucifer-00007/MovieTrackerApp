@@ -59,8 +59,8 @@ function ShimmerOverlay() {
   );
 }
 
-/** Base skeleton box with shimmer */
-function SkeletonBox({
+/** Base skeleton box with shimmer - exported for custom skeleton layouts */
+export function SkeletonBox({
   width,
   height,
   borderRadius = BorderRadius.md,

@@ -8,13 +8,14 @@
 import * as FileSystem from 'expo-file-system';
 import * as Notifications from 'expo-notifications';
 import { useDownloadsStore } from '@/stores/downloadsStore';
+import { DOWNLOAD_CONFIG } from '@/constants/animations';
 import type { DownloadItem, DownloadQueueItem } from '@/types/downloads';
 
 // Download configuration
 const DOWNLOAD_DIRECTORY = `${FileSystem.documentDirectory}downloads/`;
-const MAX_CONCURRENT_DOWNLOADS = 3;
-const RETRY_ATTEMPTS = 3;
-const RETRY_DELAY = 1000; // 1 second
+const MAX_CONCURRENT_DOWNLOADS = DOWNLOAD_CONFIG.MAX_CONCURRENT;
+const RETRY_ATTEMPTS = DOWNLOAD_CONFIG.RETRY_ATTEMPTS;
+const RETRY_DELAY = DOWNLOAD_CONFIG.RETRY_DELAY_MS;
 
 // Active download tracking
 const activeDownloads = new Map<string, FileSystem.DownloadResumable>();

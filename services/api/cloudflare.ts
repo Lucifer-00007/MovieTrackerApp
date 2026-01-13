@@ -26,6 +26,7 @@ import type {
 } from './cloudflare-types';
 
 import { API_BASE_URLS } from '@/constants/api';
+import { ANIMATION_DURATION } from '@/constants/animations';
 
 // ============================================================================
 // Configuration
@@ -42,8 +43,8 @@ export interface RetryConfig {
 
 const DEFAULT_RETRY_CONFIG: RetryConfig = {
   maxAttempts: 3,
-  baseDelayMs: 1000,
-  maxDelayMs: 10000,
+  baseDelayMs: ANIMATION_DURATION.SLOW,
+  maxDelayMs: ANIMATION_DURATION.API_TIMEOUT,
 };
 
 // ============================================================================

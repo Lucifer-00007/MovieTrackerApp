@@ -16,6 +16,7 @@ import { ContentRow } from '@/components/media/ContentRow';
 import { Skeleton } from '@/components/ui/Skeleton';
 import { ErrorState } from '@/components/ui/ErrorState';
 import { Spacing } from '@/constants/theme';
+import { COMPONENT_TEST_IDS } from '@/constants/test-ids';
 import { getTrending, getRecommendations } from '@/services/api';
 import {
   getPopularMovies,
@@ -328,7 +329,7 @@ export default function HomeScreen() {
             title="Recently Viewed"
             items={recentlyViewed}
             onItemPress={handleItemPress}
-            testID="home-recently-viewed-row"
+            testID={COMPONENT_TEST_IDS.RECENTLY_VIEWED_ROW}
           />
         )}
 
@@ -338,7 +339,7 @@ export default function HomeScreen() {
             title="Recommended for You"
             items={recommendations}
             onItemPress={handleItemPress}
-            testID="home-recommendations-row"
+            testID={COMPONENT_TEST_IDS.RECOMMENDATIONS_ROW}
           />
         )}
 
@@ -348,7 +349,7 @@ export default function HomeScreen() {
             title="Trending This Week"
             items={trendingMovies}
             onItemPress={handleItemPress}
-            testID="home-trending-movies-row"
+            testID={COMPONENT_TEST_IDS.TRENDING_MOVIES_ROW}
           />
         )}
 
@@ -368,7 +369,7 @@ export default function HomeScreen() {
             title="Popular Movies"
             items={popularMovies}
             onItemPress={handleItemPress}
-            testID="home-popular-movies-row"
+            testID={COMPONENT_TEST_IDS.POPULAR_MOVIES_ROW}
           />
         )}
 
@@ -378,7 +379,7 @@ export default function HomeScreen() {
             title="Top Web Series"
             items={topWebSeries}
             onItemPress={handleItemPress}
-            testID="home-top-web-series-row"
+            testID={COMPONENT_TEST_IDS.TOP_WEB_SERIES_ROW}
           />
         )}
 
@@ -388,7 +389,7 @@ export default function HomeScreen() {
             title="Trending TV Shows"
             items={trendingTv}
             onItemPress={handleItemPress}
-            testID="home-trending-tv-row"
+            testID={COMPONENT_TEST_IDS.TRENDING_TV_ROW}
           />
         )}
 

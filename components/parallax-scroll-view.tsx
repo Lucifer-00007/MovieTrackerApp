@@ -10,8 +10,9 @@ import Animated, {
 import { ThemedView } from '@/components/themed-view';
 import { useColorScheme } from '@/hooks/use-color-scheme';
 import { useThemeColor } from '@/hooks/use-theme-color';
+import { DIMENSIONS } from '@/constants/layout';
 
-const HEADER_HEIGHT = 250;
+const HEADER_HEIGHT = DIMENSIONS.PARALLAX_HEADER_HEIGHT;
 
 type Props = PropsWithChildren<{
   headerImage: ReactElement;
@@ -72,8 +73,8 @@ const styles = StyleSheet.create({
   },
   content: {
     flex: 1,
-    padding: 32,
-    gap: 16,
+    padding: DIMENSIONS.PARALLAX_CONTENT_PADDING,
+    gap: DIMENSIONS.PARALLAX_CONTENT_GAP,
     overflow: 'hidden',
   },
 });

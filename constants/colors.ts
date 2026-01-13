@@ -297,6 +297,10 @@ export const ComponentTokens = {
     size: 70,
     iconSize: 28,
   },
+  playButtonLarge: {
+    size: 80,
+    iconSize: 48,
+  },
   progressBar: {
     height: 4,
     thumbSize: 16,

@@ -33,6 +33,8 @@ export const DIMENSIONS = {
   POSTER_SMALL_HEIGHT: 90,
   POSTER_MEDIUM_WIDTH: 100,
   POSTER_MEDIUM_HEIGHT: 150,
+  POSTER_CARD_WIDTH: 80,
+  POSTER_CARD_HEIGHT: 120,
   
   /** Layout measurements */
   SEPARATOR_HEIGHT: 1,
@@ -47,6 +49,15 @@ export const DIMENSIONS = {
   CIRCLE_LG: 44,
   CIRCLE_XL: 70,
   CIRCLE_XXL: 100,
+  
+  /** Parallax scroll view */
+  PARALLAX_HEADER_HEIGHT: 250,
+  PARALLAX_CONTENT_PADDING: 32,
+  PARALLAX_CONTENT_GAP: 16,
+  
+  /** GDPR Modal */
+  GDPR_MODAL_MAX_WIDTH: 400,
+  GDPR_ICON_CONTAINER_SIZE: 64,
 } as const;
 
 /** Z-index values */

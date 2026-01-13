@@ -5,6 +5,7 @@
 
 import { OMDbError, RETRYABLE_ERROR_CODES } from './errors';
 import { DEFAULT_RETRY_CONFIG } from './config';
+import { ANIMATION_DURATION } from '@/constants/animations';
 import type { RetryConfig } from './types';
 
 /**
@@ -126,7 +127,7 @@ export function getRetryDelay(error: OMDbError, attempt: number, config: RetryCo
     // Use longer exponential backoff for rate limiting
     const rateLimitConfig: RetryConfig = {
       ...config,
-      baseDelayMs: Math.max(config.baseDelayMs, 5000), // Minimum 5 seconds for rate limits
+      baseDelayMs: Math.max(config.baseDelayMs, ANIMATION_DURATION.HERO_CAROUSEL), // Minimum 5 seconds for rate limits
       backoffFactor: 3, // More aggressive backoff
     };
     return calculateBackoffDelay(attempt, rateLimitConfig);
@@ -141,7 +142,7 @@ export function getRetryDelay(error: OMDbError, attempt: number, config: RetryCo
   if (error.code === 'NETWORK_ERROR' || error.code === 'TIMEOUT') {
     const networkConfig: RetryConfig = {
       ...config,
-      baseDelayMs: Math.min(config.baseDelayMs, 2000), // Faster retry for network issues
+      baseDelayMs: Math.min(config.baseDelayMs, ANIMATION_DURATION.OMDB_RETRY_DELAY), // Faster retry for network issues
     };
     return calculateBackoffDelay(attempt, networkConfig);
   }

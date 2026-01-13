@@ -6,6 +6,7 @@
 import { OMDbError } from './errors';
 import { getOMDbConfig, DEFAULT_RETRY_CONFIG } from './config';
 import { parseOMDbErrorCode, logError, isRetryableError, getRetryDelay, createHttpError, sleep } from './utils';
+import { ANIMATION_DURATION } from '@/constants/animations';
 import type { RetryConfig } from './types';
 
 /**
@@ -104,7 +105,7 @@ async function handleOMDbResponse<T extends { Response: string; Error?: string }
 export async function fetchWithRetry<T extends { Response: string; Error?: string }>(
   url: string,
   config: RetryConfig = DEFAULT_RETRY_CONFIG,
-  timeoutMs: number = 10000
+  timeoutMs: number = ANIMATION_DURATION.API_TIMEOUT
 ): Promise<T> {
   // Validate HTTPS usage (Requirement 1.4)
   if (!isHttpsUrl(url)) {

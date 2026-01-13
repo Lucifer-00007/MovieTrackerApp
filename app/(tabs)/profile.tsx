@@ -23,6 +23,7 @@ import { useEffectiveColorScheme } from '@/hooks/use-effective-color-scheme';
 import { Colors, Spacing, Typography, BorderRadius } from '@/constants/theme';
 import { SOLID_COLORS } from '@/constants/colors';
 import { PROFILE_GRID, getLanguageName, getThemeLabel } from '@/constants/profile';
+import { COMPONENT_TEST_IDS } from '@/constants/test-ids';
 import { useWatchlistStore } from '@/stores/watchlistStore';
 import { usePreferencesStore } from '@/stores/preferencesStore';
 import { EmptyState } from '@/components/ui/EmptyState';
@@ -212,7 +213,7 @@ export default function ProfileScreen() {
       </SettingsSection>
 
       {/* Notifications Settings */}
-      <SettingsSection title="Notifications" testID="notifications-section">
+      <SettingsSection title="Notifications" testID={COMPONENT_TEST_IDS.NOTIFICATIONS_SECTION}>
         <SettingsRow
           title="Enable Notifications"
           subtitle="Receive push notifications"
@@ -223,10 +224,10 @@ export default function ProfileScreen() {
               onValueChange={handleNotificationsToggle}
               trackColor={{ false: colors.backgroundSecondary, true: colors.tint }}
               thumbColor={SOLID_COLORS.WHITE}
-              testID="notifications-toggle"
+              testID={COMPONENT_TEST_IDS.NOTIFICATIONS_TOGGLE}
             />
           }
-          testID="notifications-setting"
+          testID={COMPONENT_TEST_IDS.NOTIFICATIONS_SETTING}
         />
         {preferences.notificationsEnabled && (
           <>
@@ -241,10 +242,10 @@ export default function ProfileScreen() {
                   onValueChange={(enabled) => handleNotificationTypeToggle('downloads', enabled)}
                   trackColor={{ false: colors.backgroundSecondary, true: colors.tint }}
                   thumbColor={SOLID_COLORS.WHITE}
-                  testID="downloads-notifications-toggle"
+                  testID={COMPONENT_TEST_IDS.DOWNLOADS_NOTIFICATIONS_TOGGLE}
                 />
               }
-              testID="downloads-notifications-setting"
+              testID={COMPONENT_TEST_IDS.DOWNLOADS_NOTIFICATIONS_SETTING}
             />
             <SettingsSeparator />
             <SettingsRow
@@ -257,10 +258,10 @@ export default function ProfileScreen() {
                   onValueChange={(enabled) => handleNotificationTypeToggle('newReleases', enabled)}
                   trackColor={{ false: colors.backgroundSecondary, true: colors.tint }}
                   thumbColor={SOLID_COLORS.WHITE}
-                  testID="new-releases-notifications-toggle"
+                  testID={COMPONENT_TEST_IDS.NEW_RELEASES_NOTIFICATIONS_TOGGLE}
                 />
               }
-              testID="new-releases-notifications-setting"
+              testID={COMPONENT_TEST_IDS.NEW_RELEASES_NOTIFICATIONS_SETTING}
             />
           </>
         )}

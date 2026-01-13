@@ -310,9 +310,9 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
   },
   playPauseButton: {
-    width: 80,
-    height: 80,
-    borderRadius: 40,
+    width: ComponentTokens.playButtonLarge.size,
+    height: ComponentTokens.playButtonLarge.size,
+    borderRadius: ComponentTokens.playButtonLarge.size / 2,
     backgroundColor: OVERLAY_COLORS.BLACK_60,
     alignItems: 'center',
     justifyContent: 'center',
