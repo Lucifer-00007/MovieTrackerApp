@@ -5,6 +5,7 @@
 
 import type { StreamingProvider } from '@/types/media';
 import { logFallbackUsage } from './utils';
+import { STREAMING_URLS } from '@/constants/api';
 
 /**
  * Get streaming/watch providers
@@ -31,7 +32,7 @@ export async function getWatchProviders(
           providerId: 8, 
           providerName: 'Netflix', 
           logoPath: '/netflix-logo.png', 
-          link: 'https://netflix.com',
+          link: STREAMING_URLS.NETFLIX,
           type: 'flatrate',
           isAvailable: true
         },
@@ -39,7 +40,7 @@ export async function getWatchProviders(
           providerId: 337, 
           providerName: 'Disney Plus', 
           logoPath: '/disney-plus-logo.png', 
-          link: 'https://disneyplus.com',
+          link: STREAMING_URLS.DISNEY_PLUS,
           type: 'flatrate',
           isAvailable: true
         },
@@ -47,7 +48,7 @@ export async function getWatchProviders(
           providerId: 15, 
           providerName: 'Hulu', 
           logoPath: '/hulu-logo.png', 
-          link: 'https://hulu.com',
+          link: STREAMING_URLS.HULU,
           type: 'flatrate',
           isAvailable: true
         },
@@ -55,7 +56,7 @@ export async function getWatchProviders(
           providerId: 9, 
           providerName: 'Amazon Prime Video', 
           logoPath: '/amazon-prime-logo.png', 
-          link: 'https://primevideo.com',
+          link: STREAMING_URLS.PRIME_VIDEO,
           type: 'flatrate',
           isAvailable: true
         }
@@ -68,7 +69,7 @@ export async function getWatchProviders(
           providerId: 8, 
           providerName: 'Netflix', 
           logoPath: '/netflix-logo.png', 
-          link: 'https://netflix.com',
+          link: STREAMING_URLS.NETFLIX,
           type: 'flatrate',
           isAvailable: true
         },
@@ -76,7 +77,7 @@ export async function getWatchProviders(
           providerId: 9, 
           providerName: 'Amazon Prime Video', 
           logoPath: '/amazon-prime-logo.png', 
-          link: 'https://primevideo.com',
+          link: STREAMING_URLS.PRIME_VIDEO,
           type: 'flatrate',
           isAvailable: true
         },
@@ -84,7 +85,7 @@ export async function getWatchProviders(
           providerId: 337, 
           providerName: 'Disney Plus', 
           logoPath: '/disney-plus-logo.png', 
-          link: 'https://disneyplus.com',
+          link: STREAMING_URLS.DISNEY_PLUS,
           type: 'flatrate',
           isAvailable: true
         },
@@ -92,7 +93,7 @@ export async function getWatchProviders(
           providerId: 103, 
           providerName: 'BBC iPlayer', 
           logoPath: '/bbc-iplayer-logo.png', 
-          link: 'https://bbc.co.uk/iplayer',
+          link: STREAMING_URLS.BBC_IPLAYER,
           type: 'flatrate',
           isAvailable: true
         }
@@ -104,7 +105,7 @@ export async function getWatchProviders(
           providerId: 8, 
           providerName: 'Netflix', 
           logoPath: '/netflix-logo.png', 
-          link: 'https://netflix.com',
+          link: STREAMING_URLS.NETFLIX,
           type: 'flatrate',
           isAvailable: true
         },
@@ -112,7 +113,7 @@ export async function getWatchProviders(
           providerId: 9, 
           providerName: 'Amazon Prime Video', 
           logoPath: '/amazon-prime-logo.png', 
-          link: 'https://primevideo.com',
+          link: STREAMING_URLS.PRIME_VIDEO,
           type: 'flatrate',
           isAvailable: true
         },
@@ -120,7 +121,7 @@ export async function getWatchProviders(
           providerId: 337, 
           providerName: 'Disney Plus', 
           logoPath: '/disney-plus-logo.png', 
-          link: 'https://disneyplus.com',
+          link: STREAMING_URLS.DISNEY_PLUS,
           type: 'flatrate',
           isAvailable: true
         },
@@ -128,7 +129,7 @@ export async function getWatchProviders(
           providerId: 230, 
           providerName: 'Crave', 
           logoPath: '/crave-logo.png', 
-          link: 'https://crave.ca',
+          link: STREAMING_URLS.CRAVE,
           type: 'flatrate',
           isAvailable: true
         }
@@ -141,7 +142,7 @@ export async function getWatchProviders(
           providerId: 8, 
           providerName: 'Netflix', 
           logoPath: '/netflix-logo.png', 
-          link: 'https://netflix.com',
+          link: STREAMING_URLS.NETFLIX,
           type: 'flatrate',
           isAvailable: true
         },
@@ -149,7 +150,7 @@ export async function getWatchProviders(
           providerId: 9, 
           providerName: 'Amazon Prime Video', 
           logoPath: '/amazon-prime-logo.png', 
-          link: 'https://primevideo.com',
+          link: STREAMING_URLS.PRIME_VIDEO,
           type: 'flatrate',
           isAvailable: true
         },
@@ -157,7 +158,7 @@ export async function getWatchProviders(
           providerId: 337, 
           providerName: 'Disney Plus', 
           logoPath: '/disney-plus-logo.png', 
-          link: 'https://disneyplus.com',
+          link: STREAMING_URLS.DISNEY_PLUS,
           type: 'flatrate',
           isAvailable: true
         }

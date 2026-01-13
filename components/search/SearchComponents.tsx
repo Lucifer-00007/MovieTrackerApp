@@ -8,6 +8,7 @@ import { Ionicons } from '@expo/vector-icons';
 
 import { useThemeColor } from '@/hooks/use-theme-color';
 import { Spacing, Typography, BorderRadius } from '@/constants/theme';
+import { SOLID_COLORS } from '@/constants/colors';
 import { MediaCard } from '@/components/media/MediaCard';
 import type { MediaItem } from '@/types/media';
 
@@ -43,7 +44,7 @@ export function FilterChip({ label, isActive, onPress }: FilterChipProps) {
       <Text
         style={[
           styles.filterChipText,
-          { color: isActive ? '#FFFFFF' : textColor },
+          { color: isActive ? SOLID_COLORS.WHITE : textColor },
         ]}
       >
         {label}
@@ -51,7 +52,7 @@ export function FilterChip({ label, isActive, onPress }: FilterChipProps) {
       <Ionicons
         name="chevron-down"
         size={14}
-        color={isActive ? '#FFFFFF' : textColor}
+        color={isActive ? SOLID_COLORS.WHITE : textColor}
         style={styles.filterChipIcon}
       />
     </Pressable>

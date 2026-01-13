@@ -11,6 +11,7 @@ import { StyleSheet, View, StatusBar } from 'react-native';
 import { useLocalSearchParams, router } from 'expo-router';
 
 import { TrailerPlayer } from '@/components/media';
+import { SOLID_COLORS } from '@/constants/colors';
 
 export default function TrailerScreen() {
   const { key } = useLocalSearchParams<{ key: string }>();
@@ -63,6 +64,6 @@ export default function TrailerScreen() {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#000000',
+    backgroundColor: SOLID_COLORS.BLACK,
   },
 });

@@ -25,11 +25,13 @@ import type {
   CFDiscoverTVOptions,
 } from './cloudflare-types';
 
+import { API_BASE_URLS } from '@/constants/api';
+
 // ============================================================================
 // Configuration
 // ============================================================================
 
-const CF_BASE_URL = 'https://movie-api-worker.movie-tracker-api.workers.dev';
+const CF_BASE_URL = API_BASE_URLS.CLOUDFLARE;
 
 /** Retry configuration */
 export interface RetryConfig {

@@ -8,19 +8,21 @@
 import NetInfo from '@react-native-community/netinfo';
 import type { AnalyticsBatch } from '@/types/analytics';
 import { calculateBackoffDelay, type RetryConfig } from '../api';
+import { API_BASE_URLS } from '@/constants/api';
+import { ANIMATION_DURATION } from '@/constants/animations';
 
 // Analytics configuration
 export const ANALYTICS_CONFIG = {
   batchSize: 10,
   maxQueueSize: 100,
-  sendIntervalMs: 30000, // 30 seconds
+  sendIntervalMs: ANIMATION_DURATION.ANALYTICS_BATCH_INTERVAL,
   maxRetryAttempts: 3,
-  baseDelayMs: 1000,
-  maxDelayMs: 30000,
+  baseDelayMs: ANIMATION_DURATION.ANALYTICS_RETRY_DELAY,
+  maxDelayMs: ANIMATION_DURATION.ANALYTICS_TIMEOUT,
 } as const;
 
 // Mock analytics endpoint (replace with real endpoint)
-const ANALYTICS_ENDPOINT = 'https://api.moviestream.app/analytics';
+const ANALYTICS_ENDPOINT = API_BASE_URLS.ANALYTICS;
 
 /**
  * Check if device is connected to the internet

@@ -5,9 +5,11 @@
  * Requirements: 1.1, 3.2, 4.2
  */
 
+import { API_BASE_URLS } from '@/constants/api';
+
 // TMDB API Configuration
-const TMDB_BASE_URL = 'https://api.themoviedb.org/3';
-export const TMDB_IMAGE_BASE_URL = 'https://image.tmdb.org/t/p';
+const TMDB_BASE_URL = API_BASE_URLS.TMDB;
+export const TMDB_IMAGE_BASE_URL = API_BASE_URLS.TMDB_IMAGES;
 
 // API Key should be set via environment variable
 export const getApiKey = (): string => {

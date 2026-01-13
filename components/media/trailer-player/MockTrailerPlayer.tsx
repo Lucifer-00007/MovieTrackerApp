@@ -81,7 +81,7 @@ export function MockTrailerPlayer({
               accessibilityLabel="Close trailer"
               testID={testID ? `${testID}-close` : undefined}
             >
-              <IconSymbol name="xmark" size={24} color="#FFFFFF" />
+              <IconSymbol name="xmark" size={24} color={SOLID_COLORS.WHITE} />
             </Pressable>
           </View>
         )}
@@ -98,7 +98,7 @@ export function MockTrailerPlayer({
             <IconSymbol
               name={isPlaying ? 'pause.fill' : 'play.fill'}
               size={48}
-              color="#FFFFFF"
+              color={SOLID_COLORS.WHITE}
             />
           </Pressable>
           <Text style={styles.mockText}>

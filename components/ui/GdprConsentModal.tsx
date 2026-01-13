@@ -22,6 +22,7 @@ import { Ionicons } from '@expo/vector-icons';
 import { useEffectiveColorScheme } from '@/hooks/use-effective-color-scheme';
 import { useLocalization } from '@/hooks/use-localization';
 import { Colors, Spacing, Typography, BorderRadius } from '@/constants/theme';
+import { SOLID_COLORS } from '@/constants/colors';
 
 interface GdprConsentModalProps {
   visible: boolean;
@@ -80,7 +81,7 @@ export function GdprConsentModal({
             {/* Header */}
             <View style={styles.header}>
               <View style={[styles.iconContainer, { backgroundColor: colors.tint }]}>
-                <Ionicons name="shield-checkmark" size={32} color="#FFFFFF" />
+                <Ionicons name="shield-checkmark" size={32} color={SOLID_COLORS.WHITE} />
               </View>
               <Text style={[styles.title, { color: colors.text }]}>
                 {t('gdpr.title')}
@@ -200,12 +201,12 @@ export function GdprConsentModal({
             >
               {isLoading ? (
                 <View style={styles.loadingContainer}>
-                  <Text style={[styles.buttonText, { color: '#FFFFFF' }]}>
+                  <Text style={[styles.buttonText, { color: SOLID_COLORS.WHITE }]}>
                     {t('gdpr.saving')}
                   </Text>
                 </View>
               ) : (
-                <Text style={[styles.buttonText, { color: '#FFFFFF' }]}>
+                <Text style={[styles.buttonText, { color: SOLID_COLORS.WHITE }]}>
                   {t('gdpr.accept')}
                 </Text>
               )}

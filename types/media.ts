@@ -76,21 +76,6 @@ export interface StreamingProvider {
   isAvailable: boolean;
 }
 
-/** Country hub configuration */
-export interface CountryConfig {
-  code: string;
-  name: string;
-  flag: string;
-  region: string;
-}
-
-/** Supported countries for country hubs */
-export const SUPPORTED_COUNTRIES: CountryConfig[] = [
-  { code: 'US', name: 'United States', flag: '🇺🇸', region: 'en-US' },
-  { code: 'JP', name: 'Japan', flag: '🇯🇵', region: 'ja-JP' },
-  { code: 'IN', name: 'India', flag: '🇮🇳', region: 'hi-IN' },
-  { code: 'CN', name: 'China', flag: '🇨🇳', region: 'zh-CN' },
-  { code: 'RU', name: 'Russia', flag: '🇷🇺', region: 'ru-RU' },
-  { code: 'ES', name: 'Spain', flag: '🇪🇸', region: 'es-ES' },
-  { code: 'DE', name: 'Germany', flag: '🇩🇪', region: 'de-DE' },
-];
+// Re-export country types and constants from centralized location
+export type { CountryConfig } from '@/constants/countries';
+export { SUPPORTED_COUNTRIES } from '@/constants/countries';

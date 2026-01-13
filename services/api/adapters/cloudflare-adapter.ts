@@ -19,6 +19,8 @@ import type {
   CFTVShowDetails,
 } from '../cloudflare-types';
 import * as cf from '../cloudflare';
+import { getCloudflareRegion } from '@/constants/countries';
+import { API_BASE_URLS } from '@/constants/api';
 
 // ============================================================================
 // Transformers
@@ -283,22 +285,14 @@ export const cloudflareAdapter: MediaApiAdapter = {
   ): Promise<PaginatedResponse<TrendingItem>> {
     const { page = 1, genre, year, sortBy } = options;
 
-    // Map country code to Cloudflare region key
-    const regionMap: Record<string, string> = {
-      US: 'hollywood',
-      IN: 'bollywood',
-      JP: 'japanese',
+    // Get region from centralized country config with fallback for additional countries
+    const additionalRegions: Record<string, string> = {
       KR: 'korean',
-      CN: 'chinese',
       FR: 'french',
-      DE: 'german',
-      ES: 'spanish',
       IT: 'italian',
-      RU: 'russian',
       TR: 'turkish',
     };
-
-    const region = regionMap[countryCode] || countryCode.toLowerCase();
+    const region = getCloudflareRegion(countryCode) || additionalRegions[countryCode] || countryCode.toLowerCase();
 
     if (mediaType === 'movie') {
       const result = await cf.discoverMovies({
@@ -348,6 +342,6 @@ export const cloudflareAdapter: MediaApiAdapter = {
     // Cloudflare API returns full URLs, but we handle both cases
     if (!path) return null;
     if (path.startsWith('http')) return path;
-    return `https://image.tmdb.org/t/p/${size}${path}`;
+    return `${API_BASE_URLS.TMDB_IMAGES}/${size}${path}`;
   },
 };

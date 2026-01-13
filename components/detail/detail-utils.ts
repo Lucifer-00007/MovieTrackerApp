@@ -7,9 +7,7 @@
 
 import type { MediaDetails, CastMember, StreamingProvider, Genre } from '@/types/media';
 import { ComponentTokens } from '@/constants/theme';
-
-/** TMDB image base URL */
-const TMDB_IMAGE_BASE = 'https://image.tmdb.org/t/p';
+import { API_BASE_URLS } from '@/constants/api';
 
 /** Check if mock data mode is enabled */
 function isMockDataMode(): boolean {
@@ -30,7 +28,7 @@ export const MAX_CAST_DISPLAY = ComponentTokens.cast.maxDisplay;
 export function getBackdropUrl(backdropPath: string | null, size: string = 'w1280'): string | null {
   if (!backdropPath) return null;
   if (isMockDataMode()) return 'placeholder';
-  return `${TMDB_IMAGE_BASE}/${size}${backdropPath}`;
+  return `${API_BASE_URLS.TMDB_IMAGES}/${size}${backdropPath}`;
 }
 
 /**
@@ -41,7 +39,7 @@ export function getBackdropUrl(backdropPath: string | null, size: string = 'w128
 export function getProfileUrl(profilePath: string | null, size: string = 'w185'): string | null {
   if (!profilePath) return null;
   if (isMockDataMode()) return 'placeholder';
-  return `${TMDB_IMAGE_BASE}/${size}${profilePath}`;
+  return `${API_BASE_URLS.TMDB_IMAGES}/${size}${profilePath}`;
 }
 
 /**
@@ -52,7 +50,7 @@ export function getProfileUrl(profilePath: string | null, size: string = 'w185')
 export function getProviderLogoUrl(logoPath: string | null, size: string = 'w92'): string | null {
   if (!logoPath) return null;
   if (isMockDataMode()) return 'placeholder';
-  return `${TMDB_IMAGE_BASE}/${size}${logoPath}`;
+  return `${API_BASE_URLS.TMDB_IMAGES}/${size}${logoPath}`;
 }
 
 /**

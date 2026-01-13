@@ -227,7 +227,7 @@ export function VideoPlayerContent({
           {onClose && (
             <View style={styles.topBar}>
               <Pressable onPress={onClose} style={styles.closeButton}>
-                <IconSymbol name="xmark" size={24} color="#FFFFFF" />
+                <IconSymbol name="xmark" size={24} color={SOLID_COLORS.WHITE} />
               </Pressable>
             </View>
           )}
@@ -237,7 +237,7 @@ export function VideoPlayerContent({
               <IconSymbol
                 name={state.isPlaying ? 'pause.fill' : 'play.fill'}
                 size={48}
-                color="#FFFFFF"
+                color={SOLID_COLORS.WHITE}
               />
             </Pressable>
           </View>

@@ -4,12 +4,13 @@
  */
 
 import { ComponentTokens } from '@/constants/colors';
+import { API_BASE_URLS } from '@/constants/api';
 
 /** Media card size variants */
 export type MediaCardVariant = 'large' | 'medium' | 'small';
 
 /** TMDB image base URL */
-export const TMDB_IMAGE_BASE = 'https://image.tmdb.org/t/p';
+export const TMDB_IMAGE_BASE = API_BASE_URLS.TMDB_IMAGES;
 
 /** Placeholder image for mock data mode */
 export const PLACEHOLDER_IMAGE = require('@/assets/images/placeholder-poster.png');

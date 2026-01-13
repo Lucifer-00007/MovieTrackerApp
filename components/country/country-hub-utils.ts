@@ -5,7 +5,13 @@
  * Requirements: 3.3, 3.4, 3.5, 3.6
  */
 
-import { SUPPORTED_COUNTRIES, type TrendingItem, type CountryConfig } from '@/types/media';
+import { 
+  SUPPORTED_COUNTRIES, 
+  getCountryConfig,
+  isCountrySupported as checkCountrySupported,
+  type CountryConfig,
+} from '@/constants/countries';
+import type { TrendingItem } from '@/types/media';
 
 /** Content type filter options */
 export type ContentTypeFilter = 'all' | 'movie' | 'tv';
@@ -23,7 +29,7 @@ export interface CountryHubFilters {
  * @returns Country configuration or undefined if not found
  */
 export function getCountryByCode(code: string): CountryConfig | undefined {
-  return SUPPORTED_COUNTRIES.find((c) => c.code === code);
+  return getCountryConfig(code);
 }
 
 /**
@@ -32,7 +38,7 @@ export function getCountryByCode(code: string): CountryConfig | undefined {
  * @returns True if country is supported
  */
 export function isCountrySupported(code: string): boolean {
-  return SUPPORTED_COUNTRIES.some((c) => c.code === code);
+  return checkCountrySupported(code);
 }
 
 /**

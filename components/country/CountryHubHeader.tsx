@@ -10,7 +10,7 @@ import { router } from 'expo-router';
 import { useThemeColor } from '@/hooks/use-theme-color';
 import { IconSymbol } from '@/components/ui/icon-symbol';
 import { Spacing, Typography } from '@/constants/theme';
-import { SUPPORTED_COUNTRIES } from '@/types/media';
+import { getCountryConfig } from '@/constants/countries';
 
 interface CountryHubHeaderProps {
   countryCode: string;
@@ -20,7 +20,7 @@ export function CountryHubHeader({ countryCode }: CountryHubHeaderProps) {
   const textColor = useThemeColor({}, 'text');
   const tintColor = useThemeColor({}, 'tint');
   
-  const country = SUPPORTED_COUNTRIES.find(c => c.code === countryCode);
+  const country = getCountryConfig(countryCode);
   const countryName = country?.name || countryCode.toUpperCase();
 
   return (

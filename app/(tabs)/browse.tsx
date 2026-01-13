@@ -21,7 +21,13 @@ import { LinearGradient } from 'expo-linear-gradient';
 import { useEffectiveColorScheme } from '@/hooks/use-effective-color-scheme';
 import { Colors, Spacing, Typography, BorderRadius } from '@/constants/theme';
 import { COUNTRY_GRADIENTS, OVERLAY_COLORS } from '@/constants/colors';
-import { SUPPORTED_COUNTRIES, type CountryConfig } from '@/types/media';
+import {
+  SUPPORTED_COUNTRIES,
+  getCountryIcon,
+  getRegionLabel,
+  getContentCount,
+  type CountryConfig,
+} from '@/constants/countries';
 
 const { width: SCREEN_WIDTH } = Dimensions.get('window');
 const GRID_PADDING = Spacing.md;
@@ -36,48 +42,6 @@ function getCountryGradient(code: string, isDark: boolean): readonly [string, st
     return isDark ? countryGradient.dark : countryGradient.light;
   }
   return isDark ? COUNTRY_GRADIENTS.default.dark : COUNTRY_GRADIENTS.default.light;
-}
-
-/** Get icon for each country's content type */
-function getCountryIcon(code: string): keyof typeof Ionicons.glyphMap {
-  const icons: Record<string, keyof typeof Ionicons.glyphMap> = {
-    US: 'film-outline',
-    JP: 'sparkles-outline',
-    IN: 'musical-notes-outline',
-    CN: 'videocam-outline',
-    RU: 'snow-outline',
-    ES: 'sunny-outline',
-    DE: 'construct-outline',
-  };
-  return icons[code] || 'globe-outline';
-}
-
-/** Get a friendly region label for a country */
-function getRegionLabel(code: string): string {
-  const labels: Record<string, string> = {
-    US: 'Hollywood & More',
-    JP: 'Anime & J-Drama',
-    IN: 'Bollywood & Regional',
-    CN: 'Chinese Cinema',
-    RU: 'Russian Films',
-    ES: 'Spanish Content',
-    DE: 'German Productions',
-  };
-  return labels[code] || 'Regional Content';
-}
-
-/** Get content count label */
-function getContentCount(code: string): string {
-  const counts: Record<string, string> = {
-    US: '10K+ titles',
-    JP: '5K+ titles',
-    IN: '8K+ titles',
-    CN: '3K+ titles',
-    RU: '2K+ titles',
-    ES: '4K+ titles',
-    DE: '2K+ titles',
-  };
-  return counts[code] || '1K+ titles';
 }
 
 /** Props for country card component */

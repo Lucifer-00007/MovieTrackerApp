@@ -10,6 +10,7 @@ import { Ionicons } from '@expo/vector-icons';
 
 import { useThemeColor } from '@/hooks/use-theme-color';
 import { Spacing, BorderRadius, Typography } from '@/constants/theme';
+import { SOLID_COLORS } from '@/constants/colors';
 
 export interface ErrorStateProps {
   /** Error title */
@@ -72,7 +73,7 @@ export function ErrorState({
             { backgroundColor: tintColor, opacity: pressed ? 0.8 : 1 },
           ]}
         >
-          <Ionicons name="refresh" size={20} color="#FFFFFF" />
+          <Ionicons name="refresh" size={20} color={SOLID_COLORS.WHITE} />
           <Text style={styles.retryText}>{retryText}</Text>
         </Pressable>
       )}
@@ -115,7 +116,7 @@ const styles = StyleSheet.create({
     minHeight: 44,
   },
   retryText: {
-    color: '#FFFFFF',
+    color: SOLID_COLORS.WHITE,
     fontSize: Typography.sizes.md,
     fontWeight: Typography.weights.semibold,
   },

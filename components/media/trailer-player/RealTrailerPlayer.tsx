@@ -10,6 +10,7 @@ import { StyleSheet, View, Text, Pressable, ActivityIndicator } from 'react-nati
 
 import { useThemeColor } from '@/hooks/use-theme-color';
 import { Spacing, Typography } from '@/constants/theme';
+import { SOLID_COLORS } from '@/constants/colors';
 import { IconSymbol } from '@/components/ui/icon-symbol';
 import { VideoPlayerContent } from './VideoPlayerContent';
 import type { TrailerPlayerProps, TrailerPlayerState } from './types';
@@ -77,9 +78,9 @@ export function RealTrailerPlayer({
   // Loading video components
   if (!VideoComponents) {
     return (
-      <View style={[styles.container, { backgroundColor: '#000000' }]} testID={testID}>
+      <View style={[styles.container, { backgroundColor: SOLID_COLORS.BLACK }]} testID={testID}>
         <View style={styles.loadingOverlay}>
-          <ActivityIndicator size="large" color="#FFFFFF" />
+          <ActivityIndicator size="large" color={SOLID_COLORS.WHITE} />
           <Text style={styles.loadingText}>Loading player...</Text>
         </View>
       </View>
@@ -145,7 +146,7 @@ const styles = StyleSheet.create({
     gap: Spacing.md,
   },
   loadingText: {
-    color: '#FFFFFF',
+    color: SOLID_COLORS.WHITE,
     fontSize: Typography.sizes.md,
     fontWeight: Typography.weights.medium,
   },
@@ -177,7 +178,7 @@ const styles = StyleSheet.create({
     borderRadius: 8,
   },
   retryButtonText: {
-    color: '#FFFFFF',
+    color: SOLID_COLORS.WHITE,
     fontSize: Typography.sizes.md,
     fontWeight: Typography.weights.semibold,
   },
