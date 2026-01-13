@@ -11,6 +11,7 @@ import { Image } from 'expo-image';
 
 import { useThemeColor } from '@/hooks/use-theme-color';
 import { Spacing, BorderRadius, Typography } from '@/constants/theme';
+import { SOLID_COLORS, OVERLAY_COLORS, ComponentTokens } from '@/constants/colors';
 import { IconSymbol } from '@/components/ui/icon-symbol';
 import { formatTime } from '../trailer-utils';
 
@@ -55,7 +56,7 @@ export function MockTrailerPlayer({
   };
 
   return (
-    <View style={[styles.container, { backgroundColor: '#000000' }]} testID={testID}>
+    <View style={[styles.container, { backgroundColor: SOLID_COLORS.BLACK }]} testID={testID}>
       {/* Background Image */}
       <Image
         source={PLACEHOLDER_IMAGE}
@@ -142,13 +143,13 @@ const styles = StyleSheet.create({
     position: 'absolute',
     top: Spacing.md,
     left: Spacing.md,
-    backgroundColor: 'rgba(0, 0, 0, 0.8)',
+    backgroundColor: OVERLAY_COLORS.BLACK_80,
     paddingHorizontal: Spacing.sm,
     paddingVertical: Spacing.xs,
     borderRadius: BorderRadius.sm,
   },
   mockBadgeText: {
-    color: '#FFFFFF',
+    color: SOLID_COLORS.WHITE,
     fontSize: Typography.sizes.sm,
     fontWeight: Typography.weights.medium,
   },
@@ -158,10 +159,10 @@ const styles = StyleSheet.create({
     alignItems: 'center',
   },
   closeButton: {
-    width: 44,
-    height: 44,
+    width: ComponentTokens.touchTarget.min,
+    height: ComponentTokens.touchTarget.min,
     borderRadius: 22,
-    backgroundColor: 'rgba(0, 0, 0, 0.6)',
+    backgroundColor: OVERLAY_COLORS.BLACK_60,
     alignItems: 'center',
     justifyContent: 'center',
   },
@@ -177,14 +178,14 @@ const styles = StyleSheet.create({
     borderRadius: 40,
     alignItems: 'center',
     justifyContent: 'center',
-    shadowColor: '#000000',
+    shadowColor: SOLID_COLORS.BLACK,
     shadowOffset: { width: 0, height: 4 },
     shadowOpacity: 0.3,
     shadowRadius: 8,
     elevation: 8,
   },
   mockText: {
-    color: '#FFFFFF',
+    color: SOLID_COLORS.WHITE,
     fontSize: Typography.sizes.md,
     fontWeight: Typography.weights.medium,
     textAlign: 'center',
@@ -197,7 +198,7 @@ const styles = StyleSheet.create({
     paddingVertical: Spacing.sm,
   },
   timeText: {
-    color: '#FFFFFF',
+    color: SOLID_COLORS.WHITE,
     fontSize: Typography.sizes.sm,
     fontWeight: Typography.weights.medium,
     minWidth: 40,
@@ -209,14 +210,14 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
   },
   seekBarBackground: {
-    height: 4,
-    backgroundColor: 'rgba(255, 255, 255, 0.3)',
+    height: ComponentTokens.progressBar.height,
+    backgroundColor: OVERLAY_COLORS.WHITE_30,
     borderRadius: 2,
     overflow: 'hidden',
   },
   seekBarProgress: {
     height: '100%',
-    backgroundColor: '#FFFFFF',
+    backgroundColor: SOLID_COLORS.WHITE,
     borderRadius: 2,
   },
 });

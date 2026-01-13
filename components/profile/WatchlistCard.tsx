@@ -8,6 +8,7 @@ import { Ionicons } from '@expo/vector-icons';
 
 import { useEffectiveColorScheme } from '@/hooks/use-effective-color-scheme';
 import { Colors, Spacing, Typography, BorderRadius } from '@/constants/theme';
+import { SOLID_COLORS, OVERLAY_COLORS, ComponentTokens } from '@/constants/colors';
 import { PROFILE_GRID } from '@/constants/profile';
 import { MediaCard } from '@/components/media/MediaCard';
 import type { WatchlistItem, WatchlistSyncStatus } from '@/types/watchlist';
@@ -119,7 +120,7 @@ export function WatchlistCard({ item, onPress, onRemove }: WatchlistCardProps) {
         ]}
         testID={`remove-button-${item.id}`}
       >
-        <Ionicons name="close" size={14} color="#FFFFFF" />
+        <Ionicons name="close" size={14} color={SOLID_COLORS.WHITE} />
       </Pressable>
       
       <Text
@@ -161,10 +162,10 @@ const styles = StyleSheet.create({
     position: 'absolute',
     top: Spacing.xs,
     left: Spacing.xs,
-    width: 20,
-    height: 20,
+    width: ComponentTokens.syncIndicator.size,
+    height: ComponentTokens.syncIndicator.size,
     borderRadius: 10,
-    backgroundColor: 'rgba(0, 0, 0, 0.5)',
+    backgroundColor: OVERLAY_COLORS.BLACK_50,
     alignItems: 'center',
     justifyContent: 'center',
   },
@@ -172,13 +173,13 @@ const styles = StyleSheet.create({
     position: 'absolute',
     top: Spacing.xs,
     right: Spacing.xs,
-    width: 24,
-    height: 24,
+    width: ComponentTokens.removeButton.size,
+    height: ComponentTokens.removeButton.size,
     borderRadius: 12,
     alignItems: 'center',
     justifyContent: 'center',
-    minWidth: 44,
-    minHeight: 44,
+    minWidth: ComponentTokens.touchTarget.min,
+    minHeight: ComponentTokens.touchTarget.min,
   },
   cardTitle: {
     fontSize: Typography.sizes.xs,

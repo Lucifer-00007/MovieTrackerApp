@@ -30,7 +30,7 @@ const NUM_COLUMNS = 2;
 const CARD_WIDTH = (SCREEN_WIDTH - GRID_PADDING * 2 - GRID_GAP * (NUM_COLUMNS - 1)) / NUM_COLUMNS;
 
 /** Get gradient colors for each country */
-function getCountryGradient(code: string, isDark: boolean): [string, string] {
+function getCountryGradient(code: string, isDark: boolean): readonly [string, string] {
   const countryGradient = COUNTRY_GRADIENTS[code as keyof typeof COUNTRY_GRADIENTS];
   if (countryGradient) {
     return isDark ? countryGradient.dark : countryGradient.light;
@@ -84,7 +84,7 @@ function getContentCount(code: string): string {
 interface CountryCardProps {
   country: CountryConfig;
   onPress: () => void;
-  colors: typeof Colors.light;
+  colors: (typeof Colors)['light'] | (typeof Colors)['dark'];
   isDark: boolean;
 }
 

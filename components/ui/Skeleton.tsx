@@ -17,6 +17,7 @@ import Animated, {
 
 import { useThemeColor } from '@/hooks/use-theme-color';
 import { Spacing, BorderRadius, ComponentTokens } from '@/constants/theme';
+import { OVERLAY_COLORS } from '@/constants/colors';
 
 const { width: SCREEN_WIDTH } = Dimensions.get('window');
 
@@ -214,7 +215,7 @@ const styles = StyleSheet.create({
   shimmerGradient: {
     width: 100,
     height: '100%',
-    backgroundColor: 'rgba(255, 255, 255, 0.2)',
+    backgroundColor: OVERLAY_COLORS.WHITE_20,
     transform: [{ skewX: '-20deg' }],
   },
   cardContainer: {

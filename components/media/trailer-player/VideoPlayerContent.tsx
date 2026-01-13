@@ -10,6 +10,7 @@ import { StyleSheet, View, Text, Pressable, ActivityIndicator, Dimensions } from
 
 import { useThemeColor } from '@/hooks/use-theme-color';
 import { Spacing, Typography } from '@/constants/theme';
+import { SOLID_COLORS, OVERLAY_COLORS, ComponentTokens } from '@/constants/colors';
 import { IconSymbol } from '@/components/ui/icon-symbol';
 import { logTrailerTap } from '@/services/analytics';
 import {
@@ -203,7 +204,7 @@ export function VideoPlayerContent({
 
   return (
     <Pressable
-      style={[styles.container, { backgroundColor: '#000000' }]}
+      style={[styles.container, { backgroundColor: SOLID_COLORS.BLACK }]}
       onPress={handleShowControls}
       testID={testID}
     >
@@ -216,7 +217,7 @@ export function VideoPlayerContent({
 
       {state.isLoading && (
         <View style={styles.loadingOverlay}>
-          <ActivityIndicator size="large" color="#FFFFFF" />
+          <ActivityIndicator size="large" color={SOLID_COLORS.WHITE} />
           <Text style={styles.loadingText}>Loading...</Text>
         </View>
       )}
@@ -273,11 +274,11 @@ const styles = StyleSheet.create({
     bottom: 0,
     alignItems: 'center',
     justifyContent: 'center',
-    backgroundColor: 'rgba(0, 0, 0, 0.8)',
+    backgroundColor: OVERLAY_COLORS.BLACK_80,
     gap: Spacing.md,
   },
   loadingText: {
-    color: '#FFFFFF',
+    color: SOLID_COLORS.WHITE,
     fontSize: Typography.sizes.md,
     fontWeight: Typography.weights.medium,
   },
@@ -296,10 +297,10 @@ const styles = StyleSheet.create({
     alignItems: 'center',
   },
   closeButton: {
-    width: 44,
-    height: 44,
+    width: ComponentTokens.touchTarget.min,
+    height: ComponentTokens.touchTarget.min,
     borderRadius: 22,
-    backgroundColor: 'rgba(0, 0, 0, 0.6)',
+    backgroundColor: OVERLAY_COLORS.BLACK_60,
     alignItems: 'center',
     justifyContent: 'center',
   },
@@ -312,10 +313,10 @@ const styles = StyleSheet.create({
     width: 80,
     height: 80,
     borderRadius: 40,
-    backgroundColor: 'rgba(0, 0, 0, 0.6)',
+    backgroundColor: OVERLAY_COLORS.BLACK_60,
     alignItems: 'center',
     justifyContent: 'center',
-    shadowColor: '#000000',
+    shadowColor: SOLID_COLORS.BLACK,
     shadowOffset: { width: 0, height: 4 },
     shadowOpacity: 0.3,
     shadowRadius: 8,
@@ -328,7 +329,7 @@ const styles = StyleSheet.create({
     paddingVertical: Spacing.sm,
   },
   timeText: {
-    color: '#FFFFFF',
+    color: SOLID_COLORS.WHITE,
     fontSize: Typography.sizes.sm,
     fontWeight: Typography.weights.medium,
     minWidth: 40,
@@ -340,23 +341,23 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
   },
   seekBarBackground: {
-    height: 4,
-    backgroundColor: 'rgba(255, 255, 255, 0.3)',
+    height: ComponentTokens.progressBar.height,
+    backgroundColor: OVERLAY_COLORS.WHITE_30,
     borderRadius: 2,
     position: 'relative',
   },
   seekBarProgress: {
     height: '100%',
-    backgroundColor: '#FFFFFF',
+    backgroundColor: SOLID_COLORS.WHITE,
     borderRadius: 2,
   },
   seekBarThumb: {
     position: 'absolute',
     top: -6,
-    width: 16,
-    height: 16,
+    width: ComponentTokens.progressBar.thumbSize,
+    height: ComponentTokens.progressBar.thumbSize,
     borderRadius: 8,
-    backgroundColor: '#FFFFFF',
+    backgroundColor: SOLID_COLORS.WHITE,
     marginLeft: -8,
   },
   errorContainer: {
@@ -382,7 +383,7 @@ const styles = StyleSheet.create({
     borderRadius: 8,
   },
   retryButtonText: {
-    color: '#FFFFFF',
+    color: SOLID_COLORS.WHITE,
     fontSize: Typography.sizes.md,
     fontWeight: Typography.weights.semibold,
   },

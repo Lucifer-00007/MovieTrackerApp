@@ -11,6 +11,7 @@ import { Ionicons } from '@expo/vector-icons';
 import { useThemeColor } from '@/hooks/use-theme-color';
 import { useEffectiveColorScheme } from '@/hooks/use-effective-color-scheme';
 import { Colors, Spacing, BorderRadius, Typography } from '@/constants/theme';
+import { SOLID_COLORS, ComponentTokens } from '@/constants/colors';
 
 export interface EmptyStateProps {
   /** Title to display */
@@ -110,8 +111,8 @@ const styles = StyleSheet.create({
     padding: Spacing.xl,
   },
   iconContainer: {
-    width: 100,
-    height: 100,
+    width: ComponentTokens.icon.xl * 2,
+    height: ComponentTokens.icon.xl * 2,
     borderRadius: 50,
     alignItems: 'center',
     justifyContent: 'center',
@@ -157,13 +158,13 @@ const styles = StyleSheet.create({
     paddingVertical: Spacing.sm,
     paddingHorizontal: Spacing.xl,
     borderRadius: BorderRadius.full,
-    minWidth: 44,
-    minHeight: 44,
+    minWidth: ComponentTokens.touchTarget.min,
+    minHeight: ComponentTokens.touchTarget.min,
     justifyContent: 'center',
     alignItems: 'center',
   },
   actionText: {
-    color: '#FFFFFF',
+    color: SOLID_COLORS.WHITE,
     fontSize: Typography.sizes.md,
     fontWeight: Typography.weights.semibold,
   },

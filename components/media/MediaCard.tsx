@@ -11,6 +11,7 @@ import { StyleSheet, View, Pressable, Text } from 'react-native';
 
 import { useThemeColor } from '@/hooks/use-theme-color';
 import { Spacing, BorderRadius, Typography, ComponentTokens } from '@/constants/theme';
+import { SOLID_COLORS, OVERLAY_COLORS } from '@/constants/colors';
 import {
   MediaCardVariant,
   getPosterUrl,
@@ -170,7 +171,7 @@ export function MediaCard({
         {variant === 'large' && (
           <View style={styles.titleOverlay}>
             <Text
-              style={[styles.titleText, { color: '#FFFFFF' }]}
+              style={[styles.titleText, { color: SOLID_COLORS.WHITE }]}
               numberOfLines={2}
               testID={testID ? `${testID}-title` : undefined}
             >
@@ -254,7 +255,7 @@ const styles = StyleSheet.create({
     left: 0,
     right: 0,
     padding: Spacing.md,
-    backgroundColor: 'rgba(0, 0, 0, 0.6)',
+    backgroundColor: OVERLAY_COLORS.BLACK_60,
   },
   titleText: {
     fontSize: Typography.sizes.lg,

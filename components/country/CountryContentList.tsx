@@ -24,6 +24,7 @@ import { Skeleton } from '@/components/ui/Skeleton';
 import { ErrorState } from '@/components/ui/ErrorState';
 import { EmptyState } from '@/components/ui/EmptyState';
 import { Colors, Spacing, Typography, BorderRadius } from '@/constants/theme';
+import { SOLID_COLORS } from '@/constants/colors';
 import { getImageUrl } from '@/services/api';
 import type { TrendingItem } from '@/types/media';
 
@@ -131,7 +132,7 @@ function ContentItem({ item, index }: ContentItemProps) {
             <IconSymbol
               name="star.fill"
               size={14}
-              color="#FFD700"
+              color={SOLID_COLORS.GOLD}
             />
             <Text style={[styles.ratingText, { color: textColor }]}>
               {item.voteAverage.toFixed(1)}

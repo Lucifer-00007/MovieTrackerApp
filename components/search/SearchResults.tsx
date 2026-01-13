@@ -12,6 +12,7 @@ import { Ionicons } from '@expo/vector-icons';
 import { useThemeColor } from '@/hooks/use-theme-color';
 import { useEffectiveColorScheme } from '@/hooks/use-effective-color-scheme';
 import { Colors, Spacing, Typography, BorderRadius } from '@/constants/theme';
+import { SOLID_COLORS } from '@/constants/colors';
 import { EmptyState } from '@/components/ui/EmptyState';
 import { Skeleton } from '@/components/ui/Skeleton';
 import { getImageUrl } from '@/services/api';
@@ -109,7 +110,7 @@ function MediaCard({ item, onPress }: MediaCardProps) {
 
         {showRating && (
           <View style={styles.ratingContainer}>
-            <Ionicons name="star" size={14} color="#FFD700" />
+            <Ionicons name="star" size={14} color={SOLID_COLORS.GOLD} />
             <Text style={[styles.ratingText, { color: textColor }]}>
               {item.voteAverage?.toFixed(1)}
             </Text>

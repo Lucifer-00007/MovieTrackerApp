@@ -21,6 +21,8 @@ import { LinearGradient } from 'expo-linear-gradient';
 
 import { useThemeColor } from '@/hooks/use-theme-color';
 import { Spacing, BorderRadius, Typography, ComponentTokens } from '@/constants/theme';
+import { SOLID_COLORS, OVERLAY_COLORS } from '@/constants/colors';
+import { API_BASE_URLS } from '@/constants/api';
 import type { TrendingItem } from '@/types/media';
 
 const { width: SCREEN_WIDTH } = Dimensions.get('window');
@@ -28,7 +30,7 @@ const HERO_HEIGHT = ComponentTokens.heroCarousel.height;
 const AUTO_ADVANCE_INTERVAL = ComponentTokens.heroCarousel.autoAdvanceInterval;
 
 /** TMDB image base URL */
-const TMDB_IMAGE_BASE = 'https://image.tmdb.org/t/p';
+const TMDB_IMAGE_BASE = API_BASE_URLS.TMDB_IMAGES;
 
 /** Placeholder image for mock data mode */
 const PLACEHOLDER_IMAGE = require('@/assets/images/placeholder-poster.png');
@@ -146,7 +148,7 @@ export function HeroCarousel({
           
           {/* Gradient overlay */}
           <LinearGradient
-            colors={['transparent', 'rgba(0,0,0,0.8)']}
+            colors={['transparent', OVERLAY_COLORS.BLACK_80]}
             style={styles.gradient}
           />
           
@@ -158,7 +160,7 @@ export function HeroCarousel({
             </View>
             
             <Text
-              style={[styles.title, { color: '#FFFFFF' }]}
+              style={[styles.title, { color: SOLID_COLORS.WHITE }]}
               numberOfLines={2}
             >
               {item.title}
@@ -166,7 +168,7 @@ export function HeroCarousel({
             
             {item.overview && (
               <Text
-                style={[styles.overview, { color: 'rgba(255,255,255,0.8)' }]}
+                style={[styles.overview, { color: OVERLAY_COLORS.WHITE_80 }]}
                 numberOfLines={2}
               >
                 {item.overview}
@@ -174,7 +176,7 @@ export function HeroCarousel({
             )}
             
             {item.voteAverage !== null && item.voteAverage > 0 && (
-              <Text style={[styles.rating, { color: '#FFFFFF' }]}>
+              <Text style={[styles.rating, { color: SOLID_COLORS.WHITE }]}>
                 ★ {item.voteAverage.toFixed(1)}
               </Text>
             )}
@@ -196,7 +198,7 @@ export function HeroCarousel({
             style={[
               styles.paginationDot,
               {
-                backgroundColor: index === currentIndex ? tintColor : 'rgba(255,255,255,0.5)',
+                backgroundColor: index === currentIndex ? tintColor : OVERLAY_COLORS.WHITE_50,
               },
             ]}
             accessibilityLabel={`Page ${index + 1} of ${items.length}${index === currentIndex ? ', current' : ''}`}
@@ -278,7 +280,7 @@ const styles = StyleSheet.create({
     marginBottom: Spacing.sm,
   },
   rankText: {
-    color: '#FFFFFF',
+    color: SOLID_COLORS.WHITE,
     fontSize: Typography.sizes.sm,
     fontWeight: Typography.weights.bold,
   },

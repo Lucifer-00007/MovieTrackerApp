@@ -2,6 +2,7 @@ import { StyleSheet, Text, type TextProps } from 'react-native';
 
 import { useThemeColor } from '@/hooks/use-theme-color';
 import { useDynamicTypeSize } from '@/hooks/use-accessibility';
+import { SOLID_COLORS, Typography } from '@/constants/colors';
 
 export type ThemedTextProps = TextProps & {
   lightColor?: string;
@@ -48,37 +49,37 @@ export function ThemedText({
 
 function getBaseFontSize(type: ThemedTextProps['type']): number {
   switch (type) {
-    case 'title': return 32;
-    case 'subtitle': return 20;
-    case 'link': return 16;
-    case 'defaultSemiBold': return 16;
+    case 'title': return Typography.sizes.xxxl;
+    case 'subtitle': return Typography.sizes.xl;
+    case 'link': return Typography.sizes.md;
+    case 'defaultSemiBold': return Typography.sizes.md;
     case 'default':
-    default: return 16;
+    default: return Typography.sizes.md;
   }
 }
 
 const styles = StyleSheet.create({
   default: {
-    fontSize: 16,
+    fontSize: Typography.sizes.md,
     lineHeight: 24,
   },
   defaultSemiBold: {
-    fontSize: 16,
+    fontSize: Typography.sizes.md,
     lineHeight: 24,
     fontWeight: '600',
   },
   title: {
-    fontSize: 32,
+    fontSize: Typography.sizes.xxxl,
     fontWeight: 'bold',
     lineHeight: 32,
   },
   subtitle: {
-    fontSize: 20,
+    fontSize: Typography.sizes.xl,
     fontWeight: 'bold',
   },
   link: {
     lineHeight: 30,
-    fontSize: 16,
-    color: '#0a7ea4',
+    fontSize: Typography.sizes.md,
+    color: SOLID_COLORS.BLUE_LINK,
   },
 });

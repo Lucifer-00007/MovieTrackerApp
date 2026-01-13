@@ -25,6 +25,7 @@ import Animated, {
 
 import { useThemeColor } from '@/hooks/use-theme-color';
 import { Spacing, BorderRadius, Typography } from '@/constants/theme';
+import { SOLID_COLORS, OVERLAY_COLORS, ComponentTokens } from '@/constants/colors';
 import type { MediaDetails } from '@/types/media';
 import {
   getBackdropUrl,
@@ -135,7 +136,7 @@ export function DetailHeader({
 
       {/* Gradient Overlay */}
       <LinearGradient
-        colors={['transparent', 'rgba(0,0,0,0.7)', 'rgba(0,0,0,0.95)']}
+        colors={['transparent', OVERLAY_COLORS.BLACK_70, OVERLAY_COLORS.BLACK_95]}
         style={styles.gradient}
         locations={[0, 0.6, 1]}
       />
@@ -261,23 +262,23 @@ const styles = StyleSheet.create({
     left: '50%',
     marginLeft: -35,
     marginTop: -35,
-    width: 70,
-    height: 70,
+    width: ComponentTokens.playButton.size,
+    height: ComponentTokens.playButton.size,
     borderRadius: 35,
     alignItems: 'center',
     justifyContent: 'center',
     zIndex: 10,
   },
   playButtonInner: {
-    width: 70,
-    height: 70,
+    width: ComponentTokens.playButton.size,
+    height: ComponentTokens.playButton.size,
     borderRadius: 35,
     alignItems: 'center',
     justifyContent: 'center',
   },
   playIcon: {
-    color: '#FFFFFF',
-    fontSize: 28,
+    color: SOLID_COLORS.WHITE,
+    fontSize: ComponentTokens.playButton.iconSize,
     marginLeft: 4,
   },
   contentOverlay: {
@@ -320,24 +321,24 @@ const styles = StyleSheet.create({
     fontWeight: Typography.weights.bold,
   },
   title: {
-    color: '#FFFFFF',
+    color: SOLID_COLORS.WHITE,
     fontSize: Typography.sizes.xxl,
     fontWeight: Typography.weights.bold,
     marginBottom: Spacing.xs,
   },
   tagline: {
-    color: 'rgba(255,255,255,0.8)',
+    color: OVERLAY_COLORS.WHITE_80,
     fontSize: Typography.sizes.md,
     fontStyle: 'italic',
     marginBottom: Spacing.sm,
   },
   metadata: {
-    color: 'rgba(255,255,255,0.7)',
+    color: OVERLAY_COLORS.WHITE_70,
     fontSize: Typography.sizes.sm,
     lineHeight: Typography.sizes.sm * Typography.lineHeights.normal,
   },
   tvInfo: {
-    color: 'rgba(255,255,255,0.7)',
+    color: OVERLAY_COLORS.WHITE_70,
     fontSize: Typography.sizes.sm,
     marginTop: Spacing.xs,
   },

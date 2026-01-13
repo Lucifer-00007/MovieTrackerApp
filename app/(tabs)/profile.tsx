@@ -21,6 +21,7 @@ import { Ionicons } from '@expo/vector-icons';
 
 import { useEffectiveColorScheme } from '@/hooks/use-effective-color-scheme';
 import { Colors, Spacing, Typography, BorderRadius } from '@/constants/theme';
+import { SOLID_COLORS } from '@/constants/colors';
 import { PROFILE_GRID, getLanguageName, getThemeLabel } from '@/constants/profile';
 import { useWatchlistStore } from '@/stores/watchlistStore';
 import { usePreferencesStore } from '@/stores/preferencesStore';
@@ -152,7 +153,7 @@ export default function ProfileScreen() {
           <Text
             style={[
               styles.tabButtonText,
-              { color: activeTab === 'watchlist' ? '#FFFFFF' : colors.text },
+              { color: activeTab === 'watchlist' ? SOLID_COLORS.WHITE : colors.text },
             ]}
           >
             Watchlist
@@ -168,7 +169,7 @@ export default function ProfileScreen() {
           <Text
             style={[
               styles.tabButtonText,
-              { color: activeTab === 'settings' ? '#FFFFFF' : colors.text },
+              { color: activeTab === 'settings' ? SOLID_COLORS.WHITE : colors.text },
             ]}
           >
             Settings
@@ -221,7 +222,7 @@ export default function ProfileScreen() {
               value={preferences.notificationsEnabled}
               onValueChange={handleNotificationsToggle}
               trackColor={{ false: colors.backgroundSecondary, true: colors.tint }}
-              thumbColor="#FFFFFF"
+              thumbColor={SOLID_COLORS.WHITE}
               testID="notifications-toggle"
             />
           }
@@ -239,7 +240,7 @@ export default function ProfileScreen() {
                   value={preferences.notificationTypes.downloads}
                   onValueChange={(enabled) => handleNotificationTypeToggle('downloads', enabled)}
                   trackColor={{ false: colors.backgroundSecondary, true: colors.tint }}
-                  thumbColor="#FFFFFF"
+                  thumbColor={SOLID_COLORS.WHITE}
                   testID="downloads-notifications-toggle"
                 />
               }
@@ -255,7 +256,7 @@ export default function ProfileScreen() {
                   value={preferences.notificationTypes.newReleases}
                   onValueChange={(enabled) => handleNotificationTypeToggle('newReleases', enabled)}
                   trackColor={{ false: colors.backgroundSecondary, true: colors.tint }}
-                  thumbColor="#FFFFFF"
+                  thumbColor={SOLID_COLORS.WHITE}
                   testID="new-releases-notifications-toggle"
                 />
               }
@@ -276,7 +277,7 @@ export default function ProfileScreen() {
               value={preferences.analyticsEnabled}
               onValueChange={handleAnalyticsToggle}
               trackColor={{ false: colors.backgroundSecondary, true: colors.tint }}
-              thumbColor="#FFFFFF"
+              thumbColor={SOLID_COLORS.WHITE}
               testID="analytics-toggle"
             />
           }

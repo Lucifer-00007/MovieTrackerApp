@@ -24,6 +24,7 @@ import Animated, {
 
 import { useEffectiveColorScheme } from '@/hooks/use-effective-color-scheme';
 import { Colors, Spacing, Typography, BorderRadius } from '@/constants/theme';
+import { SOLID_COLORS, OVERLAY_COLORS, ComponentTokens } from '@/constants/colors';
 import { IconSymbol } from '@/components/ui/icon-symbol';
 import { ErrorState } from '@/components/ui/ErrorState';
 import {
@@ -205,25 +206,25 @@ export default function TvDetailScreen() {
       <View style={[styles.header, styles.absoluteHeader]}>
         <Pressable
           onPress={() => router.back()}
-          style={[styles.backButton, styles.headerButton, { backgroundColor: 'rgba(0,0,0,0.5)' }]}
+          style={[styles.backButton, styles.headerButton, { backgroundColor: OVERLAY_COLORS.BLACK_50 }]}
           accessibilityLabel="Go back"
           accessibilityRole="button"
         >
-          <IconSymbol name="chevron.left" size={24} color="#FFFFFF" />
+          <IconSymbol name="chevron.left" size={24} color={SOLID_COLORS.WHITE} />
         </Pressable>
         
         <View style={styles.headerActions}>
           {/* Watchlist button */}
           <Pressable
             onPress={handleWatchlistToggle}
-            style={[styles.headerButton, { backgroundColor: 'rgba(0,0,0,0.5)' }]}
+            style={[styles.headerButton, { backgroundColor: OVERLAY_COLORS.BLACK_50 }]}
             accessibilityLabel={inWatchlist ? 'Remove from watchlist' : 'Add to watchlist'}
             accessibilityRole="button"
           >
             <IconSymbol
               name={inWatchlist ? 'bookmark.fill' : 'bookmark'}
               size={24}
-              color={inWatchlist ? colors.tint : '#FFFFFF'}
+              color={inWatchlist ? colors.tint : SOLID_COLORS.WHITE}
             />
           </Pressable>
         </View>
@@ -314,8 +315,8 @@ const styles = StyleSheet.create({
     paddingTop: Spacing.xl,
   },
   backButton: {
-    minWidth: 44,
-    minHeight: 44,
+    minWidth: ComponentTokens.touchTarget.min,
+    minHeight: ComponentTokens.touchTarget.min,
     alignItems: 'center',
     justifyContent: 'center',
   },
@@ -328,7 +329,7 @@ const styles = StyleSheet.create({
     fontWeight: Typography.weights.semibold,
   },
   headerSpacer: {
-    width: 44,
+    width: ComponentTokens.touchTarget.min,
   },
   headerActions: {
     flexDirection: 'row',
