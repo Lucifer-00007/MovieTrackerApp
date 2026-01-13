@@ -13,7 +13,7 @@ import { Colors, Spacing, Typography, BorderRadius } from '@/constants/theme';
 export type ContentTypeFilter = 'all' | 'movie' | 'tv';
 
 /** Filter state interface */
-export interface CountryHubFilters {
+export interface CountryHubFiltersState {
   contentType: ContentTypeFilter;
   genre: number | null;
   year: number | null;
@@ -93,12 +93,12 @@ function FilterChip({ label, isSelected, onPress }: FilterChipProps) {
   );
 }
 
-interface CountryHubFiltersProps {
-  filters: CountryHubFilters;
-  onFiltersChange: (filters: CountryHubFilters) => void;
+interface CountryHubFiltersComponentProps {
+  filters: CountryHubFiltersState;
+  onFiltersChange: (filters: CountryHubFiltersState) => void;
 }
 
-export function CountryHubFilters({ filters, onFiltersChange }: CountryHubFiltersProps) {
+export function CountryHubFilters({ filters, onFiltersChange }: CountryHubFiltersComponentProps) {
   const backgroundColor = useThemeColor({}, 'background');
 
   const handleContentTypeChange = (contentType: ContentTypeFilter) => {

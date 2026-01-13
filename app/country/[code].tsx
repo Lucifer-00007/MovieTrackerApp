@@ -13,7 +13,7 @@ import { useInfiniteQuery } from '@tanstack/react-query';
 import { useThemeColor } from '@/hooks/use-theme-color';
 import { discoverByCountry } from '@/services/api';
 import { CountryHubHeader } from '@/components/country/CountryHubHeader';
-import { CountryHubFilters, type CountryHubFilters as FiltersType } from '@/components/country/CountryHubFilters';
+import { CountryHubFilters, type CountryHubFiltersState as FiltersType } from '@/components/country/CountryHubFilters';
 import { CountryContentList } from '@/components/country/CountryContentList';
 import { ErrorState } from '@/components/ui/ErrorState';
 
