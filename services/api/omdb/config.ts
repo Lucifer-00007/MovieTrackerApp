@@ -3,7 +3,8 @@
  * Configuration and setup utilities for OMDb API
  */
 
-import { API_BASE_URLS, ANIMATION_DURATION } from '@/constants';
+import { API_BASE_URLS } from '@/constants/api';
+import { ANIMATION_DURATION } from '@/constants/animations';
 import type { OMDbConfig, RetryConfig } from './types';
 
 /** Get API key from environment variable */

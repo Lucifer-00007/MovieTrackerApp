@@ -311,4 +311,13 @@ export const ComponentTokens = {
   removeButton: {
     size: 24,
   },
+  synopsis: {
+    expandThreshold: 200,
+  },
+  cast: {
+    maxDisplay: 10,
+  },
+  contentRow: {
+    itemSpacing: 12,
+  },
 } as const;
