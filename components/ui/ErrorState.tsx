@@ -11,6 +11,7 @@ import { Ionicons } from '@expo/vector-icons';
 import { useThemeColor } from '@/hooks/use-theme-color';
 import { Spacing, BorderRadius, Typography } from '@/constants/theme';
 import { SOLID_COLORS } from '@/constants/colors';
+import { ICON_NAMES } from '@/constants/test-ids';
 
 export interface ErrorStateProps {
   /** Error title */
@@ -32,7 +33,7 @@ export function ErrorState({
   message,
   onRetry,
   retryText = 'Try Again',
-  icon = 'alert-circle-outline',
+  icon = ICON_NAMES.ALERT_CIRCLE,
   testID,
 }: ErrorStateProps) {
   const textColor = useThemeColor({}, 'text');

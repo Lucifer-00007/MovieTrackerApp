@@ -10,6 +10,7 @@ import { Ionicons } from '@expo/vector-icons';
 
 import { useThemeColor } from '@/hooks/use-theme-color';
 import { Spacing, Typography } from '@/constants/theme';
+import { ICON_NAMES } from '@/constants/test-ids';
 
 export interface OfflineBannerProps {
   /** Whether the device is offline */
@@ -45,7 +46,7 @@ export function OfflineBanner({
     >
       <View style={styles.content}>
         <Ionicons
-          name="cloud-offline-outline"
+          name={ICON_NAMES.CLOUD_OFFLINE}
           size={20}
           color={warningColor}
           style={styles.icon}

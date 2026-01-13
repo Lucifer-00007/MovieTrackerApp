@@ -88,3 +88,13 @@ export const STORAGE_KEYS = {
   WATCHLIST_DATA: 'watchlist_data',
   DOWNLOADS_DATA: 'downloads_data',
 } as const;
+
+
+/** Icon names used throughout the app */
+export const ICON_NAMES = {
+  ALERT_CIRCLE: 'alert-circle-outline',
+  CLOUD_OFFLINE: 'cloud-offline-outline',
+  CHECKMARK_CIRCLE: 'checkmark-circle',
+  CLOSE_CIRCLE: 'close-circle',
+  SYNC: 'sync',
+} as const;

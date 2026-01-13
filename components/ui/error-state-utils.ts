@@ -3,6 +3,8 @@
  * Pure logic functions for error handling and display
  */
 
+import { ICON_NAMES } from '@/constants/test-ids';
+
 /** Error types that can occur in the app */
 export type ErrorType = 
   | 'network_offline'
@@ -55,7 +57,7 @@ export function getErrorConfig(type: ErrorType): ErrorConfig {
       type: 'network_offline',
       title: "You're offline",
       message: 'Please check your internet connection and try again.',
-      icon: 'cloud-offline-outline',
+      icon: ICON_NAMES.CLOUD_OFFLINE,
       canRetry: true,
     },
     server_error: {
@@ -83,7 +85,7 @@ export function getErrorConfig(type: ErrorType): ErrorConfig {
       type: 'unknown',
       title: 'Something went wrong',
       message: 'An unexpected error occurred. Please try again.',
-      icon: 'alert-circle-outline',
+      icon: ICON_NAMES.ALERT_CIRCLE,
       canRetry: true,
     },
   };

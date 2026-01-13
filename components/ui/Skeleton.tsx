@@ -18,6 +18,7 @@ import Animated, {
 import { useThemeColor } from '@/hooks/use-theme-color';
 import { Spacing, BorderRadius, ComponentTokens } from '@/constants/theme';
 import { OVERLAY_COLORS } from '@/constants/colors';
+import { DIMENSIONS } from '@/constants/layout';
 
 const { width: SCREEN_WIDTH } = Dimensions.get('window');
 
@@ -213,7 +214,7 @@ const styles = StyleSheet.create({
     height: '100%',
   },
   shimmerGradient: {
-    width: 100,
+    width: DIMENSIONS.DEMO_IMAGE_SIZE,
     height: '100%',
     backgroundColor: OVERLAY_COLORS.WHITE_20,
     transform: [{ skewX: '-20deg' }],
