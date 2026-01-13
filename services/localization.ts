@@ -2,6 +2,8 @@ import { I18n } from 'i18n-js';
 import * as Localization from 'expo-localization';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 
+import { STORAGE_KEYS } from '@/constants/test-ids';
+
 // Import locale files
 import en from '../locales/en.json';
 
@@ -31,7 +33,7 @@ i18n.enableFallback = true;
 i18n.defaultLocale = 'en';
 
 // Storage key for persisted locale preference
-const LOCALE_STORAGE_KEY = 'user_locale_preference';
+const LOCALE_STORAGE_KEY = STORAGE_KEYS.USER_LOCALE_PREFERENCE;
 
 /**
  * Initialize the localization system

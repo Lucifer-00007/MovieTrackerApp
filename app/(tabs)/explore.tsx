@@ -7,8 +7,10 @@ import ParallaxScrollView from '@/components/parallax-scroll-view';
 import { ThemedText } from '@/components/themed-text';
 import { ThemedView } from '@/components/themed-view';
 import { IconSymbol } from '@/components/ui/icon-symbol';
-import { Fonts } from '@/constants/theme';
+import { Fonts, Spacing } from '@/constants/theme';
 import { SOLID_COLORS } from '@/constants/colors';
+import { DOC_URLS } from '@/constants/api';
+import { DIMENSIONS } from '@/constants/layout';
 
 export default function TabTwoScreen() {
   return (
@@ -42,7 +44,7 @@ export default function TabTwoScreen() {
           The layout file in <ThemedText type="defaultSemiBold">app/(tabs)/_layout.tsx</ThemedText>{' '}
           sets up the tab navigator.
         </ThemedText>
-        <ExternalLink href="https://docs.expo.dev/router/introduction">
+        <ExternalLink href={DOC_URLS.EXPO_ROUTER}>
           <ThemedText type="link">Learn more</ThemedText>
         </ExternalLink>
       </Collapsible>
@@ -60,9 +62,9 @@ export default function TabTwoScreen() {
         </ThemedText>
         <Image
           source={require('@/assets/images/react-logo.png')}
-          style={{ width: 100, height: 100, alignSelf: 'center' }}
+          style={{ width: DIMENSIONS.DEMO_IMAGE_SIZE, height: DIMENSIONS.DEMO_IMAGE_SIZE, alignSelf: 'center' }}
         />
-        <ExternalLink href="https://reactnative.dev/docs/images">
+        <ExternalLink href={DOC_URLS.REACT_NATIVE_IMAGES}>
           <ThemedText type="link">Learn more</ThemedText>
         </ExternalLink>
       </Collapsible>
@@ -72,7 +74,7 @@ export default function TabTwoScreen() {
           <ThemedText type="defaultSemiBold">useColorScheme()</ThemedText> hook lets you inspect
           what the user&apos;s current color scheme is, and so you can adjust UI colors accordingly.
         </ThemedText>
-        <ExternalLink href="https://docs.expo.dev/develop/user-interface/color-themes/">
+        <ExternalLink href={DOC_URLS.EXPO_COLOR_SCHEMES}>
           <ThemedText type="link">Learn more</ThemedText>
         </ExternalLink>
       </Collapsible>
@@ -108,6 +110,6 @@ const styles = StyleSheet.create({
   },
   titleContainer: {
     flexDirection: 'row',
-    gap: 8,
+    gap: Spacing.sm,
   },
 });

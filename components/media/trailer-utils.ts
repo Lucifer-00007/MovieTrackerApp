@@ -5,6 +5,8 @@
  * Requirements: 5.1, 5.2, 5.3, 5.4, 5.5
  */
 
+import { YOUTUBE_EMBED_URL } from '@/constants/api';
+
 /**
  * Get YouTube embed URL from video key
  * @param videoKey - YouTube video ID
@@ -14,7 +16,7 @@ export function getYouTubeEmbedUrl(videoKey: string): string {
   if (!videoKey || videoKey.trim() === '') {
     return '';
   }
-  return `https://www.youtube.com/embed/${videoKey}?autoplay=1&playsinline=1&rel=0`;
+  return YOUTUBE_EMBED_URL(videoKey);
 }
 
 /**

@@ -6,6 +6,7 @@
 import { OMDbError, RETRYABLE_ERROR_CODES } from './errors';
 import { DEFAULT_RETRY_CONFIG } from './config';
 import { ANIMATION_DURATION } from '@/constants/animations';
+import { API_HEADERS } from '@/constants/api';
 import type { RetryConfig } from './types';
 
 /**
@@ -173,7 +174,7 @@ export function createHttpError(response: Response): OMDbError {
   }
   
   // Check for rate limit headers
-  const rateLimitRemaining = response.headers.get('X-RateLimit-Remaining');
+  const rateLimitRemaining = response.headers.get(API_HEADERS.RATE_LIMIT_REMAINING);
   const rateLimitReset = response.headers.get('X-RateLimit-Reset');
   if (rateLimitRemaining !== null) {
     context.rateLimitRemaining = parseInt(rateLimitRemaining, 10);

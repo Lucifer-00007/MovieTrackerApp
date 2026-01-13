@@ -10,6 +10,7 @@ import { useEffectiveColorScheme } from '@/hooks/use-effective-color-scheme';
 import { Colors, Spacing, Typography, BorderRadius } from '@/constants/theme';
 import { SOLID_COLORS, OVERLAY_COLORS, ComponentTokens } from '@/constants/colors';
 import { PROFILE_GRID } from '@/constants/profile';
+import { COMPONENT_TEST_IDS } from '@/constants/test-ids';
 import { MediaCard } from '@/components/media/MediaCard';
 import type { WatchlistItem, WatchlistSyncStatus } from '@/types/watchlist';
 
@@ -40,7 +41,7 @@ function SyncStatusIndicator({ status }: SyncStatusIndicatorProps) {
     <View
       style={styles.syncIndicator}
       accessibilityLabel={config.label}
-      testID="sync-status-indicator"
+      testID={COMPONENT_TEST_IDS.SYNC_STATUS_INDICATOR}
     >
       <Ionicons name={config.icon} size={16} color={config.color} />
     </View>
