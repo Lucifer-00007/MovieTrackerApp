@@ -147,6 +147,7 @@ export default function SearchScreen() {
   const tintColor = useThemeColor({}, 'tint');
   const textColor = useThemeColor({}, 'text');
   const textSecondary = useThemeColor({}, 'textSecondary');
+  const textMuted = useThemeColor({}, 'textMuted');
   const borderColor = useThemeColor({}, 'border');
   const cardBackground = useThemeColor({}, 'card');
 
@@ -275,12 +276,19 @@ export default function SearchScreen() {
     >
       {/* Search Header */}
       <View style={styles.header}>
-        <Text
-          style={[styles.title, { color: textColor }]}
-          accessibilityRole="header"
-        >
-          Search
-        </Text>
+        <View style={styles.headerRow}>
+          <View style={[styles.headerIcon, { backgroundColor: colors.backgroundSecondary }]}>
+            <Ionicons name="search" size={22} color={colors.tint} />
+          </View>
+          <View style={styles.headerText}>
+            <Text style={[styles.title, { color: textColor }]} accessibilityRole="header">
+              Search
+            </Text>
+            <Text style={[styles.subtitle, { color: textSecondary }]}>
+              Movies, series & more
+            </Text>
+          </View>
+        </View>
       </View>
 
       {/* Search Input */}
@@ -290,14 +298,14 @@ export default function SearchScreen() {
             styles.searchInputContainer,
             {
               backgroundColor: colors.backgroundSecondary,
-              borderColor: borderColor,
+              borderColor: query.length > 0 ? colors.tint : borderColor,
             },
           ]}
         >
           <Ionicons
             name="search"
             size={20}
-            color={textSecondary}
+            color={query.length > 0 ? colors.tint : textSecondary}
             style={styles.searchIcon}
           />
           <TextInput
@@ -496,18 +504,42 @@ export default function SearchScreen() {
         {/* Initial State - No Query */}
         {!isValidSearchQuery(query) && !showLoading && (
           <View style={styles.initialState}>
-            <Ionicons
-              name="search-outline"
-              size={64}
-              color={textSecondary}
-              style={styles.initialIcon}
-            />
+            <View style={[styles.initialIconContainer, { backgroundColor: colors.backgroundSecondary }]}>
+              <Ionicons name="search-outline" size={48} color={colors.tint} />
+            </View>
             <Text style={[styles.initialTitle, { color: textColor }]}>
               Find Movies & TV Shows
             </Text>
             <Text style={[styles.initialSubtitle, { color: textSecondary }]}>
               Search by title, actor, or keyword
             </Text>
+            
+            {/* Quick Search Suggestions */}
+            <View style={styles.quickSearchContainer}>
+              <Text style={[styles.quickSearchLabel, { color: textMuted }]}>
+                Popular searches
+              </Text>
+              <View style={styles.quickSearchTags}>
+                {['Action', 'Comedy', 'Thriller', 'Anime', 'Drama'].map((tag) => (
+                  <Pressable
+                    key={tag}
+                    onPress={() => setQuery(tag)}
+                    style={({ pressed }) => [
+                      styles.quickSearchTag,
+                      { 
+                        backgroundColor: colors.backgroundSecondary,
+                        borderColor: colors.border,
+                        opacity: pressed ? 0.7 : 1,
+                      },
+                    ]}
+                  >
+                    <Text style={[styles.quickSearchTagText, { color: textSecondary }]}>
+                      {tag}
+                    </Text>
+                  </Pressable>
+                ))}
+              </View>
+            </View>
           </View>
         )}
 
@@ -563,9 +595,28 @@ const styles = StyleSheet.create({
     paddingTop: Spacing.lg,
     paddingBottom: Spacing.sm,
   },
+  headerRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+  },
+  headerIcon: {
+    width: 44,
+    height: 44,
+    borderRadius: BorderRadius.md,
+    alignItems: 'center',
+    justifyContent: 'center',
+    marginRight: Spacing.sm,
+  },
+  headerText: {
+    flex: 1,
+  },
   title: {
-    fontSize: Typography.sizes.xxl,
+    fontSize: Typography.sizes.xl,
     fontWeight: Typography.weights.bold,
+  },
+  subtitle: {
+    fontSize: Typography.sizes.sm,
+    marginTop: 2,
   },
   searchContainer: {
     paddingHorizontal: Spacing.md,
@@ -675,9 +726,14 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'center',
     paddingHorizontal: Spacing.xl,
-    paddingTop: Spacing.xxl,
+    paddingTop: Spacing.lg,
   },
-  initialIcon: {
+  initialIconContainer: {
+    width: 100,
+    height: 100,
+    borderRadius: 50,
+    alignItems: 'center',
+    justifyContent: 'center',
     marginBottom: Spacing.lg,
   },
   initialTitle: {
@@ -689,6 +745,30 @@ const styles = StyleSheet.create({
   initialSubtitle: {
     fontSize: Typography.sizes.md,
     textAlign: 'center',
+    marginBottom: Spacing.xl,
+  },
+  quickSearchContainer: {
+    width: '100%',
+    alignItems: 'center',
+  },
+  quickSearchLabel: {
+    fontSize: Typography.sizes.sm,
+    marginBottom: Spacing.sm,
+  },
+  quickSearchTags: {
+    flexDirection: 'row',
+    flexWrap: 'wrap',
+    justifyContent: 'center',
+    gap: Spacing.sm,
+  },
+  quickSearchTag: {
+    paddingHorizontal: Spacing.md,
+    paddingVertical: Spacing.sm,
+    borderRadius: BorderRadius.full,
+    borderWidth: 1,
+  },
+  quickSearchTagText: {
+    fontSize: Typography.sizes.sm,
   },
   loadingContainer: {
     padding: Spacing.md,

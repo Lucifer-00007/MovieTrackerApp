@@ -9,7 +9,8 @@ import { StyleSheet, View, Text, Pressable } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 
 import { useThemeColor } from '@/hooks/use-theme-color';
-import { Spacing, BorderRadius, Typography } from '@/constants/theme';
+import { useEffectiveColorScheme } from '@/hooks/use-effective-color-scheme';
+import { Colors, Spacing, BorderRadius, Typography } from '@/constants/theme';
 
 export interface EmptyStateProps {
   /** Title to display */
@@ -37,25 +38,26 @@ export function EmptyState({
   onAction,
   testID,
 }: EmptyStateProps) {
+  const colorScheme = useEffectiveColorScheme();
+  const colors = Colors[colorScheme];
   const textColor = useThemeColor({}, 'text');
   const textSecondary = useThemeColor({}, 'textSecondary');
-  const textMuted = useThemeColor({}, 'textMuted');
   const tintColor = useThemeColor({}, 'tint');
-  const backgroundColor = useThemeColor({}, 'backgroundSecondary');
-  const borderColor = useThemeColor({}, 'border');
 
   return (
     <View
-      style={[styles.container, { backgroundColor }]}
+      style={styles.container}
       testID={testID}
       accessibilityLabel={`${title}${message ? `. ${message}` : ''}`}
     >
-      <Ionicons
-        name={icon}
-        size={64}
-        color={textMuted}
-        style={styles.icon}
-      />
+      {/* Icon Container */}
+      <View style={[styles.iconContainer, { backgroundColor: colors.backgroundSecondary }]}>
+        <Ionicons
+          name={icon}
+          size={48}
+          color={tintColor}
+        />
+      </View>
       
       <Text style={[styles.title, { color: textColor }]}>
         {title}
@@ -69,15 +71,13 @@ export function EmptyState({
       
       {suggestions && suggestions.length > 0 && (
         <View style={styles.suggestionsContainer}>
-          <Text style={[styles.suggestionsTitle, { color: textSecondary }]}>
-            Try:
-          </Text>
           {suggestions.map((suggestion, index) => (
             <View
               key={index}
-              style={[styles.suggestionItem, { borderColor }]}
+              style={[styles.suggestionItem, { backgroundColor: colors.backgroundSecondary }]}
             >
-              <Text style={[styles.suggestionText, { color: textColor }]}>
+              <View style={[styles.suggestionBullet, { backgroundColor: tintColor }]} />
+              <Text style={[styles.suggestionText, { color: textSecondary }]}>
                 {suggestion}
               </Text>
             </View>
@@ -108,10 +108,13 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'center',
     padding: Spacing.xl,
-    borderRadius: BorderRadius.lg,
-    margin: Spacing.md,
   },
-  icon: {
+  iconContainer: {
+    width: 100,
+    height: 100,
+    borderRadius: 50,
+    alignItems: 'center',
+    justifyContent: 'center',
     marginBottom: Spacing.lg,
   },
   title: {
@@ -128,28 +131,32 @@ const styles = StyleSheet.create({
   },
   suggestionsContainer: {
     width: '100%',
+    maxWidth: 280,
     marginTop: Spacing.md,
-  },
-  suggestionsTitle: {
-    fontSize: Typography.sizes.sm,
-    fontWeight: Typography.weights.semibold,
-    marginBottom: Spacing.sm,
+    gap: Spacing.sm,
   },
   suggestionItem: {
+    flexDirection: 'row',
+    alignItems: 'center',
     paddingVertical: Spacing.sm,
     paddingHorizontal: Spacing.md,
-    borderWidth: 1,
     borderRadius: BorderRadius.md,
-    marginBottom: Spacing.xs,
+  },
+  suggestionBullet: {
+    width: 6,
+    height: 6,
+    borderRadius: 3,
+    marginRight: Spacing.sm,
   },
   suggestionText: {
     fontSize: Typography.sizes.sm,
+    flex: 1,
   },
   actionButton: {
     marginTop: Spacing.lg,
     paddingVertical: Spacing.sm,
     paddingHorizontal: Spacing.xl,
-    borderRadius: BorderRadius.md,
+    borderRadius: BorderRadius.full,
     minWidth: 44,
     minHeight: 44,
     justifyContent: 'center',

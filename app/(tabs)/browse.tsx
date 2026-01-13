@@ -15,62 +15,48 @@ import {
   Dimensions,
 } from 'react-native';
 import { useRouter } from 'expo-router';
+import { Ionicons } from '@expo/vector-icons';
+import { LinearGradient } from 'expo-linear-gradient';
 
 import { useEffectiveColorScheme } from '@/hooks/use-effective-color-scheme';
-import { useThemeColor } from '@/hooks/use-theme-color';
 import { Colors, Spacing, Typography, BorderRadius } from '@/constants/theme';
 import { SUPPORTED_COUNTRIES, type CountryConfig } from '@/types/media';
 
 const { width: SCREEN_WIDTH } = Dimensions.get('window');
 const GRID_PADDING = Spacing.md;
-const GRID_GAP = Spacing.md;
+const GRID_GAP = Spacing.sm;
 const NUM_COLUMNS = 2;
 const CARD_WIDTH = (SCREEN_WIDTH - GRID_PADDING * 2 - GRID_GAP * (NUM_COLUMNS - 1)) / NUM_COLUMNS;
 
-/** Props for country card component */
-interface CountryCardProps {
-  country: CountryConfig;
-  onPress: () => void;
+/** Get gradient colors for each country */
+function getCountryGradient(code: string, isDark: boolean): [string, string] {
+  const gradients: Record<string, [string, string]> = {
+    US: isDark ? ['#1a365d', '#2c5282'] : ['#ebf8ff', '#bee3f8'],
+    JP: isDark ? ['#742a2a', '#9b2c2c'] : ['#fff5f5', '#fed7d7'],
+    IN: isDark ? ['#744210', '#975a16'] : ['#fffff0', '#fefcbf'],
+    CN: isDark ? ['#742a2a', '#9b2c2c'] : ['#fff5f5', '#fed7d7'],
+    RU: isDark ? ['#1a365d', '#2c5282'] : ['#ebf8ff', '#bee3f8'],
+    ES: isDark ? ['#744210', '#975a16'] : ['#fffff0', '#fefcbf'],
+    DE: isDark ? ['#1c4532', '#276749'] : ['#f0fff4', '#c6f6d5'],
+  };
+  return gradients[code] || (isDark ? ['#2d3748', '#4a5568'] : ['#f7fafc', '#edf2f7']);
 }
 
-/** Country card component */
-function CountryCard({ country, onPress }: CountryCardProps) {
-  const cardBackground = useThemeColor({}, 'card');
-  const cardBorder = useThemeColor({}, 'cardBorder');
-  const textColor = useThemeColor({}, 'text');
-  const textSecondary = useThemeColor({}, 'textSecondary');
-
-  return (
-    <Pressable
-      onPress={onPress}
-      accessibilityRole="button"
-      accessibilityLabel={`Browse content from ${country.name}`}
-      accessibilityHint="Double tap to view top content from this country"
-      style={({ pressed }) => [
-        styles.countryCard,
-        {
-          backgroundColor: cardBackground,
-          borderColor: cardBorder,
-          opacity: pressed ? 0.8 : 1,
-        },
-      ]}
-    >
-      <Text style={styles.countryFlag} accessibilityLabel={`${country.name} flag`}>
-        {country.flag}
-      </Text>
-      <Text style={[styles.countryName, { color: textColor }]}>
-        {country.name}
-      </Text>
-      <Text style={[styles.countryRegion, { color: textSecondary }]}>
-        {getRegionLabel(country.code)}
-      </Text>
-    </Pressable>
-  );
+/** Get icon for each country's content type */
+function getCountryIcon(code: string): keyof typeof Ionicons.glyphMap {
+  const icons: Record<string, keyof typeof Ionicons.glyphMap> = {
+    US: 'film-outline',
+    JP: 'sparkles-outline',
+    IN: 'musical-notes-outline',
+    CN: 'videocam-outline',
+    RU: 'snow-outline',
+    ES: 'sunny-outline',
+    DE: 'construct-outline',
+  };
+  return icons[code] || 'globe-outline';
 }
 
-/**
- * Get a friendly region label for a country
- */
+/** Get a friendly region label for a country */
 function getRegionLabel(code: string): string {
   const labels: Record<string, string> = {
     US: 'Hollywood & More',
@@ -84,12 +70,94 @@ function getRegionLabel(code: string): string {
   return labels[code] || 'Regional Content';
 }
 
+/** Get content count label */
+function getContentCount(code: string): string {
+  const counts: Record<string, string> = {
+    US: '10K+ titles',
+    JP: '5K+ titles',
+    IN: '8K+ titles',
+    CN: '3K+ titles',
+    RU: '2K+ titles',
+    ES: '4K+ titles',
+    DE: '2K+ titles',
+  };
+  return counts[code] || '1K+ titles';
+}
+
+/** Props for country card component */
+interface CountryCardProps {
+  country: CountryConfig;
+  onPress: () => void;
+  colors: typeof Colors.light;
+  isDark: boolean;
+}
+
+/** Country card component */
+function CountryCard({ country, onPress, colors, isDark }: CountryCardProps) {
+  const gradient = getCountryGradient(country.code, isDark);
+  const icon = getCountryIcon(country.code);
+
+  return (
+    <Pressable
+      onPress={onPress}
+      accessibilityRole="button"
+      accessibilityLabel={`Browse content from ${country.name}`}
+      accessibilityHint="Double tap to view top content from this country"
+      style={({ pressed }) => [
+        styles.countryCard,
+        {
+          borderColor: colors.cardBorder,
+          opacity: pressed ? 0.9 : 1,
+          transform: [{ scale: pressed ? 0.98 : 1 }],
+        },
+      ]}
+    >
+      <LinearGradient
+        colors={gradient}
+        start={{ x: 0, y: 0 }}
+        end={{ x: 1, y: 1 }}
+        style={styles.cardGradient}
+      >
+        {/* Flag and Icon Row */}
+        <View style={styles.cardHeader}>
+          <Text style={styles.countryFlag} accessibilityLabel={`${country.name} flag`}>
+            {country.flag}
+          </Text>
+          <View style={[styles.iconBadge, { backgroundColor: isDark ? 'rgba(255,255,255,0.1)' : 'rgba(0,0,0,0.05)' }]}>
+            <Ionicons name={icon} size={16} color={colors.textSecondary} />
+          </View>
+        </View>
+
+        {/* Country Info */}
+        <View style={styles.cardBody}>
+          <Text style={[styles.countryName, { color: colors.text }]}>
+            {country.name}
+          </Text>
+          <Text style={[styles.countryRegion, { color: colors.textSecondary }]}>
+            {getRegionLabel(country.code)}
+          </Text>
+        </View>
+
+        {/* Footer with count */}
+        <View style={styles.cardFooter}>
+          <View style={[styles.countBadge, { backgroundColor: isDark ? 'rgba(255,255,255,0.1)' : 'rgba(0,0,0,0.05)' }]}>
+            <Ionicons name="play-circle" size={12} color={colors.tint} />
+            <Text style={[styles.countText, { color: colors.textMuted }]}>
+              {getContentCount(country.code)}
+            </Text>
+          </View>
+          <Ionicons name="chevron-forward" size={16} color={colors.textMuted} />
+        </View>
+      </LinearGradient>
+    </Pressable>
+  );
+}
+
 export default function BrowseScreen() {
   const router = useRouter();
   const colorScheme = useEffectiveColorScheme();
   const colors = Colors[colorScheme];
-  const textColor = useThemeColor({}, 'text');
-  const textSecondary = useThemeColor({}, 'textSecondary');
+  const isDark = colorScheme === 'dark';
 
   const handleCountryPress = useCallback(
     (countryCode: string) => {
@@ -102,15 +170,37 @@ export default function BrowseScreen() {
     <View style={[styles.container, { backgroundColor: colors.background }]}>
       {/* Header */}
       <View style={styles.header}>
-        <Text
-          style={[styles.title, { color: textColor }]}
-          accessibilityRole="header"
-        >
-          Browse by Country
-        </Text>
-        <Text style={[styles.subtitle, { color: textSecondary }]}>
-          Discover the best content from around the world
-        </Text>
+        <View style={styles.headerTop}>
+          <View style={[styles.headerIcon, { backgroundColor: colors.backgroundSecondary }]}>
+            <Ionicons name="globe" size={24} color={colors.tint} />
+          </View>
+          <View style={styles.headerText}>
+            <Text style={[styles.title, { color: colors.text }]} accessibilityRole="header">
+              Browse by Country
+            </Text>
+            <Text style={[styles.subtitle, { color: colors.textSecondary }]}>
+              Discover regional content worldwide
+            </Text>
+          </View>
+        </View>
+        
+        {/* Stats Row */}
+        <View style={[styles.statsRow, { backgroundColor: colors.backgroundSecondary }]}>
+          <View style={styles.statItem}>
+            <Text style={[styles.statValue, { color: colors.text }]}>7</Text>
+            <Text style={[styles.statLabel, { color: colors.textMuted }]}>Regions</Text>
+          </View>
+          <View style={[styles.statDivider, { backgroundColor: colors.border }]} />
+          <View style={styles.statItem}>
+            <Text style={[styles.statValue, { color: colors.text }]}>34K+</Text>
+            <Text style={[styles.statLabel, { color: colors.textMuted }]}>Titles</Text>
+          </View>
+          <View style={[styles.statDivider, { backgroundColor: colors.border }]} />
+          <View style={styles.statItem}>
+            <Text style={[styles.statValue, { color: colors.text }]}>15+</Text>
+            <Text style={[styles.statLabel, { color: colors.textMuted }]}>Languages</Text>
+          </View>
+        </View>
       </View>
 
       {/* Country Grid */}
@@ -126,6 +216,8 @@ export default function BrowseScreen() {
               key={country.code}
               country={country}
               onPress={() => handleCountryPress(country.code)}
+              colors={colors}
+              isDark={isDark}
             />
           ))}
         </View>
@@ -146,13 +238,52 @@ const styles = StyleSheet.create({
     paddingTop: Spacing.lg,
     paddingBottom: Spacing.md,
   },
+  headerTop: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    marginBottom: Spacing.md,
+  },
+  headerIcon: {
+    width: 48,
+    height: 48,
+    borderRadius: BorderRadius.md,
+    alignItems: 'center',
+    justifyContent: 'center',
+    marginRight: Spacing.sm,
+  },
+  headerText: {
+    flex: 1,
+  },
   title: {
-    fontSize: Typography.sizes.xxl,
+    fontSize: Typography.sizes.xl,
     fontWeight: Typography.weights.bold,
-    marginBottom: Spacing.xs,
   },
   subtitle: {
-    fontSize: Typography.sizes.md,
+    fontSize: Typography.sizes.sm,
+    marginTop: 2,
+  },
+  statsRow: {
+    flexDirection: 'row',
+    borderRadius: BorderRadius.lg,
+    padding: Spacing.md,
+    alignItems: 'center',
+    justifyContent: 'space-around',
+  },
+  statItem: {
+    alignItems: 'center',
+    flex: 1,
+  },
+  statValue: {
+    fontSize: Typography.sizes.lg,
+    fontWeight: Typography.weights.bold,
+  },
+  statLabel: {
+    fontSize: Typography.sizes.xs,
+    marginTop: 2,
+  },
+  statDivider: {
+    width: 1,
+    height: 30,
   },
   scrollView: {
     flex: 1,
@@ -167,27 +298,58 @@ const styles = StyleSheet.create({
   },
   countryCard: {
     width: CARD_WIDTH,
-    paddingVertical: Spacing.lg,
-    paddingHorizontal: Spacing.md,
     borderRadius: BorderRadius.lg,
     borderWidth: 1,
-    alignItems: 'center',
-    justifyContent: 'center',
-    minHeight: 140,
+    overflow: 'hidden',
   },
-  countryFlag: {
-    fontSize: 48,
+  cardGradient: {
+    padding: Spacing.md,
+    minHeight: 160,
+  },
+  cardHeader: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'flex-start',
     marginBottom: Spacing.sm,
   },
+  countryFlag: {
+    fontSize: 40,
+  },
+  iconBadge: {
+    width: 28,
+    height: 28,
+    borderRadius: BorderRadius.full,
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  cardBody: {
+    flex: 1,
+    justifyContent: 'center',
+  },
   countryName: {
-    fontSize: Typography.sizes.lg,
-    fontWeight: Typography.weights.semibold,
-    textAlign: 'center',
-    marginBottom: Spacing.xs,
+    fontSize: Typography.sizes.md,
+    fontWeight: Typography.weights.bold,
+    marginBottom: 2,
   },
   countryRegion: {
-    fontSize: Typography.sizes.sm,
-    textAlign: 'center',
+    fontSize: Typography.sizes.xs,
+  },
+  cardFooter: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    marginTop: Spacing.sm,
+  },
+  countBadge: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    paddingHorizontal: Spacing.sm,
+    paddingVertical: 4,
+    borderRadius: BorderRadius.full,
+    gap: 4,
+  },
+  countText: {
+    fontSize: Typography.sizes.xs,
   },
   bottomSpacer: {
     height: Spacing.xl,
