@@ -114,7 +114,7 @@ const styles = StyleSheet.create({
     fontSize: Typography.sizes.xxl,
     fontWeight: Typography.weights.bold,
     textAlign: 'center',
-    marginTop: Spacing.md,
+    marginTop: Spacing.xxl,
   },
   storageContainer: {
     padding: Spacing.md,

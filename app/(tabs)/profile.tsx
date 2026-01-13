@@ -406,7 +406,7 @@ const styles = StyleSheet.create({
   },
   tabHeader: {
     paddingHorizontal: Spacing.md,
-    paddingTop: Spacing.xxl,
+    paddingTop: Spacing.xxxxl,
     paddingBottom: Spacing.md,
   },
   tabContainer: {
