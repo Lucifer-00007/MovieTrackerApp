@@ -17,6 +17,9 @@
     "find:long-files": "node ./scripts/find-long-files.js",
     "find:constants": "node ./scripts/find-hardcoded-constants.js"
   },
+  "overrides": {
+    "expo-constants": "~18.0.13"
+  },
   "dependencies": {
     "@expo/vector-icons": "^15.0.3",
     "@react-native-async-storage/async-storage": "^2.2.0",
