@@ -185,18 +185,6 @@ export function CountryHubHeader({ countryCode }: CountryHubHeaderProps) {
                 <Text style={[styles.countryDescription, { color: countryInfo.gradient[0] }]}>
                   {countryInfo.description}
                 </Text>
-                
-                {/* Enhanced Meta Information */}
-                <View style={styles.metaContainer}>
-                  <View style={[styles.metaBadge, { backgroundColor: cardBackground + 'CC' }]}>
-                    <Ionicons name="library-outline" size={12} color={textSecondary} />
-                    <Text style={[styles.metaText, { color: textSecondary }]}>{countryInfo.totalContent}</Text>
-                  </View>
-                  <View style={[styles.metaBadge, { backgroundColor: cardBackground + 'CC' }]}>
-                    <Ionicons name="trending-up" size={12} color={textSecondary} />
-                    <Text style={[styles.metaText, { color: textSecondary }]}>Live</Text>
-                  </View>
-                </View>
               </View>
             </View>
           </Pressable>
@@ -209,7 +197,7 @@ export function CountryHubHeader({ countryCode }: CountryHubHeaderProps) {
               colors={[countryInfo.gradient[0] + '20', countryInfo.gradient[0] + '10']}
               style={styles.statIconContainer}
             >
-              <Ionicons name="film" size={18} color={countryInfo.gradient[0]} />
+              <Ionicons name="film" size={16} color={countryInfo.gradient[0]} />
             </LinearGradient>
             <View style={styles.statContent}>
               <Text style={[styles.statLabel, { color: textColor }]}>Movies</Text>
@@ -223,7 +211,7 @@ export function CountryHubHeader({ countryCode }: CountryHubHeaderProps) {
               colors={[countryInfo.gradient[1] + '20', countryInfo.gradient[1] + '10']}
               style={styles.statIconContainer}
             >
-              <Ionicons name="tv" size={18} color={countryInfo.gradient[1]} />
+              <Ionicons name="tv" size={16} color={countryInfo.gradient[1]} />
             </LinearGradient>
             <View style={styles.statContent}>
               <Text style={[styles.statLabel, { color: textColor }]}>Series</Text>
@@ -343,12 +331,12 @@ const styles = StyleSheet.create({
     gap: Spacing.xs,
   },
   countryName: {
-    fontSize: Typography.sizes.xxl,
+    fontSize: Typography.sizes.xl,
     fontWeight: Typography.weights.bold,
     lineHeight: Typography.sizes.xxl * 1.1,
   },
   countryDescription: {
-    fontSize: Typography.sizes.sm,
+    fontSize: Typography.sizes.xs,
     fontWeight: Typography.weights.semibold,
   },
   metaContainer: {
@@ -408,8 +396,8 @@ const styles = StyleSheet.create({
     elevation: 2,
   },
   statIconContainer: {
-    width: 40,
-    height: 40,
+    width: 30,
+    height: 30,
     borderRadius: BorderRadius.lg,
     alignItems: 'center',
     justifyContent: 'center',
@@ -418,12 +406,12 @@ const styles = StyleSheet.create({
     flex: 1,
   },
   statLabel: {
-    fontSize: Typography.sizes.md,
+    fontSize: Typography.sizes.xs,
     fontWeight: Typography.weights.bold,
     lineHeight: Typography.sizes.md * 1.2,
   },
   statSubtext: {
-    fontSize: Typography.sizes.xs,
+    fontSize: Typography.sizes.xxs,
   },
   statIndicator: {
     width: 4,
