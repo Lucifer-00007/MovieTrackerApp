@@ -435,10 +435,15 @@ Failed to resolve the Android SDK path. Default install location not found: /Use
 - Move all the hard-coded constants to ./constants folder following DRY principles(use bun run find:long-files). Follow this practice in future developments as well.
 - Check the codebase and find if any file is longer than 500 line(use bun run find:long-files). If so break into modules.
 
-- [] Make this changes:
+- [x] Make this changes:
 - ./app/tv/ - update to webs-series, update all the related files and folders 
 - When i click on any season i want a season detail page. Eg: when i click on season 2 it should open a season 2 detail pages related to the webseries. Upadate such that this open page is persistent whe we refresh the pages
 
+- [] Add a episode detail page that works when we click on any one episode from a season in web-series. This should be persistent when we refresh this page.
+
+- []
+- []
+- []
 - []
 - []
 - []

@@ -110,7 +110,6 @@ export default function SeasonDetailScreen() {
       setSeriesDetails(details);
 
       // Generate mock season data based on series info
-      // In production, this would call a dedicated season API endpoint
       const avgEpisodesPerSeason = details.numberOfEpisodes && details.numberOfSeasons
         ? Math.ceil(details.numberOfEpisodes / details.numberOfSeasons)
         : 10;
@@ -145,28 +144,23 @@ export default function SeasonDetailScreen() {
     }
   }, [seriesId, season]);
 
-  // Initial fetch
   useEffect(() => {
     fetchSeasonData();
   }, [fetchSeasonData]);
 
-  // Handle refresh
   const handleRefresh = useCallback(() => {
     fetchSeasonData(true);
   }, [fetchSeasonData]);
 
-  // Handle retry
   const handleRetry = useCallback(() => {
     fetchSeasonData();
   }, [fetchSeasonData]);
 
-  // Handle episode press
+  // Handle episode press - navigate to episode detail page
   const handleEpisodePress = useCallback((episode: Episode) => {
-    // Could navigate to episode detail or play episode
-    console.log(`Episode ${episode.episodeNumber} pressed`);
-  }, []);
+    router.push(`/web-series/${seriesId}/season/${season}/episode/${episode.episodeNumber}` as any);
+  }, [seriesId, season]);
 
-  // Render episode item
   const renderEpisode = useCallback(({ item }: { item: Episode }) => {
     const stillUrl = getImageUrl(item.stillPath, 'w300');
     
@@ -180,7 +174,6 @@ export default function SeasonDetailScreen() {
         accessibilityRole="button"
         accessibilityLabel={`Episode ${item.episodeNumber}: ${item.name}`}
       >
-        {/* Episode Thumbnail */}
         <View style={styles.episodeThumbnail}>
           {stillUrl ? (
             <Image
@@ -196,13 +189,11 @@ export default function SeasonDetailScreen() {
               <Ionicons name="play-circle-outline" size={32} color={colors.textSecondary} />
             </View>
           )}
-          {/* Episode number badge */}
           <View style={[styles.episodeBadge, { backgroundColor: colors.tint }]}>
             <Text style={styles.episodeBadgeText}>{item.episodeNumber}</Text>
           </View>
         </View>
 
-        {/* Episode Info */}
         <View style={styles.episodeInfo}>
           <Text style={[styles.episodeTitle, { color: colors.text }]} numberOfLines={1}>
             {item.name}
@@ -231,7 +222,6 @@ export default function SeasonDetailScreen() {
           </Text>
         </View>
 
-        {/* Play icon */}
         <View style={styles.playIconContainer}>
           <Ionicons name="chevron-forward" size={20} color={colors.textSecondary} />
         </View>
@@ -239,17 +229,11 @@ export default function SeasonDetailScreen() {
     );
   }, [colors, handleEpisodePress]);
 
-  // Loading state
   if (isLoading) {
     return (
       <View style={[styles.container, { backgroundColor: colors.background }]}>
         <View style={[styles.header, { borderBottomColor: colors.border, backgroundColor: colors.background }]}>
-          <Pressable
-            onPress={() => router.back()}
-            style={styles.backButton}
-            accessibilityLabel="Go back"
-            accessibilityRole="button"
-          >
+          <Pressable onPress={() => router.back()} style={styles.backButton}>
             <IconSymbol name="chevron.left" size={24} color={colors.text} />
           </Pressable>
           <ContentSkeleton />
@@ -260,26 +244,17 @@ export default function SeasonDetailScreen() {
     );
   }
 
-  // Error state
   if (error || !seasonDetail || !seriesDetails) {
     return (
       <View style={[styles.container, { backgroundColor: colors.background }]}>
         <View style={[styles.header, { borderBottomColor: colors.border }]}>
-          <Pressable
-            onPress={() => router.back()}
-            style={styles.backButton}
-            accessibilityLabel="Go back"
-            accessibilityRole="button"
-          >
+          <Pressable onPress={() => router.back()} style={styles.backButton}>
             <IconSymbol name="chevron.left" size={24} color={colors.text} />
           </Pressable>
           <Text style={[styles.headerTitle, { color: colors.text }]}>Season {season}</Text>
           <View style={styles.headerSpacer} />
         </View>
-        <ErrorState
-          message={error || 'Season not found'}
-          onRetry={handleRetry}
-        />
+        <ErrorState message={error || 'Season not found'} onRetry={handleRetry} />
       </View>
     );
   }
@@ -288,14 +263,8 @@ export default function SeasonDetailScreen() {
 
   return (
     <View style={[styles.container, { backgroundColor: colors.background }]}>
-      {/* Header */}
       <View style={[styles.header, { borderBottomColor: colors.border, backgroundColor: colors.background }]}>
-        <Pressable
-          onPress={() => router.back()}
-          style={styles.backButton}
-          accessibilityLabel="Go back"
-          accessibilityRole="button"
-        >
+        <Pressable onPress={() => router.back()} style={styles.backButton}>
           <IconSymbol name="chevron.left" size={24} color={colors.text} />
         </Pressable>
         <Text style={[styles.headerTitle, { color: colors.text }]} numberOfLines={1}>
@@ -311,7 +280,6 @@ export default function SeasonDetailScreen() {
         contentContainerStyle={styles.listContent}
         ListHeaderComponent={
           <View style={styles.seasonHeader}>
-            {/* Season Poster */}
             <View style={styles.posterContainer}>
               {posterUrl ? (
                 <Image
@@ -330,7 +298,6 @@ export default function SeasonDetailScreen() {
               )}
             </View>
 
-            {/* Season Info */}
             <View style={styles.seasonInfo}>
               <Text style={[styles.seasonTitle, { color: colors.text }]}>
                 {seasonDetail.name}
@@ -357,11 +324,7 @@ export default function SeasonDetailScreen() {
         }
         ListHeaderComponentStyle={styles.listHeader}
         refreshControl={
-          <RefreshControl
-            refreshing={isRefreshing}
-            onRefresh={handleRefresh}
-            tintColor={colors.tint}
-          />
+          <RefreshControl refreshing={isRefreshing} onRefresh={handleRefresh} tintColor={colors.tint} />
         }
         ItemSeparatorComponent={() => <View style={styles.separator} />}
       />
@@ -370,17 +333,7 @@ export default function SeasonDetailScreen() {
 }
 
 const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-  },
-  centered: {
-    justifyContent: 'center',
-    alignItems: 'center',
-  },
-  loadingText: {
-    marginTop: Spacing.md,
-    fontSize: Typography.sizes.md,
-  },
+  container: { flex: 1 },
   header: {
     flexDirection: 'row',
     alignItems: 'center',
@@ -402,57 +355,18 @@ const styles = StyleSheet.create({
     textAlign: 'center',
     marginHorizontal: Spacing.sm,
   },
-  headerSpacer: {
-    width: ComponentTokens.touchTarget.min,
-  },
-  listContent: {
-    paddingBottom: Spacing.xxl,
-  },
-  listHeader: {
-    marginBottom: Spacing.md,
-  },
-  seasonHeader: {
-    flexDirection: 'row',
-    padding: Spacing.lg,
-    gap: Spacing.md,
-  },
-  posterContainer: {
-    width: 120,
-    height: 180,
-    borderRadius: BorderRadius.lg,
-    overflow: 'hidden',
-  },
-  posterImage: {
-    width: '100%',
-    height: '100%',
-  },
-  posterPlaceholder: {
-    width: '100%',
-    height: '100%',
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
-  seasonInfo: {
-    flex: 1,
-    justifyContent: 'center',
-  },
-  seasonTitle: {
-    fontSize: Typography.sizes.xl,
-    fontWeight: Typography.weights.bold,
-    marginBottom: Spacing.xs,
-  },
-  seasonMeta: {
-    flexDirection: 'row',
-    flexWrap: 'wrap',
-    marginBottom: Spacing.sm,
-  },
-  seasonMetaText: {
-    fontSize: Typography.sizes.sm,
-  },
-  seasonOverview: {
-    fontSize: Typography.sizes.sm,
-    lineHeight: Typography.sizes.sm * Typography.lineHeights.relaxed,
-  },
+  headerSpacer: { width: ComponentTokens.touchTarget.min },
+  listContent: { paddingBottom: Spacing.xxl },
+  listHeader: { marginBottom: Spacing.md },
+  seasonHeader: { flexDirection: 'row', padding: Spacing.lg, gap: Spacing.md },
+  posterContainer: { width: 120, height: 180, borderRadius: BorderRadius.lg, overflow: 'hidden' },
+  posterImage: { width: '100%', height: '100%' },
+  posterPlaceholder: { width: '100%', height: '100%', alignItems: 'center', justifyContent: 'center' },
+  seasonInfo: { flex: 1, justifyContent: 'center' },
+  seasonTitle: { fontSize: Typography.sizes.xl, fontWeight: Typography.weights.bold, marginBottom: Spacing.xs },
+  seasonMeta: { flexDirection: 'row', flexWrap: 'wrap', marginBottom: Spacing.sm },
+  seasonMetaText: { fontSize: Typography.sizes.sm },
+  seasonOverview: { fontSize: Typography.sizes.sm, lineHeight: Typography.sizes.sm * Typography.lineHeights.relaxed },
   episodeCard: {
     flexDirection: 'row',
     marginHorizontal: Spacing.lg,
@@ -460,23 +374,9 @@ const styles = StyleSheet.create({
     borderRadius: BorderRadius.lg,
     borderWidth: 1,
   },
-  episodeThumbnail: {
-    width: 120,
-    height: 68,
-    borderRadius: BorderRadius.md,
-    overflow: 'hidden',
-    position: 'relative',
-  },
-  thumbnailImage: {
-    width: '100%',
-    height: '100%',
-  },
-  thumbnailPlaceholder: {
-    width: '100%',
-    height: '100%',
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
+  episodeThumbnail: { width: 120, height: 68, borderRadius: BorderRadius.md, overflow: 'hidden', position: 'relative' },
+  thumbnailImage: { width: '100%', height: '100%' },
+  thumbnailPlaceholder: { width: '100%', height: '100%', alignItems: 'center', justifyContent: 'center' },
   episodeBadge: {
     position: 'absolute',
     top: Spacing.xs,
@@ -485,39 +385,12 @@ const styles = StyleSheet.create({
     paddingVertical: 2,
     borderRadius: BorderRadius.sm,
   },
-  episodeBadgeText: {
-    color: SOLID_COLORS.WHITE,
-    fontSize: Typography.sizes.xs,
-    fontWeight: Typography.weights.bold,
-  },
-  episodeInfo: {
-    flex: 1,
-    marginLeft: Spacing.sm,
-    justifyContent: 'center',
-  },
-  episodeTitle: {
-    fontSize: Typography.sizes.md,
-    fontWeight: Typography.weights.semibold,
-    marginBottom: 2,
-  },
-  episodeMeta: {
-    flexDirection: 'row',
-    flexWrap: 'wrap',
-    marginBottom: Spacing.xs,
-  },
-  episodeMetaText: {
-    fontSize: Typography.sizes.xs,
-    marginRight: Spacing.xs,
-  },
-  episodeOverview: {
-    fontSize: Typography.sizes.xs,
-    lineHeight: Typography.sizes.xs * Typography.lineHeights.normal,
-  },
-  playIconContainer: {
-    justifyContent: 'center',
-    paddingLeft: Spacing.sm,
-  },
-  separator: {
-    height: Spacing.sm,
-  },
+  episodeBadgeText: { color: SOLID_COLORS.WHITE, fontSize: Typography.sizes.xs, fontWeight: Typography.weights.bold },
+  episodeInfo: { flex: 1, marginLeft: Spacing.sm, justifyContent: 'center' },
+  episodeTitle: { fontSize: Typography.sizes.md, fontWeight: Typography.weights.semibold, marginBottom: 2 },
+  episodeMeta: { flexDirection: 'row', flexWrap: 'wrap', marginBottom: Spacing.xs },
+  episodeMetaText: { fontSize: Typography.sizes.xs, marginRight: Spacing.xs },
+  episodeOverview: { fontSize: Typography.sizes.xs, lineHeight: Typography.sizes.xs * Typography.lineHeights.normal },
+  playIconContainer: { justifyContent: 'center', paddingLeft: Spacing.sm },
+  separator: { height: Spacing.sm },
 });
