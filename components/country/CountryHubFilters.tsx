@@ -8,7 +8,7 @@
 import { StyleSheet, View, ScrollView, Pressable, Text } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import { useThemeColor } from '@/hooks/use-theme-color';
-import { Colors, Spacing, Typography, BorderRadius } from '@/constants/theme';
+import { Spacing, Typography, BorderRadius } from '@/constants/theme';
 import { SOLID_COLORS } from '@/constants/colors';
 
 /** Content type filter options */
@@ -127,7 +127,6 @@ interface CountryHubFiltersComponentProps {
 }
 
 export function CountryHubFilters({ filters, onFiltersChange }: CountryHubFiltersComponentProps) {
-  const backgroundColor = useThemeColor({}, 'background');
   const cardBackground = useThemeColor({}, 'card');
   const borderColor = useThemeColor({}, 'cardBorder');
 

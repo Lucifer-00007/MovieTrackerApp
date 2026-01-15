@@ -1,6 +1,6 @@
 /**
  * Country Hub Header Component
- * Displays country information and navigation with enhanced visual design
+ * Premium header design with enhanced visual elements and interactivity
  * 
  * Requirements: 3.1, 3.2
  */
@@ -9,10 +9,14 @@ import { StyleSheet, View, Text, Pressable } from 'react-native';
 import { router } from 'expo-router';
 import { LinearGradient } from 'expo-linear-gradient';
 import { Ionicons } from '@expo/vector-icons';
+import Animated, { 
+  useSharedValue, 
+  useAnimatedStyle, 
+  withSpring,
+} from 'react-native-reanimated';
 import { useThemeColor } from '@/hooks/use-theme-color';
 import { IconSymbol } from '@/components/ui/icon-symbol';
 import { Spacing, Typography, BorderRadius } from '@/constants/theme';
-import { SOLID_COLORS, OVERLAY_COLORS } from '@/constants/colors';
 import { getCountryConfig } from '@/constants/countries';
 
 interface CountryHubHeaderProps {
@@ -22,131 +26,217 @@ interface CountryHubHeaderProps {
 export function CountryHubHeader({ countryCode }: CountryHubHeaderProps) {
   const textColor = useThemeColor({}, 'text');
   const textSecondary = useThemeColor({}, 'textSecondary');
-  const tintColor = useThemeColor({}, 'tint');
   const cardBackground = useThemeColor({}, 'card');
   
   const country = getCountryConfig(countryCode);
   const countryName = country?.name || countryCode.toUpperCase();
 
-  // Get country flag emoji and info
+  // Animation values
+  const headerScale = useSharedValue(1);
+  const flagRotation = useSharedValue(0);
+
+  // Get comprehensive country information
   const getCountryInfo = (code: string) => {
-    const countryData: Record<string, { flag: string; description: string; timezone: string }> = {
-      'DE': { flag: '🇩🇪', description: 'European Cinema Hub', timezone: 'CET' },
-      'US': { flag: '🇺🇸', description: 'Hollywood & Beyond', timezone: 'PST/EST' },
-      'GB': { flag: '🇬🇧', description: 'British Productions', timezone: 'GMT' },
-      'FR': { flag: '🇫🇷', description: 'French Cinema', timezone: 'CET' },
-      'IT': { flag: '🇮🇹', description: 'Italian Films', timezone: 'CET' },
-      'ES': { flag: '🇪🇸', description: 'Spanish Content', timezone: 'CET' },
-      'JP': { flag: '🇯🇵', description: 'Anime & J-Drama', timezone: 'JST' },
-      'KR': { flag: '🇰🇷', description: 'K-Drama & K-Movies', timezone: 'KST' },
-      'IN': { flag: '🇮🇳', description: 'Bollywood & Regional', timezone: 'IST' },
-      'CN': { flag: '🇨🇳', description: 'Chinese Cinema', timezone: 'CST' },
+    const countryData: Record<string, { 
+      flag: string; 
+      description: string; 
+      timezone: string;
+      popularGenres: string[];
+      totalContent: string;
+      gradient: string[];
+    }> = {
+      'DE': { 
+        flag: '🇩🇪', 
+        description: 'European Cinema Hub', 
+        timezone: 'CET',
+        popularGenres: ['Drama', 'Thriller', 'Documentary'],
+        totalContent: '2.5K+',
+        gradient: ['#FF6B6B', '#4ECDC4']
+      },
+      'US': { 
+        flag: '🇺🇸', 
+        description: 'Hollywood & Beyond', 
+        timezone: 'PST/EST',
+        popularGenres: ['Action', 'Comedy', 'Sci-Fi'],
+        totalContent: '15K+',
+        gradient: ['#667eea', '#764ba2']
+      },
+      'GB': { 
+        flag: '🇬🇧', 
+        description: 'British Productions', 
+        timezone: 'GMT',
+        popularGenres: ['Drama', 'Comedy', 'Mystery'],
+        totalContent: '3.2K+',
+        gradient: ['#f093fb', '#f5576c']
+      },
+      'FR': { 
+        flag: '🇫🇷', 
+        description: 'French Cinema', 
+        timezone: 'CET',
+        popularGenres: ['Romance', 'Drama', 'Art House'],
+        totalContent: '2.8K+',
+        gradient: ['#4facfe', '#00f2fe']
+      },
+      'JP': { 
+        flag: '🇯🇵', 
+        description: 'Anime & J-Drama', 
+        timezone: 'JST',
+        popularGenres: ['Anime', 'Drama', 'Horror'],
+        totalContent: '8.5K+',
+        gradient: ['#fa709a', '#fee140']
+      },
+      'KR': { 
+        flag: '🇰🇷', 
+        description: 'K-Drama & K-Movies', 
+        timezone: 'KST',
+        popularGenres: ['Romance', 'Thriller', 'Drama'],
+        totalContent: '4.1K+',
+        gradient: ['#a8edea', '#fed6e3']
+      },
     };
-    return countryData[code] || { flag: '🌍', description: 'International Content', timezone: 'UTC' };
+    return countryData[code] || { 
+      flag: '🌍', 
+      description: 'International Content', 
+      timezone: 'UTC',
+      popularGenres: ['Drama', 'Action', 'Comedy'],
+      totalContent: '1K+',
+      gradient: ['#667eea', '#764ba2']
+    };
   };
 
   const countryInfo = getCountryInfo(countryCode);
 
+  // Animated styles
+  const headerAnimatedStyle = useAnimatedStyle(() => ({
+    transform: [{ scale: headerScale.value }],
+  }));
+
+  const flagAnimatedStyle = useAnimatedStyle(() => ({
+    transform: [{ rotateY: `${flagRotation.value}deg` }],
+  }));
+
+  const handleHeaderPress = () => {
+    headerScale.value = withSpring(0.98, { duration: 150 });
+    setTimeout(() => {
+      headerScale.value = withSpring(1, { duration: 150 });
+    }, 100);
+  };
+
+  const handleFlagPress = () => {
+    flagRotation.value = withSpring(flagRotation.value + 180, { duration: 800 });
+  };
+
   return (
     <View style={styles.container}>
-      {/* Enhanced background with multiple gradients */}
+      {/* Dynamic background with country-specific gradient */}
       <LinearGradient
         colors={[
-          tintColor + '30',
-          tintColor + '20', 
-          tintColor + '10',
+          countryInfo.gradient[0] + '40',
+          countryInfo.gradient[1] + '30',
+          countryInfo.gradient[0] + '20',
           'transparent'
         ]}
         style={styles.backgroundGradient}
-        locations={[0, 0.3, 0.7, 1]}
+        locations={[0, 0.4, 0.7, 1]}
       />
       
-      {/* Decorative elements */}
-      <View style={[styles.decorativeCircle, styles.circle1, { backgroundColor: tintColor + '15' }]} />
-      <View style={[styles.decorativeCircle, styles.circle2, { backgroundColor: tintColor + '10' }]} />
+      {/* Animated decorative elements */}
+      <View style={[styles.decorativeElement, styles.element1, { backgroundColor: countryInfo.gradient[0] + '15' }]} />
+      <View style={[styles.decorativeElement, styles.element2, { backgroundColor: countryInfo.gradient[1] + '10' }]} />
+      <View style={[styles.decorativeElement, styles.element3, { backgroundColor: countryInfo.gradient[0] + '08' }]} />
       
-      <View style={styles.header}>
-        {/* Back Button */}
-        <Pressable
-          onPress={() => router.back()}
-          accessibilityRole="button"
-          accessibilityLabel="Go back"
-          style={({ pressed }) => [
-            styles.backButton,
-            { 
-              backgroundColor: cardBackground + 'E6',
-              transform: [{ scale: pressed ? 0.95 : 1 }]
-            }
-          ]}
-        >
-          <IconSymbol
-            name="chevron.left"
-            size={20}
-            color={textColor}
-          />
-        </Pressable>
-        
-        {/* Main Content */}
-        <View style={styles.mainContent}>
-          {/* Country Flag and Name */}
-          <View style={styles.countrySection}>
-            <View style={[styles.flagContainer, { backgroundColor: cardBackground + 'CC' }]}>
-              <Text style={styles.flag}>{countryInfo.flag}</Text>
-              <View style={[styles.flagGlow, { backgroundColor: tintColor + '20' }]} />
-            </View>
+      <Animated.View style={[styles.header, headerAnimatedStyle]}>
+        {/* Navigation Section */}
+        <View style={styles.navigationSection}>
+          <Pressable
+            onPress={() => router.back()}
+            accessibilityRole="button"
+            accessibilityLabel="Go back"
+            style={({ pressed }) => [
+              styles.backButton,
+              { 
+                backgroundColor: cardBackground + 'F0',
+                transform: [{ scale: pressed ? 0.9 : 1 }]
+              }
+            ]}
+          >
+            <IconSymbol name="chevron.left" size={20} color={textColor} />
+          </Pressable>
+        </View>
+
+        {/* Main Content Section */}
+        <Pressable onPress={handleHeaderPress} style={styles.mainSection}>
+          {/* Country Identity */}
+          <View style={styles.countryIdentity}>
+            <Pressable onPress={handleFlagPress}>
+              <Animated.View style={[styles.flagContainer, flagAnimatedStyle]}>
+                <LinearGradient
+                  colors={[countryInfo.gradient[0] + '30', countryInfo.gradient[1] + '20']}
+                  style={styles.flagBackground}
+                />
+                <Text style={styles.flag}>{countryInfo.flag}</Text>
+                <View style={[styles.flagRing, { borderColor: countryInfo.gradient[0] + '40' }]} />
+              </Animated.View>
+            </Pressable>
             
             <View style={styles.countryDetails}>
               <Text style={[styles.countryName, { color: textColor }]}>
                 {countryName}
               </Text>
-              <Text style={[styles.countryDescription, { color: tintColor }]}>
+              <Text style={[styles.countryDescription, { color: countryInfo.gradient[0] }]}>
                 {countryInfo.description}
               </Text>
-              <View style={styles.metaInfo}>
-                <View style={styles.metaItem}>
-                  <Ionicons name="time-outline" size={12} color={textSecondary} />
-                  <Text style={[styles.metaText, { color: textSecondary }]}>
-                    {countryInfo.timezone}
-                  </Text>
+              
+              {/* Enhanced Meta Information */}
+              <View style={styles.metaContainer}>
+                <View style={[styles.metaBadge, { backgroundColor: cardBackground + 'CC' }]}>
+                  <Ionicons name="library-outline" size={12} color={textSecondary} />
+                  <Text style={[styles.metaText, { color: textSecondary }]}>{countryInfo.totalContent}</Text>
                 </View>
-                <View style={styles.metaItem}>
+                <View style={[styles.metaBadge, { backgroundColor: cardBackground + 'CC' }]}>
                   <Ionicons name="trending-up" size={12} color={textSecondary} />
-                  <Text style={[styles.metaText, { color: textSecondary }]}>
-                    Trending Now
-                  </Text>
+                  <Text style={[styles.metaText, { color: textSecondary }]}>Live</Text>
                 </View>
               </View>
             </View>
           </View>
+        </Pressable>
 
-          {/* Stats Section */}
-          <View style={styles.statsSection}>
-            <View style={[styles.statCard, { backgroundColor: cardBackground + 'B3' }]}>
-              <View style={[styles.statIcon, { backgroundColor: tintColor + '20' }]}>
-                <Ionicons name="film" size={16} color={tintColor} />
-              </View>
-              <View style={styles.statInfo}>
-                <Text style={[styles.statNumber, { color: textColor }]}>Movies</Text>
-                <Text style={[styles.statLabel, { color: textSecondary }]}>Popular</Text>
-              </View>
+        {/* Enhanced Stats Section */}
+        <View style={styles.statsSection}>
+          <View style={[styles.statCard, { backgroundColor: cardBackground + 'E6' }]}>
+            <LinearGradient
+              colors={[countryInfo.gradient[0] + '20', countryInfo.gradient[0] + '10']}
+              style={styles.statIconContainer}
+            >
+              <Ionicons name="film" size={18} color={countryInfo.gradient[0]} />
+            </LinearGradient>
+            <View style={styles.statContent}>
+              <Text style={[styles.statLabel, { color: textColor }]}>Movies</Text>
+              <Text style={[styles.statSubtext, { color: textSecondary }]}>Popular</Text>
             </View>
-            
-            <View style={[styles.statCard, { backgroundColor: cardBackground + 'B3' }]}>
-              <View style={[styles.statIcon, { backgroundColor: tintColor + '20' }]}>
-                <Ionicons name="tv" size={16} color={tintColor} />
-              </View>
-              <View style={styles.statInfo}>
-                <Text style={[styles.statNumber, { color: textColor }]}>Series</Text>
-                <Text style={[styles.statLabel, { color: textSecondary }]}>Trending</Text>
-              </View>
-            </View>
+            <View style={[styles.statIndicator, { backgroundColor: countryInfo.gradient[0] }]} />
           </View>
-        </View>      
-      </View>
+          
+          <View style={[styles.statCard, { backgroundColor: cardBackground + 'E6' }]}>
+            <LinearGradient
+              colors={[countryInfo.gradient[1] + '20', countryInfo.gradient[1] + '10']}
+              style={styles.statIconContainer}
+            >
+              <Ionicons name="tv" size={18} color={countryInfo.gradient[1]} />
+            </LinearGradient>
+            <View style={styles.statContent}>
+              <Text style={[styles.statLabel, { color: textColor }]}>Series</Text>
+              <Text style={[styles.statSubtext, { color: textSecondary }]}>Trending</Text>
+            </View>
+            <View style={[styles.statIndicator, { backgroundColor: countryInfo.gradient[1] }]} />
+          </View>
+        </View>
+      </Animated.View>
 
-      {/* Bottom accent line */}
+      {/* Enhanced Bottom Accent */}
       <LinearGradient
-        colors={[tintColor + '60', tintColor + '20', 'transparent']}
+        colors={[countryInfo.gradient[0] + '80', countryInfo.gradient[1] + '60', 'transparent']}
         start={{ x: 0, y: 0 }}
         end={{ x: 1, y: 0 }}
         style={styles.accentLine}
@@ -158,93 +248,144 @@ export function CountryHubHeader({ countryCode }: CountryHubHeaderProps) {
 const styles = StyleSheet.create({
   container: {
     position: 'relative',
-    paddingTop: Spacing.xxl + Spacing.md,
+    paddingTop: Spacing.xxxl,
     overflow: 'hidden',
   },
   backgroundGradient: {
     ...StyleSheet.absoluteFillObject,
   },
-  decorativeCircle: {
+  decorativeElement: {
     position: 'absolute',
     borderRadius: 100,
   },
-  circle1: {
-    width: 120,
-    height: 120,
-    top: -40,
-    right: -30,
+  element1: {
+    width: 150,
+    height: 150,
+    top: -60,
+    right: -40,
   },
-  circle2: {
+  element2: {
+    width: 100,
+    height: 100,
+    top: 80,
+    right: 120,
+  },
+  element3: {
     width: 80,
     height: 80,
-    top: 60,
-    right: 100,
+    top: 40,
+    left: -20,
   },
   header: {
-    flexDirection: 'row',
-    alignItems: 'flex-start',
     paddingHorizontal: Spacing.md,
     paddingVertical: Spacing.lg,
-    gap: Spacing.md,
+    gap: Spacing.lg,
+  },
+  navigationSection: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
   },
   backButton: {
-    width: 44,
-    height: 44,
-    borderRadius: BorderRadius.lg,
-    alignItems: 'center',
-    justifyContent: 'center',
-    marginTop: Spacing.xs,
-  },
-  mainContent: {
-    flex: 1,
-    gap: Spacing.md,
-  },
-  countrySection: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    gap: Spacing.xs,
-  },
-  flagContainer: {
-    width: 40,
-    height: 40,
+    width: 48,
+    height: 48,
     borderRadius: BorderRadius.xl,
     alignItems: 'center',
     justifyContent: 'center',
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.1,
+    shadowRadius: 4,
+    elevation: 3,
+  },
+  moreButton: {
+    width: 48,
+    height: 48,
+    borderRadius: BorderRadius.xl,
+    alignItems: 'center',
+    justifyContent: 'center',
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.1,
+    shadowRadius: 4,
+    elevation: 3,
+  },
+  mainSection: {
+    gap: Spacing.md,
+  },
+  countryIdentity: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: Spacing.lg,
+  },
+  flagContainer: {
+    width: 75,
+    height: 75,
+    alignItems: 'center',
+    justifyContent: 'center',
     position: 'relative',
-    overflow: 'hidden',
+  },
+  flagBackground: {
+    ...StyleSheet.absoluteFillObject,
+    borderRadius: BorderRadius.xl,
   },
   flag: {
-    fontSize: 25,
-    zIndex: 1,
+    fontSize: 50,
+    zIndex: 2,
   },
-  flagGlow: {
+  flagRing: {
     ...StyleSheet.absoluteFillObject,
-    borderRadius: BorderRadius.xs,
+    borderRadius: BorderRadius.xl,
+    borderWidth: 2,
   },
   countryDetails: {
     flex: 1,
+    gap: Spacing.xs,
   },
   countryName: {
-    fontSize: Typography.sizes.lg,
+    fontSize: Typography.sizes.xl,
     fontWeight: Typography.weights.bold,
     lineHeight: Typography.sizes.xxxl * 1.1,
-    marginBottom: 2,
   },
   countryDescription: {
-    fontSize: Typography.sizes.md,
+    fontSize: Typography.sizes.sm,
     fontWeight: Typography.weights.semibold,
-    marginBottom: Spacing.xs,
   },
-  metaInfo: {
+  metaContainer: {
     flexDirection: 'row',
-    gap: Spacing.md,
+    gap: Spacing.xs,
+    marginTop: Spacing.xs,
   },
-  metaItem: {
+  metaBadge: {
     flexDirection: 'row',
     alignItems: 'center',
+    paddingHorizontal: Spacing.sm,
+    paddingVertical: 4,
+    borderRadius: BorderRadius.md,
     gap: 4,
   },
   metaText: {
+    fontSize: Typography.sizes.xs,
+    fontWeight: Typography.weights.medium,
+  },
+  genresPreview: {
+    gap: Spacing.xs,
+  },
+  genresTitle: {
+    fontSize: Typography.sizes.sm,
+    fontWeight: Typography.weights.bold,
+  },
+  genresList: {
+    flexDirection: 'row',
+    gap: Spacing.xs,
+  },
+  genreChip: {
+    paddingHorizontal: Spacing.sm,
+    paddingVertical: 4,
+    borderRadius: BorderRadius.md,
+    borderWidth: 1,
+  },
+  genreText: {
     fontSize: Typography.sizes.xs,
     fontWeight: Typography.weights.medium,
   },
@@ -256,39 +397,43 @@ const styles = StyleSheet.create({
     flex: 1,
     flexDirection: 'row',
     alignItems: 'center',
-    padding: Spacing.sm,
-    borderRadius: BorderRadius.lg,
+    padding: Spacing.md,
+    borderRadius: BorderRadius.xl,
     gap: Spacing.sm,
+    position: 'relative',
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.05,
+    shadowRadius: 4,
+    elevation: 2,
   },
-  statIcon: {
-    width: 32,
-    height: 32,
-    borderRadius: BorderRadius.md,
+  statIconContainer: {
+    width: 40,
+    height: 40,
+    borderRadius: BorderRadius.lg,
     alignItems: 'center',
     justifyContent: 'center',
   },
-  statInfo: {
+  statContent: {
     flex: 1,
   },
-  statNumber: {
-    fontSize: Typography.sizes.sm,
-    fontWeight: Typography.weights.bold,
-    lineHeight: Typography.sizes.sm * 1.2,
-  },
   statLabel: {
+    fontSize: Typography.sizes.md,
+    fontWeight: Typography.weights.bold,
+    lineHeight: Typography.sizes.md * 1.2,
+  },
+  statSubtext: {
     fontSize: Typography.sizes.xs,
   },
-  actionButton: {
-    width: 44,
-    height: 44,
-    borderRadius: BorderRadius.lg,
-    alignItems: 'center',
-    justifyContent: 'center',
-    marginTop: Spacing.xs,
+  statIndicator: {
+    width: 4,
+    height: 24,
+    borderRadius: 2,
   },
   accentLine: {
-    height: 3,
+    height: 4,
     marginHorizontal: Spacing.md,
     borderRadius: 2,
+    marginTop: Spacing.xs,
   },
 });

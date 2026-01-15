@@ -17,15 +17,12 @@ import {
 } from 'react-native';
 import { router } from 'expo-router';
 import { Image } from 'expo-image';
-import { LinearGradient } from 'expo-linear-gradient';
 import { Ionicons } from '@expo/vector-icons';
 import { useThemeColor } from '@/hooks/use-theme-color';
-import { useEffectiveColorScheme } from '@/hooks/use-effective-color-scheme';
-import { IconSymbol } from '@/components/ui/icon-symbol';
 import { Skeleton } from '@/components/ui/Skeleton';
 import { ErrorState } from '@/components/ui/ErrorState';
 import { EmptyState } from '@/components/ui/EmptyState';
-import { Colors, Spacing, Typography, BorderRadius } from '@/constants/theme';
+import { Spacing, Typography, BorderRadius } from '@/constants/theme';
 import { SOLID_COLORS, OVERLAY_COLORS } from '@/constants/colors';
 import { COMPONENT_TEST_IDS } from '@/constants/test-ids';
 import { BLURHASH_PLACEHOLDER } from '@/constants/images';
