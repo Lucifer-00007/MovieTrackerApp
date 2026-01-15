@@ -10,6 +10,7 @@ import { StyleSheet, View, Text, TextInput, Pressable } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import { useThemeColor } from '@/hooks/use-theme-color';
 import { Spacing, Typography, BorderRadius } from '@/constants/theme';
+import { SOLID_COLORS } from '@/constants/colors';
 
 interface SearchHeaderProps {
   query: string;
@@ -29,6 +30,7 @@ export function SearchHeader({
   const textSecondary = useThemeColor({}, 'textSecondary');
   const borderColor = useThemeColor({}, 'border');
   const cardBackground = useThemeColor({}, 'card');
+  const tintColor = useThemeColor({}, 'tint');
 
   const handleClear = () => {
     onClear();
@@ -40,14 +42,14 @@ export function SearchHeader({
       <Text style={[styles.title, { color: textColor }]}>
         Search
       </Text>
+      <Text style={[styles.subtitle, { color: textSecondary }]}>
+        Find movies and TV shows
+      </Text>
       
       <View style={[styles.searchContainer, { backgroundColor: cardBackground, borderColor }]}>
-        <Ionicons 
-          name="search" 
-          size={20} 
-          color={textSecondary} 
-          style={styles.searchIcon} 
-        />
+        <View style={[styles.searchIconContainer, { backgroundColor: tintColor }]}>
+          <Ionicons name="search" size={18} color={SOLID_COLORS.WHITE} />
+        </View>
         
         <TextInput
           ref={inputRef}
@@ -71,7 +73,7 @@ export function SearchHeader({
             ]}
             accessibilityLabel="Clear search"
           >
-            <Ionicons name="close-circle" size={20} color={textSecondary} />
+            <Ionicons name="close-circle" size={22} color={textSecondary} />
           </Pressable>
         )}
       </View>
@@ -82,33 +84,39 @@ export function SearchHeader({
 const styles = StyleSheet.create({
   container: {
     padding: Spacing.md,
-    gap: Spacing.md,
+    paddingTop: Spacing.xxl + Spacing.md,
+    gap: Spacing.xs,
   },
   title: {
-    fontSize: Typography.sizes.xxl,
+    fontSize: Typography.sizes.xxxl,
     fontWeight: Typography.weights.bold,
-    textAlign: 'center',
-    marginTop: Spacing.xxl,
+  },
+  subtitle: {
+    fontSize: Typography.sizes.md,
+    marginBottom: Spacing.sm,
   },
   searchContainer: {
     flexDirection: 'row',
     alignItems: 'center',
     borderWidth: 1,
     borderRadius: BorderRadius.lg,
-    paddingHorizontal: Spacing.md,
-    paddingVertical: Spacing.sm,
-    gap: Spacing.sm,
+    paddingRight: Spacing.sm,
+    overflow: 'hidden',
   },
-  searchIcon: {
-    flexShrink: 0,
+  searchIconContainer: {
+    width: 44,
+    height: 44,
+    alignItems: 'center',
+    justifyContent: 'center',
   },
   searchInput: {
     flex: 1,
     fontSize: Typography.sizes.md,
     fontWeight: Typography.weights.medium,
-    paddingVertical: 0,
+    paddingVertical: Spacing.sm,
+    paddingHorizontal: Spacing.sm,
   },
   clearButton: {
-    flexShrink: 0,
+    padding: Spacing.xs,
   },
 });
