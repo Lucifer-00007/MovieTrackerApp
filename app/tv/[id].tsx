@@ -1,7 +1,7 @@
 /**
  * TV Series Detail Screen
  * Displays comprehensive TV series information with watchlist options
- * Reuses detail components from movie screen
+ * Enhanced with seasons, ratings, media info, and production details
  * 
  * Requirements: 4.2
  */
@@ -33,6 +33,12 @@ import {
   CastCarousel,
   ProviderList,
   RecommendationsRow,
+  QuickActions,
+  MediaInfo,
+  RatingsSection,
+  GenreTags,
+  ProductionInfo,
+  SeasonsSection,
 } from '@/components/detail';
 import {
   getTvDetails,
@@ -43,7 +49,7 @@ import {
 } from '@/services/api';
 import { useWatchlistStore } from '@/stores/watchlistStore';
 import { useRecentlyViewedStore } from '@/stores/recentlyViewedStore';
-import type { MediaDetails, CastMember, StreamingProvider, MediaItem } from '@/types/media';
+import type { MediaDetails, CastMember, StreamingProvider, MediaItem, Genre } from '@/types/media';
 
 const AnimatedScrollView = Animated.createAnimatedComponent(ScrollView);
 
@@ -95,8 +101,8 @@ export default function TvDetailScreen() {
       const [tvDetails, tvCast, tvProviders, tvRecs, trailer] = await Promise.all([
         getTvDetails(tvId),
         getTvCredits(tvId).catch(() => []),
-        getWatchProviders('tv', tvId).catch(() => []),
-        getRecommendations('tv', tvId).then(r => r.items).catch(() => []),
+        getWatchProviders('tv', tvId, 'US').catch(() => []),
+        getRecommendations('tv', tvId, 1).then(r => r.items).catch(() => []),
         getTrailerKey('tv', tvId).catch(() => null),
       ]);
 
@@ -152,6 +158,18 @@ export default function TvDetailScreen() {
     } else {
       router.push(`/tv/${recId}` as any);
     }
+  }, []);
+
+  // Handle genre press
+  const handleGenrePress = useCallback((genre: Genre) => {
+    // Navigate to search with genre filter
+    router.push(`/(tabs)/search?genre=${genre.id}` as any);
+  }, []);
+
+  // Handle season press
+  const handleSeasonPress = useCallback((seasonNumber: number) => {
+    // Could navigate to season detail or show episode list
+    console.log(`Season ${seasonNumber} pressed`);
   }, []);
 
   // Handle refresh
@@ -212,22 +230,6 @@ export default function TvDetailScreen() {
         >
           <IconSymbol name="chevron.left" size={24} color={SOLID_COLORS.WHITE} />
         </Pressable>
-        
-        <View style={styles.headerActions}>
-          {/* Watchlist button */}
-          <Pressable
-            onPress={handleWatchlistToggle}
-            style={[styles.headerButton, { backgroundColor: OVERLAY_COLORS.BLACK_50 }]}
-            accessibilityLabel={inWatchlist ? 'Remove from watchlist' : 'Add to watchlist'}
-            accessibilityRole="button"
-          >
-            <IconSymbol
-              name={inWatchlist ? 'bookmark.fill' : 'bookmark'}
-              size={24}
-              color={inWatchlist ? colors.tint : SOLID_COLORS.WHITE}
-            />
-          </Pressable>
-        </View>
       </View>
 
       <AnimatedScrollView
@@ -251,6 +253,24 @@ export default function TvDetailScreen() {
           testID="tv-detail-header"
         />
 
+        {/* Quick Actions Bar */}
+        <QuickActions
+          title={details.title}
+          mediaType="tv"
+          mediaId={details.id}
+          isInWatchlist={inWatchlist}
+          canDownload={providers.length > 0}
+          onWatchlistPress={handleWatchlistToggle}
+          testID="tv-quick-actions"
+        />
+
+        {/* Genre Tags */}
+        <GenreTags
+          genres={details.genres}
+          onGenrePress={handleGenrePress}
+          testID="tv-genres"
+        />
+
         {/* Synopsis */}
         {details.overview && (
           <Synopsis
@@ -259,16 +279,42 @@ export default function TvDetailScreen() {
           />
         )}
 
-        {/* Cast Carousel - hidden if empty (Requirement 17.1) */}
+        {/* Ratings Section */}
+        <RatingsSection
+          voteAverage={details.voteAverage}
+          voteCount={details.voteCount}
+          testID="tv-ratings"
+        />
+
+        {/* Seasons Section (TV-specific) */}
+        <SeasonsSection
+          details={details}
+          onSeasonPress={handleSeasonPress}
+          testID="tv-seasons"
+        />
+
+        {/* Media Info Cards */}
+        <MediaInfo
+          details={details}
+          testID="tv-info"
+        />
+
+        {/* Cast Carousel */}
         <CastCarousel
           cast={cast}
           testID="tv-cast"
         />
 
-        {/* Streaming Providers - shows "not available" if empty (Requirement 17.6) */}
+        {/* Streaming Providers */}
         <ProviderList
           providers={providers}
           testID="tv-providers"
+        />
+
+        {/* Production Details */}
+        <ProductionInfo
+          details={details}
+          testID="tv-production"
         />
 
         {/* Recommendations */}

@@ -25,6 +25,8 @@ const MAPPING = {
   'person.fill': 'person',
   'xmark': 'close',
   'play.fill': 'play-arrow',
+  'bookmark': 'bookmark-border',
+  'bookmark.fill': 'bookmark',
 } as IconMapping;
 
 /**

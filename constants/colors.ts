@@ -314,11 +314,19 @@ export const ComponentTokens = {
   },
   synopsis: {
     expandThreshold: 200,
+    collapsedLines: 4,
   },
   cast: {
     maxDisplay: 10,
+    itemWidth: 80,
   },
   contentRow: {
     itemSpacing: 12,
+  },
+  detailPage: {
+    sectionSpacing: 24,
+    actionButtonSize: 56,
+    infoCardMinWidth: 100,
+    galleryImageHeight: 200,
   },
 } as const;

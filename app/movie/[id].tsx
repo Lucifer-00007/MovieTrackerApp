@@ -1,6 +1,7 @@
 /**
  * Movie Detail Screen
  * Displays comprehensive movie information with watchlist and download options
+ * Enhanced with ratings, media info, production details, and quick actions
  * 
  * Requirements: 4.2, 7.2, 8.1, 17.1, 17.6
  */
@@ -33,6 +34,11 @@ import {
   CastCarousel,
   ProviderList,
   RecommendationsRow,
+  QuickActions,
+  MediaInfo,
+  RatingsSection,
+  GenreTags,
+  ProductionInfo,
 } from '@/components/detail';
 import {
   getMovieDetails,
@@ -43,7 +49,7 @@ import {
 } from '@/services/api';
 import { useWatchlistStore } from '@/stores/watchlistStore';
 import { useRecentlyViewedStore } from '@/stores/recentlyViewedStore';
-import type { MediaDetails, CastMember, StreamingProvider, MediaItem } from '@/types/media';
+import type { MediaDetails, CastMember, StreamingProvider, MediaItem, Genre } from '@/types/media';
 
 const AnimatedScrollView = Animated.createAnimatedComponent(ScrollView);
 
@@ -95,8 +101,8 @@ export default function MovieDetailScreen() {
       const [movieDetails, movieCast, movieProviders, movieRecs, trailer] = await Promise.all([
         getMovieDetails(movieId),
         getMovieCredits(movieId).catch(() => []),
-        getWatchProviders('movie', movieId).catch(() => []),
-        getRecommendations('movie', movieId).then(r => r.items).catch(() => []),
+        getWatchProviders('movie', movieId, 'US').catch(() => []),
+        getRecommendations('movie', movieId, 1).then(r => r.items).catch(() => []),
         getTrailerKey('movie', movieId).catch(() => null),
       ]);
 
@@ -152,6 +158,12 @@ export default function MovieDetailScreen() {
     } else {
       router.push(`/tv/${recId}` as any);
     }
+  }, []);
+
+  // Handle genre press
+  const handleGenrePress = useCallback((genre: Genre) => {
+    // Navigate to search with genre filter
+    router.push(`/(tabs)/search?genre=${genre.id}` as any);
   }, []);
 
   // Handle refresh
@@ -212,22 +224,6 @@ export default function MovieDetailScreen() {
         >
           <IconSymbol name="chevron.left" size={24} color={SOLID_COLORS.WHITE} />
         </Pressable>
-        
-        <View style={styles.headerActions}>
-          {/* Watchlist button */}
-          <Pressable
-            onPress={handleWatchlistToggle}
-            style={[styles.headerButton, { backgroundColor: OVERLAY_COLORS.BLACK_50 }]}
-            accessibilityLabel={inWatchlist ? 'Remove from watchlist' : 'Add to watchlist'}
-            accessibilityRole="button"
-          >
-            <IconSymbol
-              name={inWatchlist ? 'bookmark.fill' : 'bookmark'}
-              size={24}
-              color={inWatchlist ? colors.tint : SOLID_COLORS.WHITE}
-            />
-          </Pressable>
-        </View>
       </View>
 
       <AnimatedScrollView
@@ -251,6 +247,24 @@ export default function MovieDetailScreen() {
           testID="movie-detail-header"
         />
 
+        {/* Quick Actions Bar */}
+        <QuickActions
+          title={details.title}
+          mediaType="movie"
+          mediaId={details.id}
+          isInWatchlist={inWatchlist}
+          canDownload={providers.length > 0}
+          onWatchlistPress={handleWatchlistToggle}
+          testID="movie-quick-actions"
+        />
+
+        {/* Genre Tags */}
+        <GenreTags
+          genres={details.genres}
+          onGenrePress={handleGenrePress}
+          testID="movie-genres"
+        />
+
         {/* Synopsis */}
         {details.overview && (
           <Synopsis
@@ -259,16 +273,35 @@ export default function MovieDetailScreen() {
           />
         )}
 
-        {/* Cast Carousel - hidden if empty (Requirement 17.1) */}
+        {/* Ratings Section */}
+        <RatingsSection
+          voteAverage={details.voteAverage}
+          voteCount={details.voteCount}
+          testID="movie-ratings"
+        />
+
+        {/* Media Info Cards */}
+        <MediaInfo
+          details={details}
+          testID="movie-info"
+        />
+
+        {/* Cast Carousel */}
         <CastCarousel
           cast={cast}
           testID="movie-cast"
         />
 
-        {/* Streaming Providers - shows "not available" if empty (Requirement 17.6) */}
+        {/* Streaming Providers */}
         <ProviderList
           providers={providers}
           testID="movie-providers"
+        />
+
+        {/* Production Details */}
+        <ProductionInfo
+          details={details}
+          testID="movie-production"
         />
 
         {/* Recommendations */}
