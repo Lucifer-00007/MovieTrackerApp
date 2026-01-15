@@ -49,7 +49,7 @@ function DownloadItemComponent({ item, onRemove }: DownloadItemProps) {
 
   const handlePress = () => {
     // Navigate to detail screen or play content
-    const route = item.mediaType === 'movie' ? '/movie/[id]' : '/tv/[id]';
+    const route = item.mediaType === 'movie' ? '/movie/[id]' : '/web-series/[id]';
     router.push({
       pathname: route,
       params: { id: item.mediaId.toString() },

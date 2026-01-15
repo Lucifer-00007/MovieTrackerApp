@@ -188,7 +188,7 @@ export function SearchResultsComponent({
   const textSecondary = useThemeColor({}, 'textSecondary');
 
   const handleItemPress = (item: MediaItem) => {
-    const route = item.mediaType === 'movie' ? '/movie/[id]' : '/tv/[id]';
+    const route = item.mediaType === 'movie' ? '/movie/[id]' : '/web-series/[id]';
     router.push({
       pathname: route,
       params: { id: item.id.toString() },

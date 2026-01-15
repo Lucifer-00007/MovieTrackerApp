@@ -11,7 +11,8 @@ export const SCREEN_TEST_IDS = {
   DOWNLOADS: 'downloads-screen',
   PROFILE: 'profile-screen',
   MOVIE_DETAIL: 'movie-detail-screen',
-  TV_DETAIL: 'tv-detail-screen',
+  WEB_SERIES_DETAIL: 'web-series-detail-screen',
+  SEASON_DETAIL: 'season-detail-screen',
   COUNTRY_HUB: 'country-hub-screen',
 } as const;
 

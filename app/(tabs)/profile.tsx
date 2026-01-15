@@ -85,7 +85,7 @@ export default function ProfileScreen() {
     if (item.mediaType === 'movie') {
       router.push(`/movie/${item.id}` as any);
     } else {
-      router.push(`/tv/${item.id}` as any);
+      router.push(`/web-series/${item.id}` as any);
     }
   }, [router]);
 

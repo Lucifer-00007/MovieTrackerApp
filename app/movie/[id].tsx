@@ -156,7 +156,7 @@ export default function MovieDetailScreen() {
     if (mediaType === 'movie') {
       router.push(`/movie/${recId}` as any);
     } else {
-      router.push(`/tv/${recId}` as any);
+      router.push(`/web-series/${recId}` as any);
     }
   }, []);
 

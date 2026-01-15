@@ -1,6 +1,6 @@
 /**
- * TV Series Detail Screen
- * Displays comprehensive TV series information with watchlist options
+ * Web Series Detail Screen
+ * Displays comprehensive web series information with watchlist options
  * Enhanced with seasons, ratings, media info, and production details
  * 
  * Requirements: 4.2
@@ -53,9 +53,9 @@ import type { MediaDetails, CastMember, StreamingProvider, MediaItem, Genre } fr
 
 const AnimatedScrollView = Animated.createAnimatedComponent(ScrollView);
 
-export default function TvDetailScreen() {
+export default function WebSeriesDetailScreen() {
   const { id } = useLocalSearchParams<{ id: string }>();
-  const tvId = parseInt(id || '0', 10);
+  const seriesId = parseInt(id || '0', 10);
   
   const colorScheme = useEffectiveColorScheme();
   const colors = Colors[colorScheme];
@@ -85,9 +85,9 @@ export default function TvDetailScreen() {
   // Check if in watchlist
   const inWatchlist = details ? isInWatchlist(details.id, 'tv') : false;
 
-  // Fetch TV data
-  const fetchTvData = useCallback(async (showRefresh = false) => {
-    if (!tvId) return;
+  // Fetch web series data
+  const fetchSeriesData = useCallback(async (showRefresh = false) => {
+    if (!seriesId) return;
 
     if (showRefresh) {
       setIsRefreshing(true);
@@ -98,39 +98,39 @@ export default function TvDetailScreen() {
 
     try {
       // Fetch all data in parallel
-      const [tvDetails, tvCast, tvProviders, tvRecs, trailer] = await Promise.all([
-        getTvDetails(tvId),
-        getTvCredits(tvId).catch(() => []),
-        getWatchProviders('tv', tvId, 'US').catch(() => []),
-        getRecommendations('tv', tvId, 1).then(r => r.items).catch(() => []),
-        getTrailerKey('tv', tvId).catch(() => null),
+      const [seriesDetails, seriesCast, seriesProviders, seriesRecs, trailer] = await Promise.all([
+        getTvDetails(seriesId),
+        getTvCredits(seriesId).catch(() => []),
+        getWatchProviders('tv', seriesId, 'US').catch(() => []),
+        getRecommendations('tv', seriesId, 1).then(r => r.items).catch(() => []),
+        getTrailerKey('tv', seriesId).catch(() => null),
       ]);
 
-      setDetails(tvDetails);
-      setCast(tvCast);
-      setProviders(tvProviders);
-      setRecommendations(tvRecs);
+      setDetails(seriesDetails);
+      setCast(seriesCast);
+      setProviders(seriesProviders);
+      setRecommendations(seriesRecs);
       setTrailerKey(trailer);
 
       // Add to recently viewed
       addToRecentlyViewed({
-        id: tvDetails.id,
+        id: seriesDetails.id,
         mediaType: 'tv',
-        title: tvDetails.title,
-        posterPath: tvDetails.posterPath,
+        title: seriesDetails.title,
+        posterPath: seriesDetails.posterPath,
       });
     } catch (err) {
-      setError(err instanceof Error ? err.message : 'Failed to load TV series details');
+      setError(err instanceof Error ? err.message : 'Failed to load web series details');
     } finally {
       setIsLoading(false);
       setIsRefreshing(false);
     }
-  }, [tvId, addToRecentlyViewed]);
+  }, [seriesId, addToRecentlyViewed]);
 
   // Initial fetch
   useEffect(() => {
-    fetchTvData();
-  }, [fetchTvData]);
+    fetchSeriesData();
+  }, [fetchSeriesData]);
 
   // Handle watchlist toggle
   const handleWatchlistToggle = useCallback(async () => {
@@ -156,31 +156,29 @@ export default function TvDetailScreen() {
     if (mediaType === 'movie') {
       router.push(`/movie/${recId}` as any);
     } else {
-      router.push(`/tv/${recId}` as any);
+      router.push(`/web-series/${recId}` as any);
     }
   }, []);
 
   // Handle genre press
   const handleGenrePress = useCallback((genre: Genre) => {
-    // Navigate to search with genre filter
     router.push(`/(tabs)/search?genre=${genre.id}` as any);
   }, []);
 
-  // Handle season press
+  // Handle season press - navigate to season detail page
   const handleSeasonPress = useCallback((seasonNumber: number) => {
-    // Could navigate to season detail or show episode list
-    console.log(`Season ${seasonNumber} pressed`);
-  }, []);
+    router.push(`/web-series/${seriesId}/season/${seasonNumber}` as any);
+  }, [seriesId]);
 
   // Handle refresh
   const handleRefresh = useCallback(() => {
-    fetchTvData(true);
-  }, [fetchTvData]);
+    fetchSeriesData(true);
+  }, [fetchSeriesData]);
 
   // Handle retry
   const handleRetry = useCallback(() => {
-    fetchTvData();
-  }, [fetchTvData]);
+    fetchSeriesData();
+  }, [fetchSeriesData]);
 
   // Loading state
   if (isLoading) {
@@ -188,7 +186,7 @@ export default function TvDetailScreen() {
       <View style={[styles.container, styles.centered, { backgroundColor: colors.background }]}>
         <ActivityIndicator size="large" color={colors.tint} />
         <Text style={[styles.loadingText, { color: colors.textSecondary }]}>
-          Loading TV series details...
+          Loading web series details...
         </Text>
       </View>
     );
@@ -207,11 +205,11 @@ export default function TvDetailScreen() {
           >
             <IconSymbol name="chevron.left" size={24} color={colors.text} />
           </Pressable>
-          <Text style={[styles.headerTitle, { color: colors.text }]}>TV Series Details</Text>
+          <Text style={[styles.headerTitle, { color: colors.text }]}>Web Series Details</Text>
           <View style={styles.headerSpacer} />
         </View>
         <ErrorState
-          message={error || 'TV series not found'}
+          message={error || 'Web series not found'}
           onRetry={handleRetry}
         />
       </View>
@@ -250,7 +248,7 @@ export default function TvDetailScreen() {
           scrollY={scrollY}
           hasTrailer={!!trailerKey}
           onPlayPress={handlePlayTrailer}
-          testID="tv-detail-header"
+          testID="web-series-detail-header"
         />
 
         {/* Quick Actions Bar */}
@@ -261,21 +259,21 @@ export default function TvDetailScreen() {
           isInWatchlist={inWatchlist}
           canDownload={providers.length > 0}
           onWatchlistPress={handleWatchlistToggle}
-          testID="tv-quick-actions"
+          testID="web-series-quick-actions"
         />
 
         {/* Genre Tags */}
         <GenreTags
           genres={details.genres}
           onGenrePress={handleGenrePress}
-          testID="tv-genres"
+          testID="web-series-genres"
         />
 
         {/* Synopsis */}
         {details.overview && (
           <Synopsis
             overview={details.overview}
-            testID="tv-synopsis"
+            testID="web-series-synopsis"
           />
         )}
 
@@ -283,45 +281,45 @@ export default function TvDetailScreen() {
         <RatingsSection
           voteAverage={details.voteAverage}
           voteCount={details.voteCount}
-          testID="tv-ratings"
+          testID="web-series-ratings"
         />
 
-        {/* Seasons Section (TV-specific) */}
+        {/* Seasons Section */}
         <SeasonsSection
           details={details}
           onSeasonPress={handleSeasonPress}
-          testID="tv-seasons"
+          testID="web-series-seasons"
         />
 
         {/* Media Info Cards */}
         <MediaInfo
           details={details}
-          testID="tv-info"
+          testID="web-series-info"
         />
 
         {/* Cast Carousel */}
         <CastCarousel
           cast={cast}
-          testID="tv-cast"
+          testID="web-series-cast"
         />
 
         {/* Streaming Providers */}
         <ProviderList
           providers={providers}
-          testID="tv-providers"
+          testID="web-series-providers"
         />
 
         {/* Production Details */}
         <ProductionInfo
           details={details}
-          testID="tv-production"
+          testID="web-series-production"
         />
 
         {/* Recommendations */}
         <RecommendationsRow
           recommendations={recommendations}
           onItemPress={handleRecommendationPress}
-          testID="tv-recommendations"
+          testID="web-series-recommendations"
         />
 
         {/* Bottom padding */}
@@ -376,10 +374,6 @@ const styles = StyleSheet.create({
   },
   headerSpacer: {
     width: ComponentTokens.touchTarget.min,
-  },
-  headerActions: {
-    flexDirection: 'row',
-    gap: Spacing.sm,
   },
   scrollView: {
     flex: 1,

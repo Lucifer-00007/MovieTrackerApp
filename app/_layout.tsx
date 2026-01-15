@@ -120,7 +120,14 @@ export default function RootLayout() {
           }} 
         />
         <Stack.Screen 
-          name="tv/[id]" 
+          name="web-series/[id]/index" 
+          options={{ 
+            headerShown: false,
+            animation: 'slide_from_right',
+          }} 
+        />
+        <Stack.Screen 
+          name="web-series/[id]/season/[seasonNumber]" 
           options={{ 
             headerShown: false,
             animation: 'slide_from_right',

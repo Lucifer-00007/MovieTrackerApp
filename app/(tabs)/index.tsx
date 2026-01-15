@@ -246,7 +246,7 @@ export default function HomeScreen() {
       if (mediaType === 'movie') {
         router.push(`/movie/${id}` as any);
       } else {
-        router.push(`/tv/${id}` as any);
+        router.push(`/web-series/${id}` as any);
       }
     },
     [router]
