@@ -146,8 +146,9 @@ export function CountryHubHeader({ countryCode }: CountryHubHeaderProps) {
       <View style={[styles.decorativeElement, styles.element3, { backgroundColor: countryInfo.gradient[0] + '08' }]} />
       
       <Animated.View style={[styles.header, headerAnimatedStyle]}>
-        {/* Navigation Section */}
-        <View style={styles.navigationSection}>
+        {/* Header Row with Navigation and Country Identity */}
+        <View style={styles.headerRow}>
+          {/* Back Button */}
           <Pressable
             onPress={() => router.back()}
             accessibilityRole="button"
@@ -162,45 +163,44 @@ export function CountryHubHeader({ countryCode }: CountryHubHeaderProps) {
           >
             <IconSymbol name="chevron.left" size={20} color={textColor} />
           </Pressable>
-        </View>
 
-        {/* Main Content Section */}
-        <Pressable onPress={handleHeaderPress} style={styles.mainSection}>
-          {/* Country Identity */}
-          <View style={styles.countryIdentity}>
-            <Pressable onPress={handleFlagPress}>
-              <Animated.View style={[styles.flagContainer, flagAnimatedStyle]}>
-                <LinearGradient
-                  colors={[countryInfo.gradient[0] + '30', countryInfo.gradient[1] + '20']}
-                  style={styles.flagBackground}
-                />
-                <Text style={styles.flag}>{countryInfo.flag}</Text>
-                <View style={[styles.flagRing, { borderColor: countryInfo.gradient[0] + '40' }]} />
-              </Animated.View>
-            </Pressable>
-            
-            <View style={styles.countryDetails}>
-              <Text style={[styles.countryName, { color: textColor }]}>
-                {countryName}
-              </Text>
-              <Text style={[styles.countryDescription, { color: countryInfo.gradient[0] }]}>
-                {countryInfo.description}
-              </Text>
+          {/* Country Identity - Main Content */}
+          <Pressable onPress={handleHeaderPress} style={styles.mainContent}>
+            <View style={styles.countryIdentity}>
+              <Pressable onPress={handleFlagPress}>
+                <Animated.View style={[styles.flagContainer, flagAnimatedStyle]}>
+                  <LinearGradient
+                    colors={[countryInfo.gradient[0] + '30', countryInfo.gradient[1] + '20']}
+                    style={styles.flagBackground}
+                  />
+                  <Text style={styles.flag}>{countryInfo.flag}</Text>
+                  <View style={[styles.flagRing, { borderColor: countryInfo.gradient[0] + '40' }]} />
+                </Animated.View>
+              </Pressable>
               
-              {/* Enhanced Meta Information */}
-              <View style={styles.metaContainer}>
-                <View style={[styles.metaBadge, { backgroundColor: cardBackground + 'CC' }]}>
-                  <Ionicons name="library-outline" size={12} color={textSecondary} />
-                  <Text style={[styles.metaText, { color: textSecondary }]}>{countryInfo.totalContent}</Text>
-                </View>
-                <View style={[styles.metaBadge, { backgroundColor: cardBackground + 'CC' }]}>
-                  <Ionicons name="trending-up" size={12} color={textSecondary} />
-                  <Text style={[styles.metaText, { color: textSecondary }]}>Live</Text>
+              <View style={styles.countryDetails}>
+                <Text style={[styles.countryName, { color: textColor }]}>
+                  {countryName}
+                </Text>
+                <Text style={[styles.countryDescription, { color: countryInfo.gradient[0] }]}>
+                  {countryInfo.description}
+                </Text>
+                
+                {/* Enhanced Meta Information */}
+                <View style={styles.metaContainer}>
+                  <View style={[styles.metaBadge, { backgroundColor: cardBackground + 'CC' }]}>
+                    <Ionicons name="library-outline" size={12} color={textSecondary} />
+                    <Text style={[styles.metaText, { color: textSecondary }]}>{countryInfo.totalContent}</Text>
+                  </View>
+                  <View style={[styles.metaBadge, { backgroundColor: cardBackground + 'CC' }]}>
+                    <Ionicons name="trending-up" size={12} color={textSecondary} />
+                    <Text style={[styles.metaText, { color: textSecondary }]}>Live</Text>
+                  </View>
                 </View>
               </View>
             </View>
-          </View>
-        </Pressable>
+          </Pressable>
+        </View>
 
         {/* Enhanced Stats Section */}
         <View style={styles.statsSection}>
@@ -281,10 +281,10 @@ const styles = StyleSheet.create({
     paddingVertical: Spacing.lg,
     gap: Spacing.lg,
   },
-  navigationSection: {
+  headerRow: {
     flexDirection: 'row',
-    justifyContent: 'space-between',
     alignItems: 'center',
+    gap: Spacing.md,
   },
   backButton: {
     width: 48,
@@ -298,6 +298,9 @@ const styles = StyleSheet.create({
     shadowRadius: 4,
     elevation: 3,
   },
+  mainContent: {
+    flex: 1,
+  },
   moreButton: {
     width: 48,
     height: 48,
@@ -310,17 +313,14 @@ const styles = StyleSheet.create({
     shadowRadius: 4,
     elevation: 3,
   },
-  mainSection: {
-    gap: Spacing.md,
-  },
   countryIdentity: {
     flexDirection: 'row',
     alignItems: 'center',
-    gap: Spacing.lg,
+    gap: Spacing.md,
   },
   flagContainer: {
-    width: 75,
-    height: 75,
+    width: 60,
+    height: 60,
     alignItems: 'center',
     justifyContent: 'center',
     position: 'relative',
@@ -330,7 +330,7 @@ const styles = StyleSheet.create({
     borderRadius: BorderRadius.xl,
   },
   flag: {
-    fontSize: 50,
+    fontSize: 32,
     zIndex: 2,
   },
   flagRing: {
@@ -343,9 +343,9 @@ const styles = StyleSheet.create({
     gap: Spacing.xs,
   },
   countryName: {
-    fontSize: Typography.sizes.xl,
+    fontSize: Typography.sizes.xxl,
     fontWeight: Typography.weights.bold,
-    lineHeight: Typography.sizes.xxxl * 1.1,
+    lineHeight: Typography.sizes.xxl * 1.1,
   },
   countryDescription: {
     fontSize: Typography.sizes.sm,
