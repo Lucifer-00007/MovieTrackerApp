@@ -9,9 +9,7 @@ import { StyleSheet, View, Text, ScrollView, Pressable, ActivityIndicator } from
 import { useRouter } from 'expo-router';
 import { Image } from 'expo-image';
 import { Ionicons } from '@expo/vector-icons';
-import { LinearGradient } from 'expo-linear-gradient';
 import { useThemeColor } from '@/hooks/use-theme-color';
-import { useEffectiveColorScheme } from '@/hooks/use-effective-color-scheme';
 import { Colors, Spacing, Typography, BorderRadius } from '@/constants/theme';
 import { SOLID_COLORS, OVERLAY_COLORS } from '@/constants/colors';
 import { BLURHASH_PLACEHOLDER } from '@/constants/images';
@@ -39,7 +37,6 @@ interface MediaCardProps {
 }
 
 function MediaCard({ item, onPress }: MediaCardProps) {
-  const colorScheme = useEffectiveColorScheme();
   const textColor = useThemeColor({}, 'text');
   const textSecondary = useThemeColor({}, 'textSecondary');
   const cardBackground = useThemeColor({}, 'card');
@@ -87,14 +84,14 @@ function MediaCard({ item, onPress }: MediaCardProps) {
         )}
         
         {/* Rating badge on poster */}
-        {showRating && (
+        {showRating ? (
           <View style={styles.ratingBadge}>
             <Ionicons name="star" size={10} color={SOLID_COLORS.GOLD} />
             <Text style={styles.ratingBadgeText}>
               {item.voteAverage?.toFixed(1)}
             </Text>
           </View>
-        )}
+        ) : null}
 
         {/* Media type badge */}
         <View style={[styles.typeBadge, { backgroundColor: tintColor }]}>
@@ -115,31 +112,31 @@ function MediaCard({ item, onPress }: MediaCardProps) {
         
         {/* Year and metadata row */}
         <View style={styles.metaRow}>
-          {year && (
+          {year !== null && (
             <View style={styles.metaItem}>
               <Ionicons name="calendar-outline" size={12} color={textSecondary} />
               <Text style={[styles.metaText, { color: textSecondary }]}>{year}</Text>
             </View>
           )}
-          {item.voteCount > 0 && (
+          {item.voteCount > 0 ? (
             <View style={styles.metaItem}>
               <Ionicons name="people-outline" size={12} color={textSecondary} />
               <Text style={[styles.metaText, { color: textSecondary }]}>
                 {item.voteCount.toLocaleString()} votes
               </Text>
             </View>
-          )}
+          ) : null}
         </View>
 
         {/* Overview */}
-        {hasOverview && (
+        {hasOverview ? (
           <Text
             style={[styles.overview, { color: textSecondary }]}
             numberOfLines={3}
           >
             {item.overview}
           </Text>
-        )}
+        ) : null}
 
         {/* Action hint */}
         <View style={styles.actionRow}>
@@ -207,9 +204,9 @@ function LoadingSkeleton() {
           <View style={styles.skeletonContent}>
             <Skeleton width={180} height={18} style={{ marginBottom: 8 }} />
             <Skeleton width={100} height={14} style={{ marginBottom: 12 }} />
-            <Skeleton width="100%" height={12} style={{ marginBottom: 4 }} />
-            <Skeleton width="90%" height={12} style={{ marginBottom: 4 }} />
-            <Skeleton width="70%" height={12} />
+            <Skeleton width={200} height={12} style={{ marginBottom: 4 }} />
+            <Skeleton width={180} height={12} style={{ marginBottom: 4 }} />
+            <Skeleton width={140} height={12} />
           </View>
         </View>
       ))}
@@ -290,14 +287,14 @@ export function SearchResultsComponent({
       contentContainerStyle={styles.content}
       showsVerticalScrollIndicator={false}
     >
-      {isFetching && (
+      {isFetching ? (
         <View style={styles.loadingIndicator}>
           <ActivityIndicator size="small" color={textSecondary} />
           <Text style={[styles.loadingText, { color: textSecondary }]}>
             Updating results...
           </Text>
         </View>
-      )}
+      ) : null}
 
       {/* Results summary */}
       <View style={styles.resultsSummary}>

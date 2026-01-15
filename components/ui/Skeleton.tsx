@@ -63,11 +63,13 @@ export function DetailHeaderSkeleton() {
   
   return (
     <View style={[styles.headerContainer, { backgroundColor }]}>
-      <Skeleton width="100%" height={400} borderRadius={0} />
+      <View style={styles.headerImageSkeleton}>
+        <Skeleton width={400} height={400} borderRadius={0} style={{ flex: 1 }} />
+      </View>
       <View style={styles.headerContent}>
         <Skeleton width={80} height={28} style={styles.badge} />
-        <Skeleton width="70%" height={32} style={styles.title} />
-        <Skeleton width="50%" height={20} style={styles.subtitle} />
+        <Skeleton width={250} height={32} style={styles.title} />
+        <Skeleton width={180} height={20} style={styles.subtitle} />
       </View>
     </View>
   );
@@ -89,9 +91,9 @@ export function ContentSkeleton() {
   return (
     <View style={styles.contentContainer}>
       <Skeleton width={120} height={24} style={styles.sectionTitle} />
-      <Skeleton width="100%" height={60} />
-      <Skeleton width="90%" height={20} style={styles.line} />
-      <Skeleton width="80%" height={20} style={styles.line} />
+      <Skeleton width={300} height={60} />
+      <Skeleton width={270} height={20} style={styles.line} />
+      <Skeleton width={240} height={20} style={styles.line} />
     </View>
   );
 }
@@ -133,6 +135,10 @@ const styles = StyleSheet.create({
   },
   headerContainer: {
     position: 'relative',
+  },
+  headerImageSkeleton: {
+    width: '100%',
+    height: 400,
   },
   headerContent: {
     position: 'absolute',
