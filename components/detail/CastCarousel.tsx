@@ -17,6 +17,7 @@ import { Image } from 'expo-image';
 
 import { useThemeColor } from '@/hooks/use-theme-color';
 import { Spacing, BorderRadius, Typography, ComponentTokens } from '@/constants/theme';
+import { PlaceholderImages, BLURHASH_PLACEHOLDER } from '@/constants/images';
 import type { CastMember } from '@/types/media';
 import {
   getProfileUrl,
@@ -28,9 +29,6 @@ import {
 
 const ITEM_WIDTH = ComponentTokens.cast.itemWidth;
 const ITEM_HEIGHT = ITEM_WIDTH * 1.5;
-
-/** Placeholder image for mock data mode */
-const PLACEHOLDER_IMAGE = require('@/assets/images/placeholder-poster.png');
 
 export interface CastCarouselProps {
   /** Array of cast members */
@@ -67,10 +65,12 @@ export function CastCarousel({
           <View style={[styles.imageContainer, { backgroundColor: cardBorder }]}>
             {profileUrl ? (
               <Image
-                source={profileUrl === 'placeholder' ? PLACEHOLDER_IMAGE : { uri: profileUrl }}
+                source={profileUrl === 'placeholder' ? PlaceholderImages.profile : { uri: profileUrl }}
                 style={styles.profileImage}
                 contentFit="cover"
+                placeholder={{ blurhash: BLURHASH_PLACEHOLDER }}
                 transition={200}
+                cachePolicy="memory-disk"
                 testID={testID ? `${testID}-member-${item.id}-image` : undefined}
               />
             ) : (

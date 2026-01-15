@@ -18,6 +18,7 @@ import { Image } from 'expo-image';
 
 import { useThemeColor } from '@/hooks/use-theme-color';
 import { Spacing, BorderRadius, Typography } from '@/constants/theme';
+import { BLURHASH_PLACEHOLDER } from '@/constants/images';
 import { logProviderTap } from '@/services/analytics';
 import type { StreamingProvider } from '@/types/media';
 import {
@@ -93,7 +94,9 @@ function ProviderGroup({ title, providers, onProviderPress, mediaId, testID }: P
                     isUnavailable && styles.unavailableLogo,
                   ]}
                   contentFit="contain"
+                  placeholder={{ blurhash: BLURHASH_PLACEHOLDER }}
                   transition={200}
+                  cachePolicy="memory-disk"
                 />
               ) : (
                 <View style={[styles.logoPlaceholder, { backgroundColor: cardBorder }]}>

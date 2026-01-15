@@ -20,10 +20,11 @@ import {
   shouldShowRating,
   generateAccessibilityLabel,
   PLACEHOLDER_IMAGE,
+  BLURHASH_PLACEHOLDER,
 } from './media-card-utils';
 
 // Re-export types and utilities for external use
-export { MediaCardVariant, getVariantDimensions } from './media-card-utils';
+export { MediaCardVariant, getVariantDimensions, BLURHASH_PLACEHOLDER } from './media-card-utils';
 
 /** Props for the MediaCard component */
 export interface MediaCardProps {
@@ -112,9 +113,9 @@ export function MediaCard({
             source={posterUrl === 'placeholder' ? PLACEHOLDER_IMAGE : { uri: posterUrl }}
             style={styles.poster}
             contentFit="cover"
+            placeholder={{ blurhash: BLURHASH_PLACEHOLDER }}
             transition={300}
-            placeholder={PLACEHOLDER_IMAGE}
-            placeholderContentFit="cover"
+            cachePolicy="memory-disk"
             accessibilityLabel={`${title} poster`}
             testID={testID ? `${testID}-poster` : undefined}
           />

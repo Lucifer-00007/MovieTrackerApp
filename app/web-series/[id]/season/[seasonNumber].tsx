@@ -12,7 +12,6 @@ import {
   View,
   Pressable,
   Text,
-  ActivityIndicator,
   RefreshControl,
   FlatList,
 } from 'react-native';
@@ -23,8 +22,10 @@ import { Ionicons } from '@expo/vector-icons';
 import { useEffectiveColorScheme } from '@/hooks/use-effective-color-scheme';
 import { Colors, Spacing, Typography, BorderRadius } from '@/constants/theme';
 import { SOLID_COLORS, ComponentTokens } from '@/constants/colors';
+import { PlaceholderImages, BLURHASH_PLACEHOLDER } from '@/constants/images';
 import { IconSymbol } from '@/components/ui/icon-symbol';
 import { ErrorState } from '@/components/ui/ErrorState';
+import { ContentSkeleton, CarouselSkeleton } from '@/components/ui/Skeleton';
 import { getTvDetails } from '@/services/api';
 import { API_BASE_URLS } from '@/constants/api';
 import type { MediaDetails } from '@/types/media';
@@ -51,9 +52,6 @@ interface SeasonDetail {
   airDate: string;
   episodes: Episode[];
 }
-
-/** Placeholder image */
-const PLACEHOLDER_IMAGE = require('@/assets/images/placeholder-poster.png');
 
 /** Check if mock data mode */
 function isMockDataMode(): boolean {
@@ -186,9 +184,12 @@ export default function SeasonDetailScreen() {
         <View style={styles.episodeThumbnail}>
           {stillUrl ? (
             <Image
-              source={stillUrl === 'placeholder' ? PLACEHOLDER_IMAGE : { uri: stillUrl }}
+              source={stillUrl === 'placeholder' ? PlaceholderImages.backdrop : { uri: stillUrl }}
               style={styles.thumbnailImage}
               contentFit="cover"
+              placeholder={{ blurhash: BLURHASH_PLACEHOLDER }}
+              transition={300}
+              cachePolicy="memory-disk"
             />
           ) : (
             <View style={[styles.thumbnailPlaceholder, { backgroundColor: colors.backgroundSecondary }]}>
@@ -241,11 +242,20 @@ export default function SeasonDetailScreen() {
   // Loading state
   if (isLoading) {
     return (
-      <View style={[styles.container, styles.centered, { backgroundColor: colors.background }]}>
-        <ActivityIndicator size="large" color={colors.tint} />
-        <Text style={[styles.loadingText, { color: colors.textSecondary }]}>
-          Loading season details...
-        </Text>
+      <View style={[styles.container, { backgroundColor: colors.background }]}>
+        <View style={[styles.header, { borderBottomColor: colors.border, backgroundColor: colors.background }]}>
+          <Pressable
+            onPress={() => router.back()}
+            style={styles.backButton}
+            accessibilityLabel="Go back"
+            accessibilityRole="button"
+          >
+            <IconSymbol name="chevron.left" size={24} color={colors.text} />
+          </Pressable>
+          <ContentSkeleton />
+          <View style={styles.headerSpacer} />
+        </View>
+        <CarouselSkeleton itemCount={3} />
       </View>
     );
   }
@@ -305,9 +315,13 @@ export default function SeasonDetailScreen() {
             <View style={styles.posterContainer}>
               {posterUrl ? (
                 <Image
-                  source={posterUrl === 'placeholder' ? PLACEHOLDER_IMAGE : { uri: posterUrl }}
+                  source={posterUrl === 'placeholder' ? PlaceholderImages.poster : { uri: posterUrl }}
                   style={styles.posterImage}
                   contentFit="cover"
+                  placeholder={{ blurhash: BLURHASH_PLACEHOLDER }}
+                  transition={300}
+                  priority="high"
+                  cachePolicy="memory-disk"
                 />
               ) : (
                 <View style={[styles.posterPlaceholder, { backgroundColor: colors.backgroundSecondary }]}>

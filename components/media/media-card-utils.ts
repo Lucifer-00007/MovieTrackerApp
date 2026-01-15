@@ -13,7 +13,9 @@ export type MediaCardVariant = 'large' | 'medium' | 'small';
 export const TMDB_IMAGE_BASE = API_BASE_URLS.TMDB_IMAGES;
 
 /** Placeholder image for mock data mode */
-export const PLACEHOLDER_IMAGE = require('@/assets/images/placeholder-poster.png');
+export { PlaceholderImages, BLURHASH_PLACEHOLDER } from '@/constants/images';
+import { PlaceholderImages } from '@/constants/images';
+export const PLACEHOLDER_IMAGE = PlaceholderImages.poster;
 
 /** Check if mock data mode is enabled */
 export function isMockDataMode(): boolean {

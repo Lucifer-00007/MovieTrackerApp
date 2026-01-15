@@ -26,6 +26,7 @@ import Animated, {
 import { useThemeColor } from '@/hooks/use-theme-color';
 import { Spacing, BorderRadius, Typography } from '@/constants/theme';
 import { SOLID_COLORS, OVERLAY_COLORS, ComponentTokens } from '@/constants/colors';
+import { PlaceholderImages, BLURHASH_PLACEHOLDER } from '@/constants/images';
 import type { MediaDetails } from '@/types/media';
 import {
   getBackdropUrl,
@@ -35,9 +36,6 @@ import {
   formatGenres,
   generateDetailAccessibilityLabel,
 } from './detail-utils';
-
-/** Placeholder image for mock data mode */
-const PLACEHOLDER_IMAGE = require('@/assets/images/placeholder-poster.png');
 
 const { width: SCREEN_WIDTH } = Dimensions.get('window');
 const HEADER_HEIGHT = 400;
@@ -120,10 +118,13 @@ export function DetailHeader({
       <Animated.View style={[styles.imageContainer, parallaxStyle]}>
         {backdropUrl ? (
           <Image
-            source={backdropUrl === 'placeholder' ? PLACEHOLDER_IMAGE : { uri: backdropUrl }}
+            source={backdropUrl === 'placeholder' ? PlaceholderImages.backdrop : { uri: backdropUrl }}
             style={styles.heroImage}
             contentFit="cover"
+            placeholder={{ blurhash: BLURHASH_PLACEHOLDER }}
             transition={300}
+            priority="high"
+            cachePolicy="memory-disk"
             testID={testID ? `${testID}-backdrop` : undefined}
           />
         ) : (

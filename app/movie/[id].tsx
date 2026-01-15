@@ -13,7 +13,6 @@ import {
   ScrollView,
   Pressable,
   Text,
-  ActivityIndicator,
   RefreshControl,
 } from 'react-native';
 import { useLocalSearchParams, router } from 'expo-router';
@@ -28,6 +27,7 @@ import { SOLID_COLORS, OVERLAY_COLORS, ComponentTokens } from '@/constants/color
 import { COMPONENT_TEST_IDS } from '@/constants/test-ids';
 import { IconSymbol } from '@/components/ui/icon-symbol';
 import { ErrorState } from '@/components/ui/ErrorState';
+import { DetailPageSkeleton } from '@/components/ui/Skeleton';
 import {
   DetailHeader,
   Synopsis,
@@ -178,14 +178,7 @@ export default function MovieDetailScreen() {
 
   // Loading state
   if (isLoading) {
-    return (
-      <View style={[styles.container, styles.centered, { backgroundColor: colors.background }]}>
-        <ActivityIndicator size="large" color={colors.tint} />
-        <Text style={[styles.loadingText, { color: colors.textSecondary }]}>
-          Loading movie details...
-        </Text>
-      </View>
-    );
+    return <DetailPageSkeleton />;
   }
 
   // Error state
@@ -321,14 +314,6 @@ export default function MovieDetailScreen() {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-  },
-  centered: {
-    justifyContent: 'center',
-    alignItems: 'center',
-  },
-  loadingText: {
-    marginTop: Spacing.md,
-    fontSize: Typography.sizes.md,
   },
   header: {
     flexDirection: 'row',

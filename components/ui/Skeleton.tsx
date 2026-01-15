@@ -1,291 +1,177 @@
 /**
  * Skeleton Component
- * Displays loading placeholder with shimmer animation
- * 
- * Requirements: 1.6
+ * Animated placeholder for loading states
  */
 
 import { useEffect } from 'react';
-import { StyleSheet, View, Dimensions } from 'react-native';
+import { StyleSheet, View, ViewStyle } from 'react-native';
 import Animated, {
   useSharedValue,
   useAnimatedStyle,
   withRepeat,
   withTiming,
-  Easing,
+  interpolate,
 } from 'react-native-reanimated';
 
 import { useThemeColor } from '@/hooks/use-theme-color';
-import { Spacing, BorderRadius, ComponentTokens } from '@/constants/theme';
-import { OVERLAY_COLORS } from '@/constants/colors';
-import { DIMENSIONS } from '@/constants/layout';
-
-const { width: SCREEN_WIDTH } = Dimensions.get('window');
-
-/** Skeleton variant types */
-export type SkeletonVariant = 'card' | 'hero' | 'row' | 'detail';
+import { BorderRadius } from '@/constants/theme';
 
 export interface SkeletonProps {
-  /** Type of skeleton to display */
-  variant: SkeletonVariant;
-  /** Number of skeleton items to display (for card and row variants) */
-  count?: number;
-  /** Test ID for testing purposes */
-  testID?: string;
-}
-
-/** Shimmer animation component */
-function ShimmerOverlay() {
-  const translateX = useSharedValue(-SCREEN_WIDTH);
-  
-  useEffect(() => {
-    translateX.value = withRepeat(
-      withTiming(SCREEN_WIDTH, {
-        duration: ComponentTokens.skeleton.duration,
-        easing: Easing.linear,
-      }),
-      -1, // Infinite repeat
-      false // Don't reverse
-    );
-  }, [translateX]);
-  
-  const animatedStyle = useAnimatedStyle(() => ({
-    transform: [{ translateX: translateX.value }],
-  }));
-  
-  return (
-    <Animated.View style={[styles.shimmer, animatedStyle]}>
-      <View style={styles.shimmerGradient} />
-    </Animated.View>
-  );
-}
-
-/** Base skeleton box with shimmer - exported for custom skeleton layouts */
-export function SkeletonBox({
-  width,
-  height,
-  borderRadius = BorderRadius.md,
-  style,
-}: {
-  width: number | string;
+  /** Width of the skeleton */
+  width: number | `${number}%`;
+  /** Height of the skeleton */
   height: number;
+  /** Border radius */
   borderRadius?: number;
-  style?: object;
-}) {
-  const skeletonColor = useThemeColor({}, 'skeleton');
+  /** Custom style */
+  style?: ViewStyle;
+}
+
+export function Skeleton({ width, height, borderRadius = BorderRadius.md, style }: SkeletonProps) {
+  const backgroundColor = useThemeColor({}, 'skeleton');
+  const highlightColor = useThemeColor({}, 'skeletonHighlight');
   
+  const shimmer = useSharedValue(0);
+
+  useEffect(() => {
+    shimmer.value = withRepeat(
+      withTiming(1, { duration: 1200 }),
+      -1,
+      false
+    );
+  }, [shimmer]);
+
+  const animatedStyle = useAnimatedStyle(() => ({
+    opacity: interpolate(shimmer.value, [0, 0.5, 1], [0.3, 0.7, 0.3]),
+  }));
+
   return (
-    <View
+    <Animated.View
       style={[
-        styles.skeletonBox,
-        {
-          width,
-          height,
-          borderRadius,
-          backgroundColor: skeletonColor,
-        },
+        styles.skeleton,
+        { width, height, borderRadius, backgroundColor },
+        animatedStyle,
         style,
       ]}
-    >
-      <ShimmerOverlay />
-    </View>
+    />
   );
 }
 
-/** Card skeleton */
-function CardSkeleton({ count = 1 }: { count?: number }) {
-  const { width, height } = ComponentTokens.mediaCard.medium;
+/** Skeleton for detail page header */
+export function DetailHeaderSkeleton() {
+  const backgroundColor = useThemeColor({}, 'background');
   
   return (
-    <View style={styles.cardContainer}>
-      {Array.from({ length: count }).map((_, index) => (
-        <View key={index} style={styles.cardItem}>
-          <SkeletonBox width={width} height={height} borderRadius={BorderRadius.lg} />
-        </View>
-      ))}
+    <View style={[styles.headerContainer, { backgroundColor }]}>
+      <Skeleton width="100%" height={400} borderRadius={0} />
+      <View style={styles.headerContent}>
+        <Skeleton width={80} height={28} style={styles.badge} />
+        <Skeleton width="70%" height={32} style={styles.title} />
+        <Skeleton width="50%" height={20} style={styles.subtitle} />
+      </View>
     </View>
   );
 }
 
-/** Hero skeleton */
-function HeroSkeleton() {
-  const height = ComponentTokens.heroCarousel.height;
+/** Skeleton for quick actions bar */
+export function QuickActionsSkeleton() {
+  return (
+    <View style={styles.actionsContainer}>
+      <Skeleton width={100} height={44} />
+      <Skeleton width={100} height={44} />
+      <Skeleton width={100} height={44} />
+    </View>
+  );
+}
+
+/** Skeleton for content section */
+export function ContentSkeleton() {
+  return (
+    <View style={styles.contentContainer}>
+      <Skeleton width={120} height={24} style={styles.sectionTitle} />
+      <Skeleton width="100%" height={60} />
+      <Skeleton width="90%" height={20} style={styles.line} />
+      <Skeleton width="80%" height={20} style={styles.line} />
+    </View>
+  );
+}
+
+/** Skeleton for horizontal carousel */
+export function CarouselSkeleton({ itemCount = 5 }: { itemCount?: number }) {
+  return (
+    <View style={styles.carouselContainer}>
+      <Skeleton width={100} height={24} style={styles.sectionTitle} />
+      <View style={styles.carouselItems}>
+        {Array.from({ length: itemCount }).map((_, i) => (
+          <Skeleton key={i} width={100} height={150} />
+        ))}
+      </View>
+    </View>
+  );
+}
+
+/** Full page skeleton for detail screens */
+export function DetailPageSkeleton() {
+  const backgroundColor = useThemeColor({}, 'background');
   
   return (
-    <View style={styles.heroContainer}>
-      <SkeletonBox width="100%" height={height} borderRadius={0} />
-      <View style={styles.heroContent}>
-        <SkeletonBox width={60} height={24} borderRadius={BorderRadius.sm} />
-        <SkeletonBox width="70%" height={32} borderRadius={BorderRadius.sm} style={styles.heroTitle} />
-        <SkeletonBox width="90%" height={16} borderRadius={BorderRadius.sm} style={styles.heroLine} />
-        <SkeletonBox width="60%" height={16} borderRadius={BorderRadius.sm} style={styles.heroLine} />
-      </View>
-    </View>
-  );
-}
-
-/** Row skeleton (title + horizontal cards) */
-function RowSkeleton({ count = 4 }: { count?: number }) {
-  return (
-    <View style={styles.rowContainer}>
-      {/* Title skeleton */}
-      <View style={styles.rowHeader}>
-        <SkeletonBox width={150} height={24} borderRadius={BorderRadius.sm} />
-        <SkeletonBox width={60} height={20} borderRadius={BorderRadius.sm} />
-      </View>
-      {/* Cards skeleton */}
-      <CardSkeleton count={count} />
-    </View>
-  );
-}
-
-/** Detail page skeleton */
-function DetailSkeleton() {
-  return (
-    <View style={styles.detailContainer}>
-      {/* Hero image */}
-      <SkeletonBox width="100%" height={300} borderRadius={0} />
-      
-      {/* Content */}
-      <View style={styles.detailContent}>
-        {/* Title */}
-        <SkeletonBox width="80%" height={32} borderRadius={BorderRadius.sm} />
-        
-        {/* Meta info */}
-        <View style={styles.detailMeta}>
-          <SkeletonBox width={80} height={20} borderRadius={BorderRadius.sm} />
-          <SkeletonBox width={60} height={20} borderRadius={BorderRadius.sm} />
-          <SkeletonBox width={100} height={20} borderRadius={BorderRadius.sm} />
-        </View>
-        
-        {/* Synopsis */}
-        <View style={styles.detailSynopsis}>
-          <SkeletonBox width="100%" height={16} borderRadius={BorderRadius.sm} />
-          <SkeletonBox width="100%" height={16} borderRadius={BorderRadius.sm} style={styles.synopsisLine} />
-          <SkeletonBox width="70%" height={16} borderRadius={BorderRadius.sm} style={styles.synopsisLine} />
-        </View>
-        
-        {/* Cast section */}
-        <SkeletonBox width={100} height={24} borderRadius={BorderRadius.sm} style={styles.sectionTitle} />
-        <View style={styles.castContainer}>
-          {Array.from({ length: 5 }).map((_, index) => (
-            <View key={index} style={styles.castItem}>
-              <SkeletonBox width={60} height={60} borderRadius={30} />
-              <SkeletonBox width={60} height={12} borderRadius={BorderRadius.sm} style={styles.castName} />
-            </View>
-          ))}
-        </View>
-        
-        {/* Providers section */}
-        <SkeletonBox width={150} height={24} borderRadius={BorderRadius.sm} style={styles.sectionTitle} />
-        <View style={styles.providersContainer}>
-          {Array.from({ length: 3 }).map((_, index) => (
-            <SkeletonBox key={index} width={50} height={50} borderRadius={BorderRadius.md} />
-          ))}
-        </View>
-      </View>
-    </View>
-  );
-}
-
-export function Skeleton({ variant, count = 1, testID }: SkeletonProps) {
-  return (
-    <View testID={testID} accessibilityLabel="Loading content">
-      {variant === 'card' && <CardSkeleton count={count} />}
-      {variant === 'hero' && <HeroSkeleton />}
-      {variant === 'row' && <RowSkeleton count={count} />}
-      {variant === 'detail' && <DetailSkeleton />}
+    <View style={[styles.pageContainer, { backgroundColor }]}>
+      <DetailHeaderSkeleton />
+      <QuickActionsSkeleton />
+      <ContentSkeleton />
+      <CarouselSkeleton />
     </View>
   );
 }
 
 const styles = StyleSheet.create({
-  skeletonBox: {
+  skeleton: {
     overflow: 'hidden',
-    position: 'relative',
   },
-  shimmer: {
-    position: 'absolute',
-    top: 0,
-    left: 0,
-    right: 0,
-    bottom: 0,
-    width: '100%',
-    height: '100%',
-  },
-  shimmerGradient: {
-    width: DIMENSIONS.DEMO_IMAGE_SIZE,
-    height: '100%',
-    backgroundColor: OVERLAY_COLORS.WHITE_20,
-    transform: [{ skewX: '-20deg' }],
-  },
-  cardContainer: {
-    flexDirection: 'row',
-    paddingHorizontal: Spacing.md,
-    gap: Spacing.sm,
-  },
-  cardItem: {
-    marginRight: Spacing.sm,
-  },
-  heroContainer: {
-    position: 'relative',
-  },
-  heroContent: {
-    position: 'absolute',
-    bottom: Spacing.xl,
-    left: Spacing.lg,
-    right: Spacing.lg,
-  },
-  heroTitle: {
-    marginTop: Spacing.sm,
-  },
-  heroLine: {
-    marginTop: Spacing.xs,
-  },
-  rowContainer: {
-    marginVertical: Spacing.md,
-  },
-  rowHeader: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'center',
-    paddingHorizontal: Spacing.md,
-    marginBottom: Spacing.sm,
-  },
-  detailContainer: {
+  pageContainer: {
     flex: 1,
   },
-  detailContent: {
-    padding: Spacing.lg,
+  headerContainer: {
+    position: 'relative',
   },
-  detailMeta: {
+  headerContent: {
+    position: 'absolute',
+    bottom: 20,
+    left: 16,
+    right: 16,
+  },
+  badge: {
+    marginBottom: 8,
+  },
+  title: {
+    marginBottom: 8,
+  },
+  subtitle: {
+    marginBottom: 4,
+  },
+  actionsContainer: {
     flexDirection: 'row',
-    gap: Spacing.md,
-    marginTop: Spacing.md,
+    justifyContent: 'space-around',
+    paddingVertical: 16,
+    paddingHorizontal: 16,
+    gap: 12,
   },
-  detailSynopsis: {
-    marginTop: Spacing.lg,
-  },
-  synopsisLine: {
-    marginTop: Spacing.xs,
+  contentContainer: {
+    padding: 16,
   },
   sectionTitle: {
-    marginTop: Spacing.xl,
-    marginBottom: Spacing.md,
+    marginBottom: 12,
   },
-  castContainer: {
+  line: {
+    marginTop: 8,
+  },
+  carouselContainer: {
+    paddingVertical: 16,
+    paddingLeft: 16,
+  },
+  carouselItems: {
     flexDirection: 'row',
-    gap: Spacing.md,
-  },
-  castItem: {
-    alignItems: 'center',
-  },
-  castName: {
-    marginTop: Spacing.xs,
-  },
-  providersContainer: {
-    flexDirection: 'row',
-    gap: Spacing.md,
+    gap: 12,
   },
 });
 
