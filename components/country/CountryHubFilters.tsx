@@ -1,13 +1,15 @@
 /**
  * Country Hub Filters Component
- * Provides filtering options for country content
+ * Provides filtering options for country content with enhanced UI
  * 
  * Requirements: 3.4, 3.5, 3.6
  */
 
 import { StyleSheet, View, ScrollView, Pressable, Text } from 'react-native';
+import { Ionicons } from '@expo/vector-icons';
 import { useThemeColor } from '@/hooks/use-theme-color';
 import { Colors, Spacing, Typography, BorderRadius } from '@/constants/theme';
+import { SOLID_COLORS } from '@/constants/colors';
 
 /** Content type filter options */
 export type ContentTypeFilter = 'all' | 'movie' | 'tv';
@@ -21,16 +23,16 @@ export interface CountryHubFiltersState {
 
 /** Genre options for filtering */
 const GENRE_OPTIONS = [
-  { id: null, name: 'All Genres' },
-  { id: 28, name: 'Action' },
-  { id: 35, name: 'Comedy' },
-  { id: 18, name: 'Drama' },
-  { id: 27, name: 'Horror' },
-  { id: 10749, name: 'Romance' },
-  { id: 878, name: 'Sci-Fi' },
-  { id: 53, name: 'Thriller' },
-  { id: 16, name: 'Animation' },
-  { id: 99, name: 'Documentary' },
+  { id: null, name: 'All Genres', icon: 'apps' as const },
+  { id: 28, name: 'Action', icon: 'flash' as const },
+  { id: 35, name: 'Comedy', icon: 'happy' as const },
+  { id: 18, name: 'Drama', icon: 'heart' as const },
+  { id: 27, name: 'Horror', icon: 'skull' as const },
+  { id: 10749, name: 'Romance', icon: 'heart-circle' as const },
+  { id: 878, name: 'Sci-Fi', icon: 'rocket' as const },
+  { id: 53, name: 'Thriller', icon: 'warning' as const },
+  { id: 16, name: 'Animation', icon: 'color-palette' as const },
+  { id: 99, name: 'Documentary', icon: 'videocam' as const },
 ];
 
 /** Year options for filtering */
@@ -44,21 +46,22 @@ const YEAR_OPTIONS = [
 ];
 
 /** Content type filter options */
-const CONTENT_TYPE_OPTIONS: { value: ContentTypeFilter; label: string }[] = [
-  { value: 'all', label: 'All' },
-  { value: 'movie', label: 'Movies' },
-  { value: 'tv', label: 'Series' },
+const CONTENT_TYPE_OPTIONS: { value: ContentTypeFilter; label: string; icon: keyof typeof Ionicons.glyphMap }[] = [
+  { value: 'all', label: 'All', icon: 'apps' },
+  { value: 'movie', label: 'Movies', icon: 'film' },
+  { value: 'tv', label: 'Series', icon: 'tv' },
 ];
 
 /** Props for filter chip component */
 interface FilterChipProps {
   label: string;
+  icon?: keyof typeof Ionicons.glyphMap;
   isSelected: boolean;
   onPress: () => void;
 }
 
-/** Filter chip component */
-function FilterChip({ label, isSelected, onPress }: FilterChipProps) {
+/** Enhanced filter chip component */
+function FilterChip({ label, icon, isSelected, onPress }: FilterChipProps) {
   const tintColor = useThemeColor({}, 'tint');
   const borderColor = useThemeColor({}, 'border');
   const textColor = useThemeColor({}, 'text');
@@ -75,21 +78,46 @@ function FilterChip({ label, isSelected, onPress }: FilterChipProps) {
         {
           backgroundColor: isSelected ? tintColor : backgroundColor,
           borderColor: isSelected ? tintColor : borderColor,
-          opacity: pressed ? 0.8 : 1,
+          transform: [{ scale: pressed ? 0.95 : 1 }],
         },
       ]}
     >
+      {icon ? (
+        <Ionicons
+          name={icon}
+          size={16}
+          color={isSelected ? SOLID_COLORS.WHITE : textColor}
+        />
+      ) : null}
       <Text
         style={[
           styles.filterChipText,
           {
-            color: isSelected ? Colors.light.background : textColor,
+            color: isSelected ? SOLID_COLORS.WHITE : textColor,
           },
         ]}
       >
         {label}
       </Text>
     </Pressable>
+  );
+}
+
+/** Filter section header */
+interface FilterSectionHeaderProps {
+  title: string;
+  icon: keyof typeof Ionicons.glyphMap;
+}
+
+function FilterSectionHeader({ title, icon }: FilterSectionHeaderProps) {
+  const textColor = useThemeColor({}, 'text');
+  const tintColor = useThemeColor({}, 'tint');
+
+  return (
+    <View style={styles.sectionHeader}>
+      <Ionicons name={icon} size={18} color={tintColor} />
+      <Text style={[styles.sectionTitle, { color: textColor }]}>{title}</Text>
+    </View>
   );
 }
 
@@ -100,6 +128,8 @@ interface CountryHubFiltersComponentProps {
 
 export function CountryHubFilters({ filters, onFiltersChange }: CountryHubFiltersComponentProps) {
   const backgroundColor = useThemeColor({}, 'background');
+  const cardBackground = useThemeColor({}, 'card');
+  const borderColor = useThemeColor({}, 'cardBorder');
 
   const handleContentTypeChange = (contentType: ContentTypeFilter) => {
     onFiltersChange({ ...filters, contentType });
@@ -114,9 +144,10 @@ export function CountryHubFilters({ filters, onFiltersChange }: CountryHubFilter
   };
 
   return (
-    <View style={[styles.container, { backgroundColor }]}>
+    <View style={[styles.container, { backgroundColor: cardBackground, borderColor }]}>
       {/* Content Type Filter */}
       <View style={styles.filterSection}>
+        <FilterSectionHeader title="Content Type" icon="layers" />
         <ScrollView
           horizontal
           showsHorizontalScrollIndicator={false}
@@ -126,6 +157,7 @@ export function CountryHubFilters({ filters, onFiltersChange }: CountryHubFilter
             <FilterChip
               key={option.value}
               label={option.label}
+              icon={option.icon}
               isSelected={filters.contentType === option.value}
               onPress={() => handleContentTypeChange(option.value)}
             />
@@ -135,6 +167,7 @@ export function CountryHubFilters({ filters, onFiltersChange }: CountryHubFilter
 
       {/* Genre Filter */}
       <View style={styles.filterSection}>
+        <FilterSectionHeader title="Genre" icon="library" />
         <ScrollView
           horizontal
           showsHorizontalScrollIndicator={false}
@@ -144,6 +177,7 @@ export function CountryHubFilters({ filters, onFiltersChange }: CountryHubFilter
             <FilterChip
               key={genre.id || 'all'}
               label={genre.name}
+              icon={genre.icon}
               isSelected={filters.genre === genre.id}
               onPress={() => handleGenreChange(genre.id)}
             />
@@ -153,6 +187,7 @@ export function CountryHubFilters({ filters, onFiltersChange }: CountryHubFilter
 
       {/* Year Filter */}
       <View style={styles.filterSection}>
+        <FilterSectionHeader title="Release Year" icon="calendar" />
         <ScrollView
           horizontal
           showsHorizontalScrollIndicator={false}
@@ -174,22 +209,38 @@ export function CountryHubFilters({ filters, onFiltersChange }: CountryHubFilter
 
 const styles = StyleSheet.create({
   container: {
-    paddingVertical: Spacing.sm,
+    marginHorizontal: Spacing.md,
+    marginVertical: Spacing.sm,
+    borderRadius: BorderRadius.lg,
+    borderWidth: 1,
+    paddingVertical: Spacing.md,
   },
   filterSection: {
-    marginBottom: Spacing.xs,
+    marginBottom: Spacing.md,
+  },
+  sectionHeader: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: Spacing.xs,
+    paddingHorizontal: Spacing.md,
+    marginBottom: Spacing.sm,
+  },
+  sectionTitle: {
+    fontSize: Typography.sizes.sm,
+    fontWeight: Typography.weights.bold,
   },
   filterRow: {
     paddingHorizontal: Spacing.md,
-    gap: Spacing.xs,
+    gap: Spacing.sm,
   },
   filterChip: {
-    paddingHorizontal: Spacing.sm,
-    paddingVertical: Spacing.xs,
+    flexDirection: 'row',
+    alignItems: 'center',
+    paddingHorizontal: Spacing.md,
+    paddingVertical: Spacing.sm,
     borderRadius: BorderRadius.full,
     borderWidth: 1,
-    minWidth: 60,
-    alignItems: 'center',
+    gap: Spacing.xs,
   },
   filterChipText: {
     fontSize: Typography.sizes.sm,

@@ -204,6 +204,7 @@ export const Spacing = {
 // ============================================================================
 
 export const BorderRadius = {
+  xs: 1,
   sm: 4,
   md: 8,
   lg: 12,

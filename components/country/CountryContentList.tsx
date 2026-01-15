@@ -1,6 +1,6 @@
 /**
  * Country Content List Component
- * Displays ranked content list with infinite scroll
+ * Displays ranked content list with infinite scroll and enhanced UI
  * 
  * Requirements: 3.1, 3.2, 3.3, 17.2
  */
@@ -17,6 +17,8 @@ import {
 } from 'react-native';
 import { router } from 'expo-router';
 import { Image } from 'expo-image';
+import { LinearGradient } from 'expo-linear-gradient';
+import { Ionicons } from '@expo/vector-icons';
 import { useThemeColor } from '@/hooks/use-theme-color';
 import { useEffectiveColorScheme } from '@/hooks/use-effective-color-scheme';
 import { IconSymbol } from '@/components/ui/icon-symbol';
@@ -24,9 +26,9 @@ import { Skeleton } from '@/components/ui/Skeleton';
 import { ErrorState } from '@/components/ui/ErrorState';
 import { EmptyState } from '@/components/ui/EmptyState';
 import { Colors, Spacing, Typography, BorderRadius } from '@/constants/theme';
-import { SOLID_COLORS } from '@/constants/colors';
+import { SOLID_COLORS, OVERLAY_COLORS } from '@/constants/colors';
 import { COMPONENT_TEST_IDS } from '@/constants/test-ids';
-import { DIMENSIONS } from '@/constants/layout';
+import { BLURHASH_PLACEHOLDER } from '@/constants/images';
 import { getImageUrl } from '@/services/api';
 import type { TrendingItem } from '@/types/media';
 
@@ -53,10 +55,11 @@ interface ContentItemProps {
 }
 
 function ContentItem({ item, index }: ContentItemProps) {
-  const colorScheme = useEffectiveColorScheme();
   const textColor = useThemeColor({}, 'text');
-  const backgroundColor = useThemeColor({}, 'backgroundSecondary');
-  const borderColor = useThemeColor({}, 'border');
+  const textSecondary = useThemeColor({}, 'textSecondary');
+  const cardBackground = useThemeColor({}, 'card');
+  const borderColor = useThemeColor({}, 'cardBorder');
+  const tintColor = useThemeColor({}, 'tint');
 
   const handlePress = useCallback(() => {
     const route = item.mediaType === 'movie' ? '/movie/[id]' : '/web-series/[id]';
@@ -67,38 +70,77 @@ function ContentItem({ item, index }: ContentItemProps) {
   }, [item.id, item.mediaType]);
 
   const posterUrl = getImageUrl(item.posterPath, 'w342');
-  const imageSource = posterUrl ? { uri: posterUrl } : PLACEHOLDER_IMAGE;
+  const year = item.releaseDate ? new Date(item.releaseDate).getFullYear() : null;
+  const hasRating = item.voteAverage && item.voteAverage > 0;
+
+  // Get rank badge color based on position
+  const getRankBadgeColor = (rank: number) => {
+    if (rank === 1) return '#FFD700'; // Gold
+    if (rank === 2) return '#C0C0C0'; // Silver
+    if (rank === 3) return '#CD7F32'; // Bronze
+    return tintColor;
+  };
 
   return (
     <Pressable
       onPress={handlePress}
       accessibilityRole="button"
-      accessibilityLabel={`View details for ${item.title}`}
+      accessibilityLabel={`View details for ${item.title}, ranked #${item.rank}`}
       testID={`country-hub-content-item-${item.id}`}
       style={({ pressed }) => [
         styles.contentItem,
         {
-          backgroundColor,
+          backgroundColor: cardBackground,
           borderColor,
-          opacity: pressed ? 0.8 : 1,
+          transform: [{ scale: pressed ? 0.98 : 1 }],
         },
       ]}
     >
       {/* Rank Badge */}
-      <View style={[styles.rankBadge, { backgroundColor: Colors.light.tint }]}>
-        <Text style={[styles.rankText, { color: Colors.light.background }]}>
-          #{item.rank}
-        </Text>
+      <View style={[styles.rankBadge, { backgroundColor: getRankBadgeColor(item.rank) }]}>
+        <Text style={styles.rankText}>#{item.rank}</Text>
       </View>
 
-      {/* Poster */}
-      <Image
-        source={imageSource}
-        style={styles.poster}
-        contentFit="cover"
-        transition={200}
-        placeholder={colorScheme === 'dark' ? Colors.dark.backgroundSecondary : Colors.light.backgroundSecondary}
-      />
+      {/* Poster Container */}
+      <View style={styles.posterContainer}>
+        {posterUrl ? (
+          <Image
+            source={posterUrl === 'placeholder' ? PLACEHOLDER_IMAGE : { uri: posterUrl }}
+            style={styles.poster}
+            contentFit="cover"
+            transition={200}
+            placeholder={{ blurhash: BLURHASH_PLACEHOLDER }}
+            cachePolicy="memory-disk"
+          />
+        ) : (
+          <View style={[styles.posterPlaceholder, { backgroundColor: borderColor }]}>
+            <Ionicons 
+              name={item.mediaType === 'movie' ? 'film-outline' : 'tv-outline'} 
+              size={32} 
+              color={textSecondary} 
+            />
+          </View>
+        )}
+
+        {/* Media Type Badge */}
+        <View style={[styles.typeBadge, { backgroundColor: tintColor }]}>
+          <Ionicons
+            name={item.mediaType === 'movie' ? 'film' : 'tv'}
+            size={12}
+            color={SOLID_COLORS.WHITE}
+          />
+        </View>
+
+        {/* Rating Badge */}
+        {hasRating ? (
+          <View style={styles.ratingBadge}>
+            <Ionicons name="star" size={10} color={SOLID_COLORS.GOLD} />
+            <Text style={styles.ratingBadgeText}>
+              {item.voteAverage?.toFixed(1)}
+            </Text>
+          </View>
+        ) : null}
+      </View>
 
       {/* Content Info */}
       <View style={styles.contentInfo}>
@@ -109,38 +151,40 @@ function ContentItem({ item, index }: ContentItemProps) {
           {item.title}
         </Text>
         
-        <View style={styles.metadata}>
-          <View style={styles.typeContainer}>
-            <IconSymbol
-              name={item.mediaType === 'movie' ? 'film' : 'tv'}
-              size={14}
-              color={textColor}
-              style={{ opacity: 0.7 }}
-            />
-            <Text style={[styles.typeText, { color: textColor, opacity: 0.7 }]}>
-              {item.mediaType === 'movie' ? 'Movie' : 'Series'}
-            </Text>
-          </View>
+        {/* Metadata Row */}
+        <View style={styles.metadataRow}>
+          {year ? (
+            <View style={styles.metaItem}>
+              <Ionicons name="calendar-outline" size={12} color={textSecondary} />
+              <Text style={[styles.metaText, { color: textSecondary }]}>{year}</Text>
+            </View>
+          ) : null}
           
-          {item.releaseDate && (
-            <Text style={[styles.yearText, { color: textColor, opacity: 0.7 }]}>
-              {new Date(item.releaseDate).getFullYear()}
-            </Text>
-          )}
+          {item.voteCount > 0 ? (
+            <View style={styles.metaItem}>
+              <Ionicons name="people-outline" size={12} color={textSecondary} />
+              <Text style={[styles.metaText, { color: textSecondary }]}>
+                {item.voteCount.toLocaleString()} votes
+              </Text>
+            </View>
+          ) : null}
         </View>
 
-        {item.voteAverage && (
-          <View style={styles.ratingContainer}>
-            <IconSymbol
-              name="star.fill"
-              size={14}
-              color={SOLID_COLORS.GOLD}
-            />
-            <Text style={[styles.ratingText, { color: textColor }]}>
-              {item.voteAverage.toFixed(1)}
-            </Text>
-          </View>
-        )}
+        {/* Overview */}
+        {item.overview ? (
+          <Text
+            style={[styles.overview, { color: textSecondary }]}
+            numberOfLines={3}
+          >
+            {item.overview}
+          </Text>
+        ) : null}
+
+        {/* Action Row */}
+        <View style={styles.actionRow}>
+          <Text style={[styles.actionText, { color: tintColor }]}>View Details</Text>
+          <Ionicons name="chevron-forward" size={14} color={tintColor} />
+        </View>
       </View>
     </Pressable>
   );
@@ -148,16 +192,24 @@ function ContentItem({ item, index }: ContentItemProps) {
 
 /** Loading skeleton component */
 function LoadingSkeleton() {
+  const cardBackground = useThemeColor({}, 'card');
+  const borderColor = useThemeColor({}, 'cardBorder');
+  
   return (
     <View style={styles.skeletonContainer}>
       {Array.from({ length: 6 }).map((_, index) => (
-        <View key={index} style={styles.skeletonItem}>
-          <Skeleton width={24} height={24} style={styles.skeletonRank} />
-          <Skeleton width={80} height={120} style={styles.skeletonPoster} />
+        <View 
+          key={index} 
+          style={[styles.skeletonItem, { backgroundColor: cardBackground, borderColor }]}
+        >
+          <Skeleton width={28} height={28} borderRadius={14} style={styles.skeletonRank} />
+          <Skeleton width={100} height={150} borderRadius={BorderRadius.md} />
           <View style={styles.skeletonContent}>
-            <Skeleton width="80%" height={16} style={{ marginBottom: 8 }} />
-            <Skeleton width="60%" height={14} style={{ marginBottom: 4 }} />
-            <Skeleton width="40%" height={14} />
+            <Skeleton width={180} height={18} style={{ marginBottom: 8 }} />
+            <Skeleton width={120} height={14} style={{ marginBottom: 12 }} />
+            <Skeleton width={200} height={12} style={{ marginBottom: 4 }} />
+            <Skeleton width={180} height={12} style={{ marginBottom: 4 }} />
+            <Skeleton width={100} height={14} />
           </View>
         </View>
       ))}
@@ -167,9 +219,14 @@ function LoadingSkeleton() {
 
 /** Footer loading component */
 function FooterLoading() {
+  const tintColor = useThemeColor({}, 'tint');
+  
   return (
     <View style={styles.footerLoading}>
-      <Skeleton width={60} height={20} />
+      <View style={styles.loadingRow}>
+        <Ionicons name="refresh" size={16} color={tintColor} />
+        <Text style={[styles.loadingText, { color: tintColor }]}>Loading more...</Text>
+      </View>
     </View>
   );
 }
@@ -187,6 +244,7 @@ export function CountryContentList({
   onRetry,
 }: CountryContentListProps) {
   const backgroundColor = useThemeColor({}, 'background');
+  const tintColor = useThemeColor({}, 'tint');
 
   const renderItem: ListRenderItem<TrendingItem> = useCallback(
     ({ item, index }) => <ContentItem item={item} index={index} />,
@@ -225,7 +283,7 @@ export function CountryContentList({
       <EmptyState
         title="No content found"
         message="Try adjusting your filters or check back later"
-        iconName="film"
+        icon="film"
       />
     );
   }
@@ -241,7 +299,7 @@ export function CountryContentList({
         <RefreshControl
           refreshing={isRefreshing}
           onRefresh={onRefresh}
-          tintColor={Colors.light.tint}
+          tintColor={tintColor}
         />
       }
       onEndReached={handleEndReached}
@@ -259,99 +317,145 @@ export function CountryContentList({
 const styles = StyleSheet.create({
   listContainer: {
     padding: Spacing.md,
-    gap: Spacing.sm,
+    gap: Spacing.md,
   },
   contentItem: {
     flexDirection: 'row',
-    padding: Spacing.sm,
-    borderRadius: BorderRadius.md,
+    padding: Spacing.md,
+    borderRadius: BorderRadius.lg,
     borderWidth: 1,
     position: 'relative',
+    gap: Spacing.md,
   },
   rankBadge: {
     position: 'absolute',
-    top: -8,
-    left: -8,
-    width: DIMENSIONS.RANK_BADGE_SIZE,
-    height: DIMENSIONS.RANK_BADGE_SIZE,
-    borderRadius: DIMENSIONS.RANK_BADGE_SIZE / 2,
+    top: -10,
+    left: -10,
+    width: 28,
+    height: 28,
+    borderRadius: 14,
     justifyContent: 'center',
     alignItems: 'center',
     zIndex: 1,
   },
   rankText: {
+    color: SOLID_COLORS.WHITE,
     fontSize: Typography.sizes.xs,
     fontWeight: Typography.weights.bold,
   },
+  posterContainer: {
+    width: 100,
+    height: 150,
+    borderRadius: BorderRadius.md,
+    overflow: 'hidden',
+    position: 'relative',
+  },
   poster: {
-    width: DIMENSIONS.POSTER_CARD_WIDTH,
-    height: DIMENSIONS.POSTER_CARD_HEIGHT,
+    width: '100%',
+    height: '100%',
+  },
+  posterPlaceholder: {
+    width: '100%',
+    height: '100%',
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  typeBadge: {
+    position: 'absolute',
+    bottom: Spacing.xs,
+    left: Spacing.xs,
+    paddingHorizontal: 6,
+    paddingVertical: 2,
     borderRadius: BorderRadius.sm,
-    marginRight: Spacing.sm,
+  },
+  ratingBadge: {
+    position: 'absolute',
+    top: Spacing.xs,
+    right: Spacing.xs,
+    flexDirection: 'row',
+    alignItems: 'center',
+    backgroundColor: OVERLAY_COLORS.BLACK_70,
+    paddingHorizontal: 6,
+    paddingVertical: 2,
+    borderRadius: BorderRadius.sm,
+    gap: 2,
+  },
+  ratingBadgeText: {
+    color: SOLID_COLORS.WHITE,
+    fontSize: 11,
+    fontWeight: Typography.weights.bold,
   },
   contentInfo: {
     flex: 1,
     justifyContent: 'space-between',
+    paddingVertical: Spacing.xs,
   },
   title: {
     fontSize: Typography.sizes.md,
+    fontWeight: Typography.weights.bold,
+    lineHeight: Typography.sizes.md * 1.3,
+    marginBottom: Spacing.xs,
+  },
+  metadataRow: {
+    flexDirection: 'row',
+    gap: Spacing.md,
+    marginBottom: Spacing.sm,
+  },
+  metaItem: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 4,
+  },
+  metaText: {
+    fontSize: Typography.sizes.xs,
+  },
+  overview: {
+    fontSize: Typography.sizes.sm,
+    lineHeight: Typography.sizes.sm * 1.5,
+    flex: 1,
+  },
+  actionRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 4,
+    marginTop: Spacing.sm,
+  },
+  actionText: {
+    fontSize: Typography.sizes.sm,
     fontWeight: Typography.weights.semibold,
-    lineHeight: Typography.lineHeights.tight,
-    marginBottom: Spacing.xs,
-  },
-  metadata: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'center',
-    marginBottom: Spacing.xs,
-  },
-  typeContainer: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    gap: 4,
-  },
-  typeText: {
-    fontSize: Typography.sizes.sm,
-    fontWeight: Typography.weights.medium,
-  },
-  yearText: {
-    fontSize: Typography.sizes.sm,
-    fontWeight: Typography.weights.medium,
-  },
-  ratingContainer: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    gap: 4,
-  },
-  ratingText: {
-    fontSize: Typography.sizes.sm,
-    fontWeight: Typography.weights.medium,
   },
   skeletonContainer: {
     padding: Spacing.md,
-    gap: Spacing.sm,
+    gap: Spacing.md,
   },
   skeletonItem: {
     flexDirection: 'row',
-    padding: Spacing.sm,
+    padding: Spacing.md,
+    borderRadius: BorderRadius.lg,
+    borderWidth: 1,
     position: 'relative',
+    gap: Spacing.md,
   },
   skeletonRank: {
     position: 'absolute',
     top: 4,
     left: 4,
-    borderRadius: 12,
-  },
-  skeletonPoster: {
-    borderRadius: BorderRadius.sm,
-    marginRight: Spacing.sm,
   },
   skeletonContent: {
     flex: 1,
     justifyContent: 'center',
   },
   footerLoading: {
-    padding: Spacing.md,
+    padding: Spacing.lg,
     alignItems: 'center',
+  },
+  loadingRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: Spacing.xs,
+  },
+  loadingText: {
+    fontSize: Typography.sizes.sm,
+    fontWeight: Typography.weights.medium,
   },
 });
