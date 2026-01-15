@@ -79,6 +79,9 @@ function CountryCard({ country, onPress, colors, isDark }: CountryCardProps) {
         end={{ x: 1, y: 1 }}
         style={styles.cardGradient}
       >
+        {/* Overlay for better text contrast */}
+        <View style={[styles.overlay, { backgroundColor: isDark ? 'rgba(0, 0, 0, 0.25)' : 'rgba(255, 255, 255, 0.15)' }]} />
+        
         {/* Flag and Icon Row */}
         <View style={styles.cardHeader}>
           <Text style={styles.countryFlag} accessibilityLabel={`${country.name} flag`}>
@@ -264,6 +267,10 @@ const styles = StyleSheet.create({
   cardGradient: {
     padding: Spacing.md,
     minHeight: 160,
+    position: 'relative',
+  },
+  overlay: {
+    ...StyleSheet.absoluteFillObject,
   },
   cardHeader: {
     flexDirection: 'row',
@@ -289,9 +296,15 @@ const styles = StyleSheet.create({
     fontSize: Typography.sizes.md,
     fontWeight: Typography.weights.bold,
     marginBottom: 2,
+    textShadowColor: 'rgba(255, 255, 255, 0.5)',
+    textShadowOffset: { width: 0, height: 1 },
+    textShadowRadius: 3,
   },
   countryRegion: {
     fontSize: Typography.sizes.xs,
+    textShadowColor: 'rgba(255, 255, 255, 0.5)',
+    textShadowOffset: { width: 0, height: 1 },
+    textShadowRadius: 3,
   },
   cardFooter: {
     flexDirection: 'row',
@@ -309,6 +322,9 @@ const styles = StyleSheet.create({
   },
   countText: {
     fontSize: Typography.sizes.xs,
+    textShadowColor: 'rgba(255, 255, 255, 0.5)',
+    textShadowOffset: { width: 0, height: 1 },
+    textShadowRadius: 3,
   },
   bottomSpacer: {
     height: Spacing.xl,
