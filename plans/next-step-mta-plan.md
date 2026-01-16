@@ -439,7 +439,7 @@ Failed to resolve the Android SDK path. Default install location not found: /Use
 - ./app/tv/ - update to webs-series, update all the related files and folders 
 - When i click on any season i want a season detail page. Eg: when i click on season 2 it should open a season 2 detail pages related to the webseries. Upadate such that this open page is persistent whe we refresh the pages
 
-- [] Add a episode detail page that works when we click on any one episode from a season in web-series. This should be persistent when we refresh this page.
+- [x] Add a episode detail page that works when we click on any one episode from a season in web-series. This should be persistent when we refresh this page.
 
 - []
 - []
