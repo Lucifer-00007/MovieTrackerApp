@@ -5,10 +5,10 @@
 
 /** Base API URLs */
 export const API_BASE_URLS = {
-  TMDB: 'https://api.themoviedb.org/3',
-  OMDB: 'https://www.omdbapi.com',
-  CLOUDFLARE: 'https://movie-api-worker.cloud-worker-api.workers.dev',
-  ANALYTICS: 'https://api.moviestream.app/analytics',
+  TMDB: process.env.EXPO_PUBLIC_TMDB_API_URL || 'https://api.themoviedb.org/3',
+  OMDB: process.env.EXPO_PUBLIC_OMDB_API_URL || 'https://www.omdbapi.com',
+  CLOUDFLARE: process.env.EXPO_PUBLIC_CLOUDFLARE_API_URL || 'https://movie-api-worker.cloud-worker-api.workers.dev',
+  ANALYTICS: process.env.EXPO_PUBLIC_ANALYTICS_API_URL || 'https://api.moviestream.app/analytics',
   TMDB_IMAGES: 'https://image.tmdb.org/t/p',
 } as const;
 
