@@ -7,7 +7,7 @@
 export const API_BASE_URLS = {
   TMDB: 'https://api.themoviedb.org/3',
   OMDB: 'https://www.omdbapi.com',
-  CLOUDFLARE: 'https://movie-api-worker.movie-tracker-api.workers.dev',
+  CLOUDFLARE: 'https://movie-api-worker.cloud-worker-api.workers.dev',
   ANALYTICS: 'https://api.moviestream.app/analytics',
   TMDB_IMAGES: 'https://image.tmdb.org/t/p',
 } as const;
@@ -35,9 +35,9 @@ export const API_HEADERS = {
 } as const;
 
 /** YouTube embed URL template */
-export const YOUTUBE_EMBED_URL = (videoKey: string) => 
+export const YOUTUBE_EMBED_URL = (videoKey: string) =>
   `https://www.youtube.com/embed/${videoKey}?autoplay=1&controls=1&showinfo=0&rel=0&iv_load_policy=3&modestbranding=1`;
 
 /** TMDB image URL template */
-export const TMDB_IMAGE_URL = (size: string, path: string) => 
+export const TMDB_IMAGE_URL = (size: string, path: string) =>
   `${API_BASE_URLS.TMDB_IMAGES}/${size}${path}`;
